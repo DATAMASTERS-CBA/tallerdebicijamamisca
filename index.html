@@ -1,0 +1,2579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo</title>
+  <!-- Bootstrap 5 + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    /* --- ESTILOS BASE (sin cambios) --- */
+    body {
+      background: #f8f9fa;
+      transition: background 0.3s, color 0.3s;
+    }
+    .logo-img {
+      max-height: 60px;
+      transition: all 0.3s;
+      margin-right: 8px;
+    }
+    .product-card {
+      transition: transform 0.2s;
+    }
+    .product-card:hover {
+      transform: scale(1.02);
+    }
+    .admin-section {
+      display: none;
+    }
+    .foto-preview {
+      max-width: 100px;
+      max-height: 100px;
+      object-fit: cover;
+    }
+    .stock-badge {
+      font-size: 0.9rem;
+    }
+    .sin-stock {
+      background-color: #f8d7da;
+    }
+    .consignacion {
+      background-color: #fff3cd;
+    }
+    .pointer {
+      cursor: pointer;
+    }
+    .alinear-izquierda {
+      text-align: left;
+    }
+    .alinear-centro {
+      text-align: center;
+    }
+    .alinear-derecha {
+      text-align: right;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .logo-container.alinear-izquierda {
+      justify-content: flex-start;
+    }
+    .logo-container.alinear-centro {
+      justify-content: center;
+    }
+    .logo-container.alinear-derecha {
+      justify-content: flex-end;
+    }
+    .tab-content {
+      padding-top: 20px;
+    }
+
+    /* Estilos para el autocompletado */
+    .suggestions-container {
+      position: relative;
+    }
+    .suggestions-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+    .suggestions-list .suggestion-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .suggestions-list .suggestion-item:hover {
+      background-color: #e9f5e9;
+    }
+    .suggestions-list .suggestion-item .suggestion-name {
+      font-weight: 500;
+    }
+    .suggestions-list .suggestion-item .suggestion-price {
+      color: #e65100;
+      font-weight: 700;
+    }
+
+    /* --- TEMAS (se aplican dinámicamente) --- */
+    .tema-default {
+      --navbar-bg: #0d6efd;
+      --navbar-color: #fff;
+      --btn-primary-bg: #0d6efd;
+      --btn-primary-border: #0d6efd;
+      --body-bg: #f8f9fa;
+      --card-bg: #fff;
+      --text-color: #212529;
+      --table-stripe: #f2f2f2;
+      --badge-bg: #6c757d;
+      --badge-color: #fff;
+      --modal-bg: #fff;
+      --input-bg: #fff;
+      --input-border: #ced4da;
+    }
+    .tema-android {
+      --navbar-bg: #3ddc84;
+      --navbar-color: #000;
+      --btn-primary-bg: #3ddc84;
+      --btn-primary-border: #3ddc84;
+      --body-bg: #e8f5e9;
+      --card-bg: #fff;
+      --text-color: #1b1b1b;
+      --table-stripe: #dcedc8;
+      --badge-bg: #2e7d32;
+      --badge-color: #fff;
+      --modal-bg: #fff;
+      --input-bg: #fff;
+      --input-border: #a5d6a7;
+    }
+    .tema-windows {
+      --navbar-bg: #0078d4;
+      --navbar-color: #fff;
+      --btn-primary-bg: #0078d4;
+      --btn-primary-border: #0078d4;
+      --body-bg: #f0f0f0;
+      --card-bg: #fff;
+      --text-color: #000;
+      --table-stripe: #e0e0e0;
+      --badge-bg: #005a9e;
+      --badge-color: #fff;
+      --modal-bg: #fff;
+      --input-bg: #fff;
+      --input-border: #b0b0b0;
+    }
+    .tema-mac {
+      --navbar-bg: #2c2c2e;
+      --navbar-color: #fff;
+      --btn-primary-bg: #007aff;
+      --btn-primary-border: #007aff;
+      --body-bg: #ececec;
+      --card-bg: #fff;
+      --text-color: #1c1c1e;
+      --table-stripe: #dcdcdc;
+      --badge-bg: #007aff;
+      --badge-color: #fff;
+      --modal-bg: #fff;
+      --input-bg: #fff;
+      --input-border: #c0c0c0;
+    }
+    .tema-videojuego {
+      --navbar-bg: #1a1a2e;
+      --navbar-color: #e94560;
+      --btn-primary-bg: #e94560;
+      --btn-primary-border: #e94560;
+      --body-bg: #16213e;
+      --card-bg: #1a1a2e;
+      --text-color: #e0e0e0;
+      --table-stripe: #2a2a4a;
+      --badge-bg: #e94560;
+      --badge-color: #fff;
+      --modal-bg: #1a1a2e;
+      --input-bg: #2a2a4a;
+      --input-border: #4a4a6a;
+    }
+    .tema-verde {
+      --navbar-bg: #2e7d32;
+      --navbar-color: #fff;
+      --btn-primary-bg: #388e3c;
+      --btn-primary-border: #388e3c;
+      --body-bg: #e8f5e9;
+      --card-bg: #fff;
+      --text-color: #1b5e20;
+      --table-stripe: #c8e6c9;
+      --badge-bg: #2e7d32;
+      --badge-color: #fff;
+      --modal-bg: #fff;
+      --input-bg: #fff;
+      --input-border: #81c784;
+    }
+    .tema-amarillo {
+      --navbar-bg: #f9a825;
+      --navbar-color: #000;
+      --btn-primary-bg: #fbc02d;
+      --btn-primary-border: #fbc02d;
+      --body-bg: #fff8e1;
+      --card-bg: #fff;
+      --text-color: #3e2723;
+      --table-stripe: #ffecb3;
+      --badge-bg: #f57f17;
+      --badge-color: #fff;
+      --modal-bg: #fff;
+      --input-bg: #fff;
+      --input-border: #ffd54f;
+    }
+    .tema-argentina {
+      --navbar-bg: #75aadb;
+      --navbar-color: #fff;
+      --btn-primary-bg: #75aadb;
+      --btn-primary-border: #75aadb;
+      --body-bg: #f5f5f5;
+      --card-bg: #fff;
+      --text-color: #212529;
+      --table-stripe: #e3ecf5;
+      --badge-bg: #75aadb;
+      --badge-color: #fff;
+      --modal-bg: #fff;
+      --input-bg: #fff;
+      --input-border: #b0c4de;
+    }
+    .tema-azul {
+      --navbar-bg: #1565c0;
+      --navbar-color: #fff;
+      --btn-primary-bg: #1976d2;
+      --btn-primary-border: #1976d2;
+      --body-bg: #e3f2fd;
+      --card-bg: #fff;
+      --text-color: #0d47a1;
+      --table-stripe: #bbdefb;
+      --badge-bg: #1565c0;
+      --badge-color: #fff;
+      --modal-bg: #fff;
+      --input-bg: #fff;
+      --input-border: #64b5f6;
+    }
+    .tema-oscuro {
+      --navbar-bg: #212529;
+      --navbar-color: #f8f9fa;
+      --btn-primary-bg: #495057;
+      --btn-primary-border: #495057;
+      --body-bg: #121212;
+      --card-bg: #2c2c2c;
+      --text-color: #e0e0e0;
+      --table-stripe: #3a3a3a;
+      --badge-bg: #6c757d;
+      --badge-color: #fff;
+      --modal-bg: #2c2c2c;
+      --input-bg: #3a3a3a;
+      --input-border: #5a5a5a;
+    }
+
+    /* Aplicación de variables */
+    body {
+      background-color: var(--body-bg, #f8f9fa);
+      color: var(--text-color, #212529);
+    }
+    .navbar {
+      background-color: var(--navbar-bg, #0d6efd) !important;
+    }
+    .navbar .navbar-brand,
+    .navbar .nav-link,
+    .navbar .contacto-info a,
+    .navbar .contacto-info span {
+      color: var(--navbar-color, #fff) !important;
+    }
+
+    /* ========== BOTONES DE NAVEGACIÓN ========== */
+    .navbar .nav-link {
+      background-color: rgba(255,255,255,0.12);
+      border-radius: 30px;
+      padding: 0.4rem 1.2rem;
+      margin: 0 0.3rem;
+      transition: background-color 0.3s, color 0.3s, transform 0.2s;
+      font-weight: 500;
+      border: 1px solid transparent;
+    }
+    .navbar .nav-link:hover {
+      background-color: rgba(255,255,255,0.25);
+      transform: scale(1.02);
+    }
+    .navbar .nav-link.active {
+      background-color: rgba(255,255,255,0.30);
+      font-weight: 700;
+      border-color: rgba(255,255,255,0.5);
+    }
+    .tema-android .navbar .nav-link,
+    .tema-amarillo .navbar .nav-link {
+      background-color: rgba(0,0,0,0.10);
+    }
+    .tema-android .navbar .nav-link:hover,
+    .tema-amarillo .navbar .nav-link:hover {
+      background-color: rgba(0,0,0,0.20);
+    }
+    .tema-android .navbar .nav-link.active,
+    .tema-amarillo .navbar .nav-link.active {
+      background-color: rgba(0,0,0,0.25);
+      border-color: rgba(0,0,0,0.3);
+    }
+
+    .btn-bicicleta {
+      background-color: rgba(255,255,255,0.15);
+      border-radius: 30px;
+      padding: 0.4rem 1.2rem;
+      color: #fff !important;
+      border: 1px solid rgba(255,255,255,0.3);
+      transition: all 0.3s;
+      font-weight: 500;
+      margin-right: 0.5rem;
+    }
+    .btn-bicicleta:hover {
+      background-color: rgba(255,255,255,0.3);
+      transform: scale(1.02);
+      color: #fff !important;
+    }
+
+    .btn-primary {
+      background-color: var(--btn-primary-bg, #0d6efd);
+      border-color: var(--btn-primary-border, #0d6efd);
+    }
+    .btn-primary:hover {
+      filter: brightness(0.9);
+    }
+    .btn-success {
+      background-color: var(--btn-primary-bg, #0d6efd);
+      border-color: var(--btn-primary-border, #0d6efd);
+    }
+    .btn-success:hover {
+      filter: brightness(0.9);
+    }
+    .btn-warning {
+      background-color: var(--btn-primary-bg, #0d6efd);
+      border-color: var(--btn-primary-border, #0d6efd);
+    }
+    .btn-warning:hover {
+      filter: brightness(0.9);
+    }
+    .card {
+      background-color: var(--card-bg, #fff);
+      color: var(--text-color, #212529);
+    }
+    .modal-content {
+      background-color: var(--modal-bg, #fff);
+      color: var(--text-color, #212529);
+    }
+    .table {
+      color: var(--text-color, #212529);
+    }
+    .table-striped > tbody > tr:nth-of-type(odd) > * {
+      background-color: var(--table-stripe, #f2f2f2);
+    }
+    .table-hover > tbody > tr:hover > * {
+      background-color: var(--table-stripe, #f2f2f2);
+      opacity: 0.8;
+    }
+    .badge {
+      background-color: var(--badge-bg, #6c757d);
+      color: var(--badge-color, #fff);
+    }
+    .form-control, .form-select {
+      background-color: var(--input-bg, #fff);
+      border-color: var(--input-border, #ced4da);
+      color: var(--text-color, #212529);
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--btn-primary-bg, #0d6efd);
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .list-group-item {
+      background-color: var(--card-bg, #fff);
+      color: var(--text-color, #212529);
+      border-color: var(--input-border, #ced4da);
+    }
+    .nav-tabs .nav-link {
+      color: var(--text-color, #212529);
+    }
+    .nav-tabs .nav-link.active {
+      background-color: var(--card-bg, #fff);
+      color: var(--text-color, #212529);
+      border-color: var(--input-border, #ced4da);
+    }
+
+    /* Ajustes para el nombre de la empresa */
+    #empresaNombre {
+      transition: font-size 0.2s, font-family 0.2s, text-align 0.2s;
+      display: inline-block;
+      transform: translate(0px, 0px);
+    }
+    .logo-container.vertical-top {
+      align-items: flex-start;
+    }
+    .logo-container.vertical-middle {
+      align-items: center;
+    }
+    .logo-container.vertical-bottom {
+      align-items: flex-end;
+    }
+    .fondo-personalizado {
+      background-size: cover;
+      background-position: center;
+    }
+    .btn-outline-secondary {
+      color: var(--text-color, #212529);
+      border-color: var(--input-border, #ced4da);
+    }
+    .btn-outline-secondary:hover {
+      background-color: var(--btn-primary-bg, #0d6efd);
+      color: var(--navbar-color, #fff);
+    }
+
+    /* Contacto en banner */
+    .contacto-info {
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    .contacto-info a {
+      text-decoration: none;
+    }
+    .contacto-info a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 992px) {
+      .contacto-info {
+        font-size: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .contacto-info span, .contacto-info a {
+        margin-right: 0.5rem !important;
+      }
+    }
+
+    /* Estados - badges */
+    .estado-badge {
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+    }
+    .estado-no_visto { background: #cce5ff; color: #004085; }
+    .estado-presupuestada { background: #fff3cd; color: #856404; }
+    .estado-confirmada { background: #ffe5cc; color: #a66300; }
+    .estado-rechazado { background: #f8d7da; color: #721c24; }
+    .estado-lista { background: #d4edda; color: #155724; }
+    .estado-retirada { background: #cce5ff; color: #004085; }
+
+    /* Colores de fondo y borde para el historial */
+    .fila-no_visto {
+      background-color: #cce5ff !important;
+      border-left: 4px solid #004085 !important;
+    }
+    .fila-presupuestada {
+      background-color: #fff3cd !important;
+      border-left: 4px solid #856404 !important;
+    }
+    .fila-confirmada {
+      background-color: #ffe5cc !important;
+      border-left: 4px solid #a66300 !important;
+    }
+    .fila-rechazado {
+      background-color: #f8d7da !important;
+      border-left: 4px solid #721c24 !important;
+    }
+    .fila-lista {
+      background-color: #d4edda !important;
+      border-left: 4px solid #155724 !important;
+    }
+    .fila-retirada {
+      background-color: #cce5ff !important;
+      border-left: 4px solid #004085 !important;
+    }
+
+    .orden-card {
+      transition: transform 0.2s;
+    }
+    .orden-card:hover {
+      transform: scale(1.01);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <div class="logo-container" id="logoContainer">
+        <img id="logoImg" src="" alt="Logo" class="logo-img me-2" style="display:none;">
+        <span class="navbar-brand" id="empresaNombre">Mi Catálogo</span>
+      </div>
+
+      <!-- Botón Mi Bicicleta -->
+      <a href="#" class="btn-bicicleta d-none d-lg-inline-block" id="btnMiBicicleta" title="Consultar estado de tu bicicleta">
+        <i class="bi bi-bicycle"></i> Mi Bicicleta
+      </a>
+
+      <!-- Información de contacto -->
+      <div class="contacto-info d-flex align-items-center ms-auto me-2">
+        <a href="#" target="_blank" id="contactoWhatsappLink" class="me-2"><i class="bi bi-whatsapp"></i> <span id="contactoWhatsapp"></span></a>
+        <span id="contactoHorario" class="me-2"></span>
+        <span id="contactoDireccion"></span>
+      </div>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" id="btnCatalogo" href="#">Catálogo</a></li>
+          <li class="nav-item"><a class="nav-link" id="btnAdmin" href="#">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="container mt-3">
+
+    <!-- SECCIÓN CATÁLOGO -->
+    <div id="seccionCatalogo">
+      <div class="row mb-3">
+        <div class="col-md-4 position-relative suggestions-container">
+          <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto..." autocomplete="off">
+          <div id="suggestionsList" class="suggestions-list"></div>
+        </div>
+        <div class="col-md-3">
+          <select id="filtroCategoria" class="form-select">
+            <option value="">Todas las categorías</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select id="ordenPrecio" class="form-select">
+            <option value="">Sin orden</option>
+            <option value="asc">Precio más bajo</option>
+            <option value="desc">Precio más alto</option>
+          </select>
+        </div>
+      </div>
+      <div id="productosCatalogo" class="row row-cols-1 row-cols-md-3 g-4"></div>
+    </div>
+
+    <!-- SECCIÓN ADMIN (requiere login) -->
+    <div id="seccionAdmin" class="admin-section">
+      <div id="loginAdmin">
+        <div class="card w-50 mx-auto">
+          <div class="card-body">
+            <h5 class="card-title">Acceso Administrador</h5>
+            <input type="password" id="claveAdmin" class="form-control mb-2" placeholder="Clave de administrador">
+            <button class="btn btn-primary" id="btnLoginAdmin">Ingresar</button>
+            <div id="msjLogin" class="mt-2 text-danger"></div>
+          </div>
+        </div>
+      </div>
+      <div id="panelAdmin" style="display:none;">
+        <ul class="nav nav-tabs" id="adminTabs">
+          <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabProductos">Productos</a></li>
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabVentas">Ventas</a></li>
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabReportes">Reportes</a></li>
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabBackup">Backup</a></li>
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAjustesAdmin">Ajustes</a></li>
+          <!-- NUEVAS PESTAÑAS -->
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabTaller">Taller</a></li>
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabClientes">Clientes</a></li>
+        </ul>
+        <div class="tab-content">
+          <!-- Productos (sin cambios) -->
+          <div class="tab-pane fade show active" id="tabProductos">
+            <div class="d-flex justify-content-between mt-2">
+              <h5>Gestión de Productos</h5>
+              <button class="btn btn-success" id="btnAgregarProducto">+ Agregar</button>
+            </div>
+            <div id="listaProductosAdmin" class="mt-2"></div>
+          </div>
+          <!-- Ventas (sin cambios) -->
+          <div class="tab-pane fade" id="tabVentas">
+            <h5>Registrar Venta</h5>
+            <div class="row g-2">
+              <div class="col-md-4"><select id="ventaProducto" class="form-select"></select></div>
+              <div class="col-md-3"><input type="number" id="ventaCantidad" class="form-control" placeholder="Cantidad" min="1"></div>
+              <div class="col-md-3"><button class="btn btn-primary" id="btnRegistrarVenta">Registrar Venta</button></div>
+            </div>
+            <hr>
+            <h5>Historial de Ventas</h5>
+            <div id="listaVentas" class="mt-2"></div>
+          </div>
+          <!-- Reportes (sin cambios) -->
+          <div class="tab-pane fade" id="tabReportes">
+            <h5>Reportes</h5>
+            <div class="btn-group mb-2">
+              <button class="btn btn-outline-secondary" data-periodo="dia">Hoy</button>
+              <button class="btn btn-outline-secondary" data-periodo="semana">Semana</button>
+              <button class="btn btn-outline-secondary" data-periodo="mes">Mes</button>
+              <button class="btn btn-outline-secondary" data-periodo="anual">Anual</button>
+            </div>
+            <div id="resumenVentas"></div>
+            <hr>
+            <h5>Stock</h5>
+            <p><strong>Stock total:</strong> <span id="stockTotal">0</span></p>
+            <p><strong>Sin stock (agotados):</strong> <span id="sinStockCount">0</span></p>
+            <div id="alertasStockMinimo" class="mt-2"></div>
+            <button class="btn btn-warning mt-2" id="btnWhatsappSinStock">Enviar lista sin stock por WhatsApp</button>
+          </div>
+          <!-- Backup (sin cambios) -->
+          <div class="tab-pane fade" id="tabBackup">
+            <h5>Backup de Base de Datos</h5>
+            <button class="btn btn-primary" id="btnExportarBackup">Exportar Backup (JSON)</button>
+            <div class="mt-2">
+              <label>Importar Backup: </label>
+              <input type="file" id="importarBackup" accept=".json" class="form-control">
+              <button class="btn btn-secondary mt-1" id="btnImportarBackup">Cargar Backup</button>
+            </div>
+          </div>
+          <!-- Ajustes (sin cambios) -->
+          <div class="tab-pane fade" id="tabAjustesAdmin">
+            <h5>Ajustes Generales</h5>
+            <form id="formAjustes">
+              <div class="mb-2"><label>Nombre Empresa</label><input type="text" id="ajusteNombre" class="form-control"></div>
+              <div class="mb-2"><label>WhatsApp (número con código país)</label><input type="text" id="ajusteWhatsapp" class="form-control"></div>
+              <div class="mb-2"><label>Dirección</label><input type="text" id="ajusteDireccion" class="form-control"></div>
+              <div class="mb-2"><label>Horarios y Días</label><input type="text" id="ajusteHorarios" class="form-control"></div>
+
+              <!-- Logo -->
+              <div class="mb-2"><label>Logo (URL o seleccionar archivo)</label>
+                <input type="text" id="ajusteLogoUrl" class="form-control" placeholder="URL del logo">
+                <input type="file" id="ajusteLogoFile" class="form-control mt-1" accept="image/*">
+              </div>
+              <div class="mb-2"><label>Tamaño Logo (%) <span id="labelTamLogo">100</span>%</label>
+                <input type="range" id="ajusteTamLogo" min="0" max="150" value="100" class="form-range">
+              </div>
+              <div class="mb-2"><label>Alineación Logo</label>
+                <select id="ajusteAlineacion" class="form-select">
+                  <option value="izquierda">Izquierda</option>
+                  <option value="centro" selected>Centro</option>
+                  <option value="derecha">Derecha</option>
+                </select>
+              </div>
+
+              <!-- Nombre empresa -->
+              <div class="mb-2"><label>Tamaño fuente del nombre (px) <span id="labelTamNombre">24</span>px</label>
+                <input type="range" id="ajusteTamNombre" min="12" max="48" value="24" class="form-range">
+              </div>
+              <div class="mb-2"><label>Tipo de fuente (nombre)</label>
+                <select id="ajusteFuenteNombre" class="form-select">
+                  <option value="'Segoe UI', Roboto, sans-serif">Segoe UI</option>
+                  <option value="'Times New Roman', serif">Times New Roman</option>
+                  <option value="Arial, Helvetica, sans-serif">Arial</option>
+                  <option value="'Courier New', monospace">Courier New</option>
+                  <option value="'Georgia', serif">Georgia</option>
+                  <option value="'Verdana', sans-serif">Verdana</option>
+                  <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                  <option value="'Impact', sans-serif">Impact</option>
+                </select>
+              </div>
+              <div class="mb-2"><label>Alineación horizontal del nombre</label>
+                <select id="ajusteAlineacionNombre" class="form-select">
+                  <option value="left">Izquierda</option>
+                  <option value="center" selected>Centro</option>
+                  <option value="right">Derecha</option>
+                </select>
+              </div>
+              <div class="mb-2"><label>Alineación vertical del nombre (dentro del contenedor)</label>
+                <select id="ajusteVerticalNombre" class="form-select">
+                  <option value="top">Arriba</option>
+                  <option value="middle" selected>Centro</option>
+                  <option value="bottom">Abajo</option>
+                </select>
+              </div>
+
+              <!-- Fondo -->
+              <div class="mb-2"><label>Color de fondo (personalizado)</label>
+                <input type="color" id="ajusteColorFondo" class="form-control form-control-color" value="#f8f9fa">
+                <button type="button" class="btn btn-outline-secondary mt-1" id="btnResetFondo">Restaurar fondo por defecto</button>
+              </div>
+              <div class="mb-2"><label>Imagen de fondo (URL)</label>
+                <input type="text" id="ajusteFondoImagen" class="form-control" placeholder="URL de imagen de fondo">
+              </div>
+
+              <!-- Temas -->
+              <div class="mb-2"><label>Tema de colores</label>
+                <select id="ajusteTema" class="form-select">
+                  <option value="default">Default</option>
+                  <option value="android">Android</option>
+                  <option value="windows">Windows</option>
+                  <option value="mac">Mac</option>
+                  <option value="videojuego">Videojuego</option>
+                  <option value="verde">Verde</option>
+                  <option value="amarillo">Amarillo</option>
+                  <option value="argentina">Argentina</option>
+                  <option value="azul">Azul</option>
+                  <option value="oscuro">Oscuro</option>
+                </select>
+              </div>
+
+              <div class="mb-2"><label>Tamaño de campos (px) <span id="labelTamCampos">16</span>px</label>
+                <input type="range" id="ajusteTamCampos" min="10" max="30" value="16" class="form-range">
+              </div>
+
+              <button type="submit" class="btn btn-success">Guardar Ajustes</button>
+            </form>
+          </div>
+
+          <!-- ========== NUEVA PESTAÑA: TALLER ========== -->
+          <div class="tab-pane fade" id="tabTaller">
+            <h5 class="mt-2">Gestión de Órdenes de Taller</h5>
+            <button class="btn btn-primary mb-2" id="btnNuevaOrden">+ Nueva Orden</button>
+            <hr>
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Historial de Equipos (Activos)</h6>
+                <div id="listaOrdenesActivas" class="mt-2"></div>
+              </div>
+              <div class="col-md-6">
+                <h6>Retirados / Rechazados</h6>
+                <div id="listaOrdenesCerradas" class="mt-2"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== NUEVA PESTAÑA: CLIENTES ========== -->
+          <div class="tab-pane fade" id="tabClientes">
+            <h5 class="mt-2">Gestión de Clientes</h5>
+            <button class="btn btn-success mb-2" id="btnNuevoCliente">+ Nuevo Cliente</button>
+            <div id="listaClientes" class="mt-2"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== MODAL MI BICICLETA (cliente) ========== -->
+  <div class="modal fade" id="modalMiBicicleta" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-bicycle"></i> Mi Bicicleta - Estado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-2">
+            <div class="col-md-8">
+              <input type="text" id="clienteWhatsappBuscar" class="form-control" placeholder="Ingresa tu número de WhatsApp sin 0 y sin 15 (ej: 1134567890)">
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-primary w-100" id="btnBuscarOrdenCliente">Buscar</button>
+            </div>
+          </div>
+          <hr>
+          <div id="resultadoOrdenCliente"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL NUEVA ORDEN (taller) ========== -->
+  <div class="modal fade" id="modalOrden" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalOrdenTitle">Nueva Orden</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formOrden">
+            <input type="hidden" id="ordenId">
+            <div class="row g-2">
+              <div class="col-md-4">
+                <label>ID Orden (automático)</label>
+                <input type="text" id="ordenIdAuto" class="form-control" readonly>
+              </div>
+              <div class="col-md-4">
+                <label>Estado</label>
+                <select id="ordenEstado" class="form-select">
+                  <option value="no_visto">NO VISTO</option>
+                  <option value="presupuestada">PRESUPUESTADA</option>
+                  <option value="confirmada">CONFIRMADA</option>
+                  <option value="rechazado">RECHAZADO</option>
+                  <option value="lista">LISTA</option>
+                  <option value="retirada">RETIRADA</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label>Cliente</label>
+                <div class="d-flex">
+                  <input type="text" id="ordenClienteBuscar" class="form-control me-1" placeholder="Buscar por nombre o WhatsApp" list="clientesList">
+                  <datalist id="clientesList"></datalist>
+                  <button class="btn btn-outline-secondary" id="btnSeleccionarCliente" title="Seleccionar cliente"><i class="bi bi-check2"></i></button>
+                </div>
+                <div class="mt-1">
+                  <input type="text" id="ordenClienteNombre" class="form-control form-control-sm" placeholder="Nombre completo">
+                  <input type="text" id="ordenClienteWhatsapp" class="form-control form-control-sm mt-1" placeholder="WhatsApp sin 0 y sin 15">
+                  <input type="text" id="ordenClienteDireccion" class="form-control form-control-sm mt-1" placeholder="Dirección">
+                </div>
+              </div>
+            </div>
+            <div class="row g-2 mt-2">
+              <div class="col-md-3">
+                <label>Modelo / Bicicleta</label>
+                <input type="text" id="ordenModelo" class="form-control" placeholder="Modelo">
+              </div>
+              <div class="col-md-3">
+                <label>Accesorios</label>
+                <input type="text" id="ordenAccesorios" class="form-control" placeholder="Accesorios">
+              </div>
+              <div class="col-md-3">
+                <label>Fecha Ingreso</label>
+                <input type="date" id="ordenFechaIngreso" class="form-control">
+              </div>
+              <div class="col-md-3">
+                <label>Fecha Salida (retiro)</label>
+                <input type="date" id="ordenFechaSalida" class="form-control">
+              </div>
+            </div>
+            <div class="row g-2 mt-2">
+              <div class="col-md-3">
+                <label>Garantía (días)</label>
+                <input type="number" id="ordenGarantia" class="form-control" value="30" min="0">
+              </div>
+              <div class="col-md-9">
+                <label>Falla Inicial</label>
+                <input type="text" id="ordenFallaInicial" class="form-control" placeholder="Falla detectada">
+              </div>
+            </div>
+            <div class="row g-2 mt-2">
+              <div class="col-md-6">
+                <label>Diagnóstico</label>
+                <input type="text" id="ordenDiagnostico" class="form-control" placeholder="Diagnóstico">
+              </div>
+              <div class="col-md-6">
+                <label>Trabajo Realizado</label>
+                <input type="text" id="ordenTrabajoRealizado" class="form-control" placeholder="Trabajo realizado">
+              </div>
+            </div>
+            <div class="row g-2 mt-2">
+              <div class="col-md-3">
+                <label>Presupuesto Mano de Obra ($)</label>
+                <input type="number" step="0.01" id="ordenPresupuestoMano" class="form-control" value="0">
+              </div>
+              <div class="col-md-9">
+                <label>Repuestos asignados</label>
+                <div class="d-flex">
+                  <select id="ordenRepuestoSelect" class="form-select me-1">
+                    <option value="">Seleccionar repuesto</option>
+                  </select>
+                  <input type="number" id="ordenRepuestoCant" class="form-control me-1" placeholder="Cant." value="1" min="1" style="width:80px;">
+                  <button class="btn btn-primary" id="btnAgregarRepuesto">Agregar</button>
+                </div>
+                <div id="ordenRepuestosList" class="mt-2"></div>
+              </div>
+            </div>
+            <div class="mt-2">
+              <strong>Total Presupuesto: $<span id="ordenTotalPresupuesto">0.00</span></strong>
+            </div>
+            <div class="mt-2">
+              <button type="submit" class="btn btn-success">Guardar Orden</button>
+              <button type="button" class="btn btn-warning" id="btnEnviarWhatsappOrden">Enviar Estado por WhatsApp</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL NUEVO CLIENTE ========== -->
+  <div class="modal fade" id="modalCliente" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalClienteTitle">Nuevo Cliente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formCliente">
+            <input type="hidden" id="clienteId">
+            <div class="mb-2">
+              <label>Nombre y Apellido</label>
+              <input type="text" id="clienteNombre" class="form-control" required>
+            </div>
+            <div class="mb-2">
+              <label>WhatsApp (sin 0 y sin 15)</label>
+              <input type="text" id="clienteWhatsapp" class="form-control" required>
+            </div>
+            <div class="mb-2">
+              <label>Dirección</label>
+              <input type="text" id="clienteDireccion" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL PRODUCTO (existente) ========== -->
+  <div class="modal fade" id="modalProducto" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Producto</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <form id="formProducto" novalidate>
+            <input type="hidden" id="prodId">
+            <div class="mb-2"><label>Nombre *</label><input type="text" id="prodNombre" class="form-control" required></div>
+            <div class="mb-2">
+              <label>Categoría *</label>
+              <div class="d-flex gap-2">
+                <select id="prodCategoria" class="form-select" required>
+                  <option value="">Seleccionar categoría</option>
+                </select>
+                <button type="button" class="btn btn-outline-secondary" id="btnGestionarCategorias" title="Gestionar categorías (agregar/editar/eliminar)"><i class="bi bi-gear"></i></button>
+              </div>
+            </div>
+            <div class="mb-2"><label>Costo *</label><input type="number" step="0.01" id="prodCosto" class="form-control" required></div>
+            <div class="mb-2"><label>Tipo</label>
+              <select id="prodTipo" class="form-select">
+                <option value="propio">Propio</option>
+                <option value="consignacion">Consignación</option>
+              </select>
+            </div>
+            <div id="camposPropio">
+              <div class="mb-2"><label>% Aumento</label><input type="number" step="0.1" id="prodPorcentaje" class="form-control" value="20"></div>
+              <div class="mb-2"><label>Precio Final (calculado)</label><input type="text" id="prodPrecioFinal" class="form-control" readonly></div>
+            </div>
+            <div id="camposConsignacion" style="display:none;">
+              <div class="mb-2"><label>Precio Acordado con Cliente *</label><input type="number" step="0.01" id="prodPrecioAcordado" class="form-control"></div>
+              <div class="mb-2"><label>% de Reventa</label><input type="number" step="0.1" id="prodPorcentajeReventa" class="form-control" value="30"></div>
+              <div class="mb-2"><label>Precio de Reventa (sugerido)</label><input type="text" id="prodPrecioReventa" class="form-control" readonly></div>
+            </div>
+            <div class="mb-2"><label>Stock *</label><input type="number" id="prodStock" class="form-control" required></div>
+            <div class="mb-2"><label>Stock Mínimo</label><input type="number" id="prodStockMinimo" class="form-control" value="5"></div>
+            <div class="mb-2"><label>Foto (URL o archivo)</label>
+              <input type="text" id="prodFotoUrl" class="form-control" placeholder="URL de imagen">
+              <input type="file" id="prodFotoFile" class="form-control mt-1" accept="image/*">
+              <img id="prodFotoPreview" src="" class="foto-preview mt-1" style="display:none;">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GESTIÓN DE CATEGORÍAS (existente) -->
+  <div class="modal fade" id="modalGestionCategorias" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Gestionar Categorías</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="mb-3 d-flex gap-2">
+            <input type="text" id="nuevaCategoriaInput" class="form-control" placeholder="Nueva categoría">
+            <button class="btn btn-success" id="btnAgregarCategoria">Agregar</button>
+          </div>
+          <ul id="listaCategoriasAdmin" class="list-group"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // =================================================================
+    // SCRIPT COMPLETO - CON FIREBASE (reemplaza localStorage)
+    // =================================================================
+    (async function() {
+      "use strict";
+
+      if (window.__inicializado) return;
+      window.__inicializado = true;
+
+      // ========== CONFIGURACIÓN DE FIREBASE ==========
+      const firebaseConfig = {
+        apiKey: "AIzaSyB9ZuwE589knYP3kyO9w31naDHsrYqJLas",
+        authDomain: "bicicleteriadario1.firebaseapp.com",
+        projectId: "bicicleteriadario1",
+        storageBucket: "bicicleteriadario1.firebasestorage.app",
+        messagingSenderId: "679191807904",
+        appId: "1:679191807904:web:327bbd8284986a5abf06c5"
+      };
+
+      // Importar Firebase dinámicamente
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+      const { getFirestore, doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const COLLECTION = 'appData';
+      const DOC_ID = 'main';
+
+      // ========== VARIABLES GLOBALES ==========
+      let productos = [];
+      let ventas = [];
+      let ajustes = {};
+      let clientes = [];
+      let ordenes = [];
+      let categorias = [];
+
+      const DEFAULT_PASSWORD = 'admin123';
+      const CATEGORIAS_PREDEFINIDAS = [
+        "Cuadro", "Ruedas", "Llantas", "Cubiertas", "Cámaras", "Frenos", "Pastillas de freno",
+        "Discos de freno", "Cambios", "Desviador", "Piñón", "Plato", "Cadena", "Manubrio",
+        "Potencia", "Sillín", "Tija de sillín", "Pedales", "Horquilla", "Amortiguador",
+        "Dirección", "Cableado", "Fundas", "Luz delantera", "Luz trasera", "Candado",
+        "Bomba de aire", "Portabultos", "Cesta", "Casco", "Guantes", "Cubrecadena",
+        "Pata de cabra", "Kit de reparación", "Aceite", "Grasa", "Limpiador", "Reflectores",
+        "Timbre", "Espejo", "Cinta de manubrio", "Tacos", "Cierre rápido", "Eje", "Buje",
+        "Rodamiento", "Tornillería", "Adaptador", "Soporte", "Mochila", "Alforjas"
+      ];
+
+      // ========== FUNCIONES DE PERSISTENCIA ==========
+      async function loadAllData() {
+        const docRef = doc(db, COLLECTION, DOC_ID);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          productos = data.productos || [];
+          ventas = data.ventas || [];
+          ajustes = data.ajustes || {};
+          clientes = data.clientes || [];
+          ordenes = data.ordenes || [];
+          categorias = data.categorias || CATEGORIAS_PREDEFINIDAS.slice();
+        } else {
+          // Datos por defecto
+          productos = [];
+          ventas = [];
+          ajustes = {
+            nombreEmpresa: 'Mi Catálogo',
+            whatsapp: '5491123456789',
+            direccion: 'Calle Falsa 123',
+            horarios: 'Lun-Vie 9-18',
+            logo: '',
+            logoTamano: 100,
+            logoAlineacion: 'centro',
+            tamanoCampos: 16,
+            tamNombre: 24,
+            fuenteNombre: "'Segoe UI', Roboto, sans-serif",
+            alineacionNombre: 'center',
+            verticalNombre: 'middle',
+            colorFondo: '#f8f9fa',
+            fondoImagen: '',
+            tema: 'default',
+            separacionLogo: 8,
+            nombreOffsetX: 0,
+            nombreOffsetY: 0,
+            mensajePresentacion: 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?'
+          };
+          clientes = [];
+          ordenes = [];
+          categorias = CATEGORIAS_PREDEFINIDAS.slice();
+          await saveAllData(); // guardar los defaults
+        }
+        // Asegurar que ajustes tenga todas las propiedades
+        if (!ajustes.tamNombre) ajustes.tamNombre = 24;
+        if (!ajustes.fuenteNombre) ajustes.fuenteNombre = "'Segoe UI', Roboto, sans-serif";
+        if (!ajustes.alineacionNombre) ajustes.alineacionNombre = 'center';
+        if (!ajustes.verticalNombre) ajustes.verticalNombre = 'middle';
+        if (!ajustes.colorFondo) ajustes.colorFondo = '#f8f9fa';
+        if (!ajustes.fondoImagen) ajustes.fondoImagen = '';
+        if (!ajustes.tema) ajustes.tema = 'default';
+        if (ajustes.separacionLogo === undefined) ajustes.separacionLogo = 8;
+        if (ajustes.nombreOffsetX === undefined) ajustes.nombreOffsetX = 0;
+        if (ajustes.nombreOffsetY === undefined) ajustes.nombreOffsetY = 0;
+        if (!ajustes.mensajePresentacion) {
+          ajustes.mensajePresentacion = 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
+        }
+      }
+
+      async function saveAllData() {
+        const docRef = doc(db, COLLECTION, DOC_ID);
+        await setDoc(docRef, {
+          productos,
+          ventas,
+          ajustes,
+          clientes,
+          ordenes,
+          categorias
+        });
+      }
+
+      // ========== FUNCIONES DE CATEGORÍAS ==========
+      function obtenerCategorias() {
+        return categorias.slice();
+      }
+
+      async function guardarCategorias(cats) {
+        categorias = cats.slice();
+        categorias.sort((a, b) => a.localeCompare(b));
+        await saveAllData();
+      }
+
+      // ========== FUNCIONES DE APLICACIÓN (adaptadas) ==========
+      function aplicarAjustes() {
+        // Tema
+        document.body.className = document.body.className
+          .split(' ')
+          .filter(c => !c.startsWith('tema-'))
+          .join(' ');
+        const tema = ajustes.tema || 'default';
+        if (tema !== 'default') document.body.classList.add('tema-' + tema);
+        else document.body.classList.add('tema-default');
+
+        // Fondo
+        if (ajustes.fondoImagen && ajustes.fondoImagen.trim() !== '') {
+          document.body.style.backgroundImage = `url('${ajustes.fondoImagen}')`;
+          document.body.style.backgroundColor = 'transparent';
+          document.body.classList.add('fondo-personalizado');
+        } else {
+          document.body.style.backgroundImage = 'none';
+          document.body.style.backgroundColor = ajustes.colorFondo || '#f8f9fa';
+          document.body.classList.remove('fondo-personalizado');
+        }
+
+        // Nombre empresa
+        const nombreEl = document.getElementById('empresaNombre');
+        if (nombreEl) {
+          nombreEl.textContent = ajustes.nombreEmpresa || 'Mi Catálogo';
+          nombreEl.style.fontSize = (ajustes.tamNombre || 24) + 'px';
+          nombreEl.style.fontFamily = ajustes.fuenteNombre || "'Segoe UI', Roboto, sans-serif";
+          nombreEl.style.textAlign = ajustes.alineacionNombre || 'center';
+          const offX = ajustes.nombreOffsetX || 0;
+          const offY = ajustes.nombreOffsetY || 0;
+          nombreEl.style.transform = `translate(${offX}px, ${offY}px)`;
+        }
+
+        // Logo
+        const logo = document.getElementById('logoImg');
+        if (logo) {
+          if (ajustes.logo) {
+            logo.src = ajustes.logo;
+            logo.style.display = 'block';
+            logo.style.width = (ajustes.logoTamano || 100) + '%';
+            logo.style.maxHeight = 'none';
+            logo.style.marginRight = (ajustes.separacionLogo !== undefined ? ajustes.separacionLogo : 8) + 'px';
+          } else {
+            logo.style.display = 'none';
+          }
+        }
+
+        // Contenedor logo
+        const container = document.getElementById('logoContainer');
+        if (container) {
+          container.className = 'logo-container alinear-' + (ajustes.logoAlineacion || 'centro');
+          container.classList.remove('vertical-top', 'vertical-middle', 'vertical-bottom');
+          const vAlign = ajustes.verticalNombre || 'middle';
+          if (vAlign === 'top') container.classList.add('vertical-top');
+          else if (vAlign === 'bottom') container.classList.add('vertical-bottom');
+          else container.classList.add('vertical-middle');
+        }
+
+        // Tamaño de campos
+        const size = (ajustes.tamanoCampos || 16) + 'px';
+        document.querySelectorAll('input, select, textarea').forEach(el => el.style.fontSize = size);
+
+        // Contacto
+        const whatsappLink = document.getElementById('contactoWhatsappLink');
+        const whatsappSpan = document.getElementById('contactoWhatsapp');
+        const horarioSpan = document.getElementById('contactoHorario');
+        const direccionSpan = document.getElementById('contactoDireccion');
+
+        if (ajustes.whatsapp) {
+          const numero = ajustes.whatsapp.replace(/\s/g, '');
+          whatsappLink.href = `https://wa.me/${numero}`;
+          whatsappSpan.textContent = ajustes.whatsapp;
+          whatsappLink.style.display = 'inline';
+        } else {
+          whatsappLink.style.display = 'none';
+        }
+        horarioSpan.textContent = ajustes.horarios || '';
+        direccionSpan.textContent = ajustes.direccion || '';
+      }
+
+      // ========== RENDERIZADO ==========
+      function renderizarCategorias() {
+        const cats = obtenerCategorias();
+        const selFiltro = document.getElementById('filtroCategoria');
+        if (selFiltro) {
+          const current = selFiltro.value;
+          const catsConStock = cats.filter(cat => 
+            productos.some(p => p.categoria === cat && p.stock > 0)
+          );
+          selFiltro.innerHTML = '<option value="">Todas las categorías</option>';
+          catsConStock.forEach(c => {
+            selFiltro.innerHTML += `<option value="${c}">${c}</option>`;
+          });
+          selFiltro.value = current;
+        }
+
+        const selProd = document.getElementById('prodCategoria');
+        if (selProd) {
+          const current = selProd.value;
+          selProd.innerHTML = '<option value="">Seleccionar categoría</option>';
+          cats.forEach(c => {
+            selProd.innerHTML += `<option value="${c}">${c}</option>`;
+          });
+          selProd.value = current;
+        }
+
+        const list = document.getElementById('listaCategoriasAdmin');
+        if (list) {
+          list.innerHTML = '';
+          cats.forEach(c => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.innerHTML = `
+              <span>${c}</span>
+              <div>
+                <button class="btn btn-sm btn-outline-secondary me-1" onclick="window.editarCategoria('${c}')"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onclick="window.eliminarCategoria('${c}')"><i class="bi bi-trash"></i></button>
+              </div>
+            `;
+            list.appendChild(li);
+          });
+        }
+      }
+
+      function renderCatalogo() {
+        const search = (document.getElementById('buscarProducto')?.value || '').toLowerCase();
+        const cat = document.getElementById('filtroCategoria')?.value || '';
+        const orden = document.getElementById('ordenPrecio')?.value || '';
+
+        let list = productos.filter(p => {
+          if (p.stock <= 0) return false;
+          const matchNombre = p.nombre.toLowerCase().includes(search);
+          const matchCat = cat ? p.categoria === cat : true;
+          return matchNombre && matchCat;
+        });
+
+        if (orden === 'asc') list.sort((a, b) => a.precioFinal - b.precioFinal);
+        else if (orden === 'desc') list.sort((a, b) => b.precioFinal - a.precioFinal);
+
+        const container = document.getElementById('productosCatalogo');
+        if (!container) return;
+        if (list.length === 0) {
+          container.innerHTML = '<p class="text-center">No hay productos disponibles</p>';
+          return;
+        }
+        let html = '';
+        list.forEach(p => {
+          const foto = p.foto ? `<img src="${p.foto}" class="card-img-top" style="height:200px;object-fit:contain;" alt="${p.nombre}">` :
+            `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;"><i class="bi bi-image" style="font-size:3rem;"></i></div>`;
+          const tipo = p.tipo === 'consignacion' ? '⚠️ Consignación' : 'Propio';
+          const precio = p.tipo === 'consignacion' ? `Acordar: $${p.precioFinal}` : `$${p.precioFinal}`;
+          const stock = p.stock > 0 ? `Stock: ${p.stock}` : '<span class="text-danger">Sin stock</span>';
+          const mensajeWhatsApp = 
+            `🚲 *${ajustes.nombreEmpresa || 'Mi Catálogo'}* - Consulta de producto%0A%0A` +
+            `📦 *Producto:* ${p.nombre}%0A` +
+            `💰 *Precio:* $${p.precioFinal}%0A` +
+            `📂 *Categoría:* ${p.categoria || 'Sin categoría'}%0A` +
+            `📦 *Stock:* ${p.stock > 0 ? p.stock : 'Agotado'} unidades%0A%0A` +
+            `Hola, me interesa este producto. ¿Podrían brindarme más información? (disponibilidad, colores, etc.)`;
+          const wpp = ajustes.whatsapp ? `https://wa.me/${ajustes.whatsapp}?text=${mensajeWhatsApp}` : '#';
+          html += `
+            <div class="col">
+              <div class="card product-card h-100">
+                ${foto}
+                <div class="card-body">
+                  <h5 class="card-title">${p.nombre}</h5>
+                  <p class="card-text"><small>Categoría: ${p.categoria}</small><br>
+                  <span class="badge bg-secondary">${tipo}</span><br>
+                  <strong>${precio}</strong><br>
+                  ${stock}</p>
+                  <a href="${wpp}" target="_blank" class="btn btn-success btn-sm ${!ajustes.whatsapp ? 'disabled' : ''}"><i class="bi bi-whatsapp"></i> Consultar</a>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      }
+
+      function renderAdminProductos() {
+        const container = document.getElementById('listaProductosAdmin');
+        if (!container) return;
+        if (productos.length === 0) {
+          container.innerHTML = '<p>No hay productos</p>';
+          return;
+        }
+        let html = '<table class="table table-striped table-hover"><thead><tr><th>Foto</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Tipo</th><th>Acciones</th></tr></thead><tbody>';
+        productos.forEach(p => {
+          const foto = p.foto ? `<img src="${p.foto}" class="foto-preview" alt="foto">` : '<i class="bi bi-image"></i>';
+          const precio = p.tipo === 'consignacion' ? `Acordado: $${p.precioFinal}` : `$${p.precioFinal}`;
+          html += `
+            <tr>
+              <td>${foto}</td>
+              <td>${p.nombre}</td>
+              <td>${p.categoria}</td>
+              <td>${precio}</td>
+              <td><span class="${p.stock <= p.stockMinimo ? 'text-danger' : ''}">${p.stock}</span></td>
+              <td>${p.tipo}</td>
+              <td>
+                <button class="btn btn-sm btn-warning" onclick="window.editarProducto('${p.id}')"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="window.eliminarProducto('${p.id}')"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+
+      function renderAdminVentas() {
+        const container = document.getElementById('listaVentas');
+        if (!container) return;
+        if (ventas.length === 0) {
+          container.innerHTML = '<p>No hay ventas registradas</p>';
+          return;
+        }
+        let html = '<table class="table table-sm"><thead><tr><th>Producto</th><th>Cant</th><th>Precio Unit</th><th>Total</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>';
+        const sorted = [...ventas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        sorted.forEach(v => {
+          const fecha = new Date(v.fecha).toLocaleString();
+          html += `<tr>
+            <td>${v.nombreProducto}</td>
+            <td>${v.cantidad}</td>
+            <td>$${v.precioUnitario.toFixed(2)}</td>
+            <td>$${v.total.toFixed(2)}</td>
+            <td>${fecha}</td>
+            <td>
+              <button class="btn btn-sm btn-danger" onclick="window.eliminarVenta('${v.id}')"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+
+      function cargarSelectVentas() {
+        const sel = document.getElementById('ventaProducto');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">Seleccionar producto</option>';
+        productos.forEach(p => {
+          sel.innerHTML += `<option value="${p.id}">${p.nombre} (Stock: ${p.stock})</option>`;
+        });
+      }
+
+      function actualizarReportes(periodo = 'dia') {
+        const totalStock = productos.reduce((acc, p) => acc + p.stock, 0);
+        document.getElementById('stockTotal').textContent = totalStock;
+        const sinStock = productos.filter(p => p.stock <= 0);
+        document.getElementById('sinStockCount').textContent = sinStock.length;
+
+        const alertas = productos.filter(p => p.stock > 0 && p.stock <= p.stockMinimo);
+        const container = document.getElementById('alertasStockMinimo');
+        if (alertas.length === 0) {
+          container.innerHTML = '<p class="text-success">Todos los productos tienen stock suficiente</p>';
+        } else {
+          let html = '<div class="alert alert-warning"><strong>Productos con stock mínimo:</strong><ul>';
+          alertas.forEach(p => {
+            html += `<li>${p.nombre} (Stock: ${p.stock}, Mínimo: ${p.stockMinimo})</li>`;
+          });
+          html += '</ul></div>';
+          container.innerHTML = html;
+        }
+
+        let now = new Date();
+        let inicio;
+        switch (periodo) {
+          case 'dia': inicio = new Date(now.getFullYear(), now.getMonth(), now.getDate()); break;
+          case 'semana': const diaSemana = now.getDay(); inicio = new Date(now); inicio.setDate(now.getDate() - diaSemana); inicio.setHours(0,0,0,0); break;
+          case 'mes': inicio = new Date(now.getFullYear(), now.getMonth(), 1); break;
+          case 'anual': inicio = new Date(now.getFullYear(), 0, 1); break;
+          default: inicio = new Date(0);
+        }
+        const ventasPeriodo = ventas.filter(v => new Date(v.fecha) >= inicio);
+        const totalVentas = ventasPeriodo.reduce((acc, v) => acc + v.total, 0);
+        const cantidad = ventasPeriodo.reduce((acc, v) => acc + v.cantidad, 0);
+        const resumen = document.getElementById('resumenVentas');
+        resumen.innerHTML = `
+          <div class="card p-2">
+            <h6>Resumen (${periodo})</h6>
+            <p><strong>Total vendido:</strong> $${totalVentas.toFixed(2)}</p>
+            <p><strong>Unidades vendidas:</strong> ${cantidad}</p>
+            <p><strong>Nº de transacciones:</strong> ${ventasPeriodo.length}</p>
+          </div>
+        `;
+      }
+
+      // ========== FUNCIONES GLOBALES (expuestas) ==========
+      window.editarCategoria = async function(oldName) {
+        const newName = prompt('Editar categoría:', oldName);
+        if (!newName || newName.trim() === oldName) return;
+        const trimmed = newName.trim();
+        let cats = obtenerCategorias();
+        const idx = cats.indexOf(oldName);
+        if (idx === -1) return;
+        if (cats.includes(trimmed) && trimmed !== oldName) {
+          alert('Ya existe una categoría con ese nombre');
+          return;
+        }
+        cats[idx] = trimmed;
+        await guardarCategorias(cats);
+        productos.forEach(p => {
+          if (p.categoria === oldName) p.categoria = trimmed;
+        });
+        await saveAllData();
+        renderizarCategorias();
+        renderCatalogo();
+        renderAdminProductos();
+      };
+
+      window.eliminarCategoria = async function(cat) {
+        if (!confirm(`¿Eliminar la categoría "${cat}"? Los productos con esta categoría quedarán sin categoría.`)) return;
+        let cats = obtenerCategorias();
+        cats = cats.filter(c => c !== cat);
+        await guardarCategorias(cats);
+        productos.forEach(p => {
+          if (p.categoria === cat) p.categoria = '';
+        });
+        await saveAllData();
+        renderizarCategorias();
+        renderCatalogo();
+        renderAdminProductos();
+      };
+
+      window.editarProducto = function(id) {
+        const prod = productos.find(p => p.id === id);
+        if (prod) abrirModalProducto(prod);
+      };
+
+      window.eliminarProducto = async function(id) {
+        if (confirm('¿Eliminar producto?')) {
+          productos = productos.filter(p => p.id !== id);
+          await saveAllData();
+          renderAdminProductos();
+          renderCatalogo();
+          cargarSelectVentas();
+          actualizarReportes();
+        }
+      };
+
+      window.eliminarVenta = async function(id) {
+        if (confirm('¿Eliminar esta venta? (No se restaurará el stock)')) {
+          ventas = ventas.filter(v => v.id !== id);
+          await saveAllData();
+          renderAdminVentas();
+          actualizarReportes();
+        }
+      };
+
+      // ========== PRODUCTOS (modal) ==========
+      function abrirModalProducto(data) {
+        const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
+        if (data) {
+          document.getElementById('prodId').value = data.id;
+          document.getElementById('prodNombre').value = data.nombre;
+          document.getElementById('prodCategoria').value = data.categoria || '';
+          document.getElementById('prodCosto').value = data.costo;
+          document.getElementById('prodTipo').value = data.tipo || 'propio';
+          document.getElementById('prodPorcentaje').value = data.porcentaje || 0;
+          document.getElementById('prodPrecioAcordado').value = data.precioFinal || 0;
+          document.getElementById('prodPorcentajeReventa').value = data.porcentajeReventa || 0;
+          document.getElementById('prodStock').value = data.stock || 0;
+          document.getElementById('prodStockMinimo').value = data.stockMinimo || 5;
+          document.getElementById('prodFotoUrl').value = data.foto || '';
+          document.getElementById('prodFotoPreview').src = data.foto || '';
+          document.getElementById('prodFotoPreview').style.display = data.foto ? 'block' : 'none';
+          toggleCamposTipo();
+          calcularPrecios();
+        } else {
+          document.getElementById('prodId').value = '';
+          document.getElementById('prodNombre').value = '';
+          document.getElementById('prodCategoria').value = '';
+          document.getElementById('prodCosto').value = '';
+          document.getElementById('prodTipo').value = 'propio';
+          document.getElementById('prodPorcentaje').value = 20;
+          document.getElementById('prodPrecioAcordado').value = '';
+          document.getElementById('prodPorcentajeReventa').value = 30;
+          document.getElementById('prodStock').value = '';
+          document.getElementById('prodStockMinimo').value = 5;
+          document.getElementById('prodFotoUrl').value = '';
+          document.getElementById('prodFotoPreview').src = '';
+          document.getElementById('prodFotoPreview').style.display = 'none';
+          toggleCamposTipo();
+          calcularPrecios();
+        }
+        modal.show();
+      }
+
+      function toggleCamposTipo() {
+        const tipo = document.getElementById('prodTipo').value;
+        document.getElementById('camposPropio').style.display = tipo === 'propio' ? 'block' : 'none';
+        document.getElementById('camposConsignacion').style.display = tipo === 'consignacion' ? 'block' : 'none';
+      }
+
+      function calcularPrecios() {
+        const tipo = document.getElementById('prodTipo').value;
+        const costo = parseFloat(document.getElementById('prodCosto').value) || 0;
+        if (tipo === 'propio') {
+          const porcentaje = parseFloat(document.getElementById('prodPorcentaje').value) || 0;
+          const pf = costo * (1 + porcentaje / 100);
+          document.getElementById('prodPrecioFinal').value = pf.toFixed(2);
+        } else {
+          const acordado = parseFloat(document.getElementById('prodPrecioAcordado').value) || 0;
+          const pReventa = parseFloat(document.getElementById('prodPorcentajeReventa').value) || 0;
+          const reventa = acordado * (1 + pReventa / 100);
+          document.getElementById('prodPrecioReventa').value = reventa.toFixed(2);
+          document.getElementById('prodPrecioFinal').value = acordado.toFixed(2);
+        }
+      }
+
+      async function guardarProducto(e) {
+        e.preventDefault();
+        const nombre = document.getElementById('prodNombre').value.trim();
+        const categoria = document.getElementById('prodCategoria').value;
+        const costo = parseFloat(document.getElementById('prodCosto').value);
+        const stock = parseInt(document.getElementById('prodStock').value);
+        if (!nombre || !categoria || isNaN(costo) || isNaN(stock)) {
+          alert('Por favor, complete todos los campos obligatorios (*)');
+          return;
+        }
+
+        const id = document.getElementById('prodId').value;
+        const tipo = document.getElementById('prodTipo').value;
+        const foto = document.getElementById('prodFotoUrl').value.trim();
+        const stockMinimo = parseInt(document.getElementById('prodStockMinimo').value) || 5;
+
+        let precioFinal, porcentaje, porcentajeReventa;
+        if (tipo === 'propio') {
+          porcentaje = parseFloat(document.getElementById('prodPorcentaje').value) || 0;
+          precioFinal = costo * (1 + porcentaje / 100);
+          porcentajeReventa = 0;
+        } else {
+          const acordado = parseFloat(document.getElementById('prodPrecioAcordado').value) || 0;
+          if (acordado <= 0) {
+            alert('Para consignación debe ingresar un precio acordado mayor a 0');
+            return;
+          }
+          porcentajeReventa = parseFloat(document.getElementById('prodPorcentajeReventa').value) || 0;
+          precioFinal = acordado;
+          porcentaje = 0;
+        }
+
+        if (id) {
+          const idx = productos.findIndex(p => p.id === id);
+          if (idx !== -1) {
+            productos[idx] = { ...productos[idx], nombre, categoria, costo, precioFinal, porcentaje, tipo, stock, stockMinimo, foto, porcentajeReventa };
+          }
+        } else {
+          const newProd = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            nombre, categoria, costo, precioFinal, porcentaje, tipo, stock, stockMinimo, foto,
+            porcentajeReventa: porcentajeReventa || 0,
+            fechaCreacion: new Date().toISOString()
+          };
+          productos.push(newProd);
+        }
+        await saveAllData();
+        bootstrap.Modal.getInstance(document.getElementById('modalProducto')).hide();
+        renderAdminProductos();
+        renderCatalogo();
+        cargarSelectVentas();
+        actualizarReportes();
+      }
+
+      // ========== VENTAS ==========
+      async function registrarVenta() {
+        const prodId = document.getElementById('ventaProducto').value;
+        const cantidad = parseInt(document.getElementById('ventaCantidad').value);
+        if (!prodId || !cantidad || cantidad < 1) return alert('Seleccione producto y cantidad válida');
+        const prod = productos.find(p => p.id === prodId);
+        if (!prod) return alert('Producto no encontrado');
+        if (prod.stock < cantidad) return alert(`Stock insuficiente. Disponible: ${prod.stock}`);
+        const venta = {
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+          productoId: prod.id,
+          nombreProducto: prod.nombre,
+          cantidad: cantidad,
+          precioUnitario: prod.precioFinal,
+          total: prod.precioFinal * cantidad,
+          fecha: new Date().toISOString()
+        };
+        ventas.push(venta);
+        prod.stock -= cantidad;
+        await saveAllData();
+        renderAdminVentas();
+        cargarSelectVentas();
+        actualizarReportes();
+        renderCatalogo();
+        renderAdminProductos();
+        alert('Venta registrada');
+      }
+
+      // ========== WHATSAPP SIN STOCK ==========
+      function enviarWhatsappSinStock() {
+        const sinStock = productos.filter(p => p.stock <= 0);
+        if (sinStock.length === 0) {
+          alert('No hay productos sin stock');
+          return;
+        }
+        let msg = '📦 *Lista de productos sin stock*\n\n';
+        sinStock.forEach(p => {
+          msg += `- ${p.nombre} (ID: ${p.id})\n`;
+        });
+        const wpp = ajustes.whatsapp ? `https://wa.me/${ajustes.whatsapp}?text=${encodeURIComponent(msg)}` : '#';
+        if (wpp === '#') alert('No hay número de WhatsApp configurado');
+        else window.open(wpp, '_blank');
+      }
+
+      // ========== BACKUP ==========
+      function exportarBackup() {
+        const data = {
+          productos, ventas, ajustes, clientes, ordenes,
+          categorias: obtenerCategorias(),
+          fecha: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      async function importarBackup() {
+        const input = document.getElementById('importarBackup');
+        if (!input.files.length) return alert('Seleccione un archivo JSON');
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (data.productos && data.ventas && data.ajustes) {
+              if (confirm('¿Sobrescribir todos los datos actuales?')) {
+                productos = data.productos;
+                ventas = data.ventas;
+                ajustes = data.ajustes;
+                clientes = data.clientes || [];
+                ordenes = data.ordenes || [];
+                if (data.categorias) {
+                  categorias = data.categorias.slice();
+                }
+                await saveAllData();
+                aplicarAjustes();
+                renderizarCategorias();
+                renderCatalogo();
+                renderAdminProductos();
+                renderAdminVentas();
+                cargarSelectVentas();
+                actualizarReportes();
+                cargarAjustesForm();
+                renderClientes();
+                renderOrdenes();
+                alert('Backup importado correctamente');
+              }
+            } else {
+              alert('Archivo no válido');
+            }
+          } catch (err) {
+            alert('Error al leer el archivo');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      // ========== AJUSTES FORM ==========
+      function cargarAjustesForm() {
+        document.getElementById('ajusteNombre').value = ajustes.nombreEmpresa || '';
+        document.getElementById('ajusteWhatsapp').value = ajustes.whatsapp || '';
+        document.getElementById('ajusteDireccion').value = ajustes.direccion || '';
+        document.getElementById('ajusteHorarios').value = ajustes.horarios || '';
+        document.getElementById('ajusteLogoUrl').value = ajustes.logo || '';
+        document.getElementById('ajusteTamLogo').value = ajustes.logoTamano || 100;
+        document.getElementById('labelTamLogo').textContent = ajustes.logoTamano || 100;
+        document.getElementById('ajusteAlineacion').value = ajustes.logoAlineacion || 'centro';
+        document.getElementById('ajusteTamNombre').value = ajustes.tamNombre || 24;
+        document.getElementById('labelTamNombre').textContent = ajustes.tamNombre || 24;
+        document.getElementById('ajusteFuenteNombre').value = ajustes.fuenteNombre || "'Segoe UI', Roboto, sans-serif";
+        document.getElementById('ajusteAlineacionNombre').value = ajustes.alineacionNombre || 'center';
+        document.getElementById('ajusteVerticalNombre').value = ajustes.verticalNombre || 'middle';
+        document.getElementById('ajusteColorFondo').value = ajustes.colorFondo || '#f8f9fa';
+        document.getElementById('ajusteFondoImagen').value = ajustes.fondoImagen || '';
+        document.getElementById('ajusteTema').value = ajustes.tema || 'default';
+        document.getElementById('ajusteTamCampos').value = ajustes.tamanoCampos || 16;
+        document.getElementById('labelTamCampos').textContent = ajustes.tamanoCampos || 16;
+
+        // Control separación logo
+        let sepContainer = document.getElementById('controlSepLogo');
+        if (!sepContainer) {
+          const form = document.getElementById('formAjustes');
+          const btnGuardar = form.querySelector('button[type="submit"]');
+          const div = document.createElement('div');
+          div.className = 'mb-2';
+          div.id = 'controlSepLogo';
+          div.innerHTML = `
+            <label>Separación entre logo y nombre (px) <span id="labelSepLogo">${ajustes.separacionLogo || 8}</span>px</label>
+            <input type="range" id="ajusteSepLogo" min="0" max="500" value="${ajustes.separacionLogo || 8}" class="form-range">
+          `;
+          btnGuardar.parentNode.insertBefore(div, btnGuardar);
+        } else {
+          document.getElementById('ajusteSepLogo').value = ajustes.separacionLogo || 8;
+          document.getElementById('labelSepLogo').textContent = ajustes.separacionLogo || 8;
+        }
+        const sliderSep = document.getElementById('ajusteSepLogo');
+        if (sliderSep) sliderSep.addEventListener('input', function() {
+          document.getElementById('labelSepLogo').textContent = this.value;
+        });
+
+        // Controles desplazamiento nombre
+        let offsetContainer = document.getElementById('controlOffsetNombre');
+        if (!offsetContainer) {
+          const form = document.getElementById('formAjustes');
+          const btnGuardar = form.querySelector('button[type="submit"]');
+          const div = document.createElement('div');
+          div.className = 'mb-2';
+          div.id = 'controlOffsetNombre';
+          div.innerHTML = `
+            <label>Desplazamiento horizontal del nombre (px) <span id="labelOffsetX">${ajustes.nombreOffsetX || 0}</span>px</label>
+            <input type="range" id="ajusteOffsetX" min="-50" max="50" value="${ajustes.nombreOffsetX || 0}" class="form-range">
+            <label>Desplazamiento vertical del nombre (px) <span id="labelOffsetY">${ajustes.nombreOffsetY || 0}</span>px</label>
+            <input type="range" id="ajusteOffsetY" min="-50" max="50" value="${ajustes.nombreOffsetY || 0}" class="form-range">
+          `;
+          btnGuardar.parentNode.insertBefore(div, btnGuardar);
+        } else {
+          document.getElementById('ajusteOffsetX').value = ajustes.nombreOffsetX || 0;
+          document.getElementById('labelOffsetX').textContent = ajustes.nombreOffsetX || 0;
+          document.getElementById('ajusteOffsetY').value = ajustes.nombreOffsetY || 0;
+          document.getElementById('labelOffsetY').textContent = ajustes.nombreOffsetY || 0;
+        }
+        const sliderX = document.getElementById('ajusteOffsetX');
+        const sliderY = document.getElementById('ajusteOffsetY');
+        if (sliderX) sliderX.addEventListener('input', function() {
+          document.getElementById('labelOffsetX').textContent = this.value;
+        });
+        if (sliderY) sliderY.addEventListener('input', function() {
+          document.getElementById('labelOffsetY').textContent = this.value;
+        });
+      }
+
+      async function guardarAjustes(e) {
+        e.preventDefault();
+        ajustes.nombreEmpresa = document.getElementById('ajusteNombre').value.trim() || 'Mi Catálogo';
+        ajustes.whatsapp = document.getElementById('ajusteWhatsapp').value.trim();
+        ajustes.direccion = document.getElementById('ajusteDireccion').value.trim();
+        ajustes.horarios = document.getElementById('ajusteHorarios').value.trim();
+        ajustes.logo = document.getElementById('ajusteLogoUrl').value.trim();
+        ajustes.logoTamano = parseInt(document.getElementById('ajusteTamLogo').value);
+        ajustes.logoAlineacion = document.getElementById('ajusteAlineacion').value;
+        ajustes.tamNombre = parseInt(document.getElementById('ajusteTamNombre').value);
+        ajustes.fuenteNombre = document.getElementById('ajusteFuenteNombre').value;
+        ajustes.alineacionNombre = document.getElementById('ajusteAlineacionNombre').value;
+        ajustes.verticalNombre = document.getElementById('ajusteVerticalNombre').value;
+        ajustes.colorFondo = document.getElementById('ajusteColorFondo').value;
+        ajustes.fondoImagen = document.getElementById('ajusteFondoImagen').value.trim();
+        ajustes.tema = document.getElementById('ajusteTema').value;
+        ajustes.tamanoCampos = parseInt(document.getElementById('ajusteTamCampos').value);
+        const sep = document.getElementById('ajusteSepLogo');
+        if (sep) ajustes.separacionLogo = parseInt(sep.value);
+        const offX = document.getElementById('ajusteOffsetX');
+        const offY = document.getElementById('ajusteOffsetY');
+        if (offX) ajustes.nombreOffsetX = parseInt(offX.value);
+        if (offY) ajustes.nombreOffsetY = parseInt(offY.value);
+
+        await saveAllData();
+        aplicarAjustes();
+        alert('Ajustes guardados');
+      }
+
+      // ================================================================
+      //  NUEVAS FUNCIONES: TALLER, CLIENTES, MI BICICLETA (adaptadas)
+      // ================================================================
+
+      // -------- CLIENTES --------
+      function renderClientes() {
+        const container = document.getElementById('listaClientes');
+        if (!container) return;
+        if (clientes.length === 0) {
+          container.innerHTML = '<p>No hay clientes registrados</p>';
+          return;
+        }
+        let html = '<table class="table table-striped table-hover"><thead><tr><th>Nombre</th><th>WhatsApp</th><th>Dirección</th><th>Acciones</th></tr></thead><tbody>';
+        clientes.forEach(c => {
+          html += `
+            <tr>
+              <td>${c.nombre}</td>
+              <td>${c.whatsapp}</td>
+              <td>${c.direccion || ''}</td>
+              <td>
+                <button class="btn btn-sm btn-warning" onclick="editarCliente('${c.id}')"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="eliminarCliente('${c.id}')"><i class="bi bi-trash"></i></button>
+                <button class="btn btn-sm btn-success" onclick="enviarWhatsappPresentacion('${c.id}')"><i class="bi bi-whatsapp"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+
+      window.editarCliente = function(id) {
+        const c = clientes.find(cl => cl.id === id);
+        if (!c) return;
+        document.getElementById('clienteId').value = c.id;
+        document.getElementById('clienteNombre').value = c.nombre;
+        document.getElementById('clienteWhatsapp').value = c.whatsapp;
+        document.getElementById('clienteDireccion').value = c.direccion || '';
+        document.getElementById('modalClienteTitle').textContent = 'Editar Cliente';
+        const modal = new bootstrap.Modal(document.getElementById('modalCliente'));
+        modal.show();
+      };
+
+      window.eliminarCliente = async function(id) {
+        if (!confirm('¿Eliminar este cliente?')) return;
+        clientes = clientes.filter(c => c.id !== id);
+        await saveAllData();
+        renderClientes();
+      };
+
+      window.enviarWhatsappPresentacion = function(id) {
+        const c = clientes.find(cl => cl.id === id);
+        if (!c) return;
+        const mensaje = ajustes.mensajePresentacion || 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
+        const texto = mensaje.replace(/{empresa}/g, ajustes.nombreEmpresa || 'Mi Catálogo');
+        const wpp = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(texto)}`;
+        window.open(wpp, '_blank');
+      };
+
+      async function guardarCliente(e) {
+        e.preventDefault();
+        const id = document.getElementById('clienteId').value;
+        const nombre = document.getElementById('clienteNombre').value.trim();
+        const whatsapp = document.getElementById('clienteWhatsapp').value.trim();
+        const direccion = document.getElementById('clienteDireccion').value.trim();
+        if (!nombre || !whatsapp) {
+          alert('Nombre y WhatsApp son obligatorios');
+          return;
+        }
+        if (id) {
+          const idx = clientes.findIndex(c => c.id === id);
+          if (idx !== -1) {
+            clientes[idx] = { ...clientes[idx], nombre, whatsapp, direccion };
+          }
+        } else {
+          const newCliente = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            nombre, whatsapp, direccion
+          };
+          clientes.push(newCliente);
+        }
+        await saveAllData();
+        bootstrap.Modal.getInstance(document.getElementById('modalCliente')).hide();
+        renderClientes();
+        actualizarListaClientesSelect();
+      }
+
+      function actualizarListaClientesSelect() {
+        const datalist = document.getElementById('clientesList');
+        if (!datalist) return;
+        datalist.innerHTML = '';
+        clientes.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.nombre;
+          opt.dataset.whatsapp = c.whatsapp;
+          opt.dataset.direccion = c.direccion || '';
+          opt.dataset.id = c.id;
+          datalist.appendChild(opt);
+        });
+      }
+
+      // -------- ÓRDENES --------
+      function generarIdOrden() {
+        const existing = ordenes.map(o => parseInt(o.id) || 0);
+        const max = existing.length ? Math.max(...existing) : 0;
+        return String(max + 1).padStart(4, '0');
+      }
+
+      function renderOrdenes() {
+        const activas = ordenes.filter(o => o.estado !== 'retirada' && o.estado !== 'rechazado');
+        const cerradas = ordenes.filter(o => o.estado === 'retirada' || o.estado === 'rechazado');
+
+        activas.sort((a, b) => new Date(a.fechaIngreso) - new Date(b.fechaIngreso));
+        cerradas.sort((a, b) => new Date(b.fechaIngreso) - new Date(a.fechaIngreso));
+
+        const containerActivas = document.getElementById('listaOrdenesActivas');
+        const containerCerradas = document.getElementById('listaOrdenesCerradas');
+
+        if (activas.length === 0) {
+          containerActivas.innerHTML = '<p>No hay órdenes activas</p>';
+        } else {
+          let html = '<div class="table-responsive"><table class="table table-sm"><thead><tr><th>ID</th><th>Cliente</th><th>Modelo</th><th>Estado</th><th>Ingreso</th><th>Acciones</th></tr></thead><tbody>';
+          activas.forEach(o => {
+            const estadoClass = 'fila-' + o.estado;
+            const estadoLabel = o.estado.replace('_', ' ').toUpperCase();
+            html += `
+              <tr class="${estadoClass}" style="border-left: 4px solid var(--estado-color, #6c757d);">
+                <td>${o.id}</td>
+                <td>${o.clienteNombre}</td>
+                <td>${o.modelo || ''}</td>
+                <td><span class="badge estado-badge estado-${o.estado}">${estadoLabel}</span></td>
+                <td>${o.fechaIngreso || ''}</td>
+                <td>
+                  <button class="btn btn-sm btn-warning" onclick="editarOrden('${o.id}')"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-danger" onclick="eliminarOrden('${o.id}')"><i class="bi bi-trash"></i></button>
+                  <button class="btn btn-sm btn-success" onclick="enviarWhatsappOrden('${o.id}')"><i class="bi bi-whatsapp"></i></button>
+                </td>
+              </tr>
+            `;
+          });
+          html += '</tbody></table></div>';
+          containerActivas.innerHTML = html;
+        }
+
+        if (cerradas.length === 0) {
+          containerCerradas.innerHTML = '<p>No hay órdenes cerradas</p>';
+        } else {
+          let html = '<div class="table-responsive"><table class="table table-sm"><thead><tr><th>ID</th><th>Cliente</th><th>Modelo</th><th>Estado</th><th>Ingreso</th><th>Acciones</th></tr></thead><tbody>';
+          cerradas.forEach(o => {
+            const estadoClass = 'fila-' + o.estado;
+            const estadoLabel = o.estado.replace('_', ' ').toUpperCase();
+            html += `
+              <tr class="${estadoClass}" style="border-left: 4px solid var(--estado-color, #6c757d);">
+                <td>${o.id}</td>
+                <td>${o.clienteNombre}</td>
+                <td>${o.modelo || ''}</td>
+                <td><span class="badge estado-badge estado-${o.estado}">${estadoLabel}</span></td>
+                <td>${o.fechaIngreso || ''}</td>
+                <td>
+                  <button class="btn btn-sm btn-warning" onclick="editarOrden('${o.id}')"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-danger" onclick="eliminarOrden('${o.id}')"><i class="bi bi-trash"></i></button>
+                  <button class="btn btn-sm btn-success" onclick="enviarWhatsappOrden('${o.id}')"><i class="bi bi-whatsapp"></i></button>
+                </td>
+              </tr>
+            `;
+          });
+          html += '</tbody></table></div>';
+          containerCerradas.innerHTML = html;
+        }
+      }
+
+      window.editarOrden = function(id) {
+        const orden = ordenes.find(o => o.id === id);
+        if (!orden) return;
+        abrirModalOrden(orden);
+      };
+
+      window.eliminarOrden = async function(id) {
+        if (!confirm('¿Eliminar esta orden?')) return;
+        const orden = ordenes.find(o => o.id === id);
+        if (orden && orden.repuestos) {
+          orden.repuestos.forEach(r => {
+            const prod = productos.find(p => p.id === r.id);
+            if (prod) {
+              prod.stock += r.cantidad;
+            }
+          });
+        }
+        ordenes = ordenes.filter(o => o.id !== id);
+        await saveAllData();
+        renderOrdenes();
+        cargarSelectRepuestos();
+        renderCatalogo();
+        renderAdminProductos();
+        actualizarReportes();
+      };
+
+      window.enviarWhatsappOrden = function(id) {
+        const orden = ordenes.find(o => o.id === id);
+        if (!orden) return;
+        const cliente = clientes.find(c => c.id === orden.clienteId);
+        const wpp = cliente ? cliente.whatsapp : orden.clienteWhatsapp;
+        if (!wpp) {
+          alert('El cliente no tiene número de WhatsApp');
+          return;
+        }
+        const estadoLabel = orden.estado.replace('_', ' ').toUpperCase();
+        let msg = `🚲 *${ajustes.nombreEmpresa || 'Taller'}* - Estado de tu orden%0A%0A`;
+        msg += `📋 *Orden N°:* ${orden.id}%0A`;
+        msg += `👤 *Cliente:* ${orden.clienteNombre}%0A`;
+        msg += `🚲 *Modelo:* ${orden.modelo || 'No especificado'}%0A`;
+        msg += `📌 *Estado:* ${estadoLabel}%0A`;
+        msg += `📅 *Ingreso:* ${orden.fechaIngreso || ''}%0A`;
+        if (orden.fechaSalida) msg += `📅 *Salida prevista:* ${orden.fechaSalida}%0A`;
+        if (orden.fallaInicial) msg += `🔧 *Falla inicial:* ${orden.fallaInicial}%0A`;
+        if (orden.diagnostico) msg += `🩺 *Diagnóstico:* ${orden.diagnostico}%0A`;
+        if (orden.trabajoRealizado) msg += `✅ *Trabajo realizado:* ${orden.trabajoRealizado}%0A`;
+        const total = calcularTotalOrden(orden);
+        msg += `💰 *Presupuesto total:* $${total.toFixed(2)}%0A`;
+        if (orden.repuestos && orden.repuestos.length) {
+          msg += `🔩 *Repuestos colocados:*%0A`;
+          orden.repuestos.forEach(r => {
+            msg += `  - ${r.nombre} (x${r.cantidad}) $${r.precio}%0A`;
+          });
+        }
+        if (orden.estado === 'retirada' && orden.fechaSalida && orden.garantiaDias) {
+          const diasRestantes = calcularGarantiaRestante(orden);
+          if (diasRestantes > 0) {
+            msg += `🛡️ *Garantía restante:* ${diasRestantes} días%0A`;
+          } else {
+            msg += `🛡️ *Garantía expirada*%0A`;
+          }
+        } else {
+          msg += `🛡️ *Garantía:* ${orden.garantiaDias || 0} días (en revisión)%0A`;
+        }
+        msg += `%0A_Consulta por este medio para más información._`;
+        const url = `https://wa.me/${wpp}?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+      };
+
+      function calcularTotalOrden(orden) {
+        let total = parseFloat(orden.presupuestoMano) || 0;
+        if (orden.repuestos) {
+          orden.repuestos.forEach(r => {
+            total += r.precio * r.cantidad;
+          });
+        }
+        return total;
+      }
+
+      function calcularGarantiaRestante(orden) {
+        if (!orden.fechaSalida || !orden.garantiaDias) return 0;
+        const salida = new Date(orden.fechaSalida);
+        const hoy = new Date();
+        const diff = Math.floor((hoy - salida) / (1000 * 60 * 60 * 24));
+        return Math.max(0, orden.garantiaDias - diff);
+      }
+
+      function abrirModalOrden(data) {
+        const modal = new bootstrap.Modal(document.getElementById('modalOrden'));
+        if (data) {
+          document.getElementById('modalOrdenTitle').textContent = 'Editar Orden';
+          document.getElementById('ordenId').value = data.id;
+          document.getElementById('ordenIdAuto').value = data.id;
+          document.getElementById('ordenEstado').value = data.estado || 'no_visto';
+          document.getElementById('ordenClienteNombre').value = data.clienteNombre || '';
+          document.getElementById('ordenClienteWhatsapp').value = data.clienteWhatsapp || '';
+          document.getElementById('ordenClienteDireccion').value = data.clienteDireccion || '';
+          document.getElementById('ordenModelo').value = data.modelo || '';
+          document.getElementById('ordenAccesorios').value = data.accesorios || '';
+          document.getElementById('ordenFechaIngreso').value = data.fechaIngreso || '';
+          document.getElementById('ordenFechaSalida').value = data.fechaSalida || '';
+          document.getElementById('ordenGarantia').value = data.garantiaDias || 30;
+          document.getElementById('ordenFallaInicial').value = data.fallaInicial || '';
+          document.getElementById('ordenDiagnostico').value = data.diagnostico || '';
+          document.getElementById('ordenTrabajoRealizado').value = data.trabajoRealizado || '';
+          document.getElementById('ordenPresupuestoMano').value = data.presupuestoMano || 0;
+          const repuestosContainer = document.getElementById('ordenRepuestosList');
+          repuestosContainer.innerHTML = '';
+          if (data.repuestos && data.repuestos.length) {
+            data.repuestos.forEach(r => {
+              agregarRepuestoItem(r.id, r.nombre, r.cantidad, r.precio);
+            });
+          }
+          calcularTotalPresupuesto();
+        } else {
+          document.getElementById('modalOrdenTitle').textContent = 'Nueva Orden';
+          document.getElementById('ordenId').value = '';
+          document.getElementById('ordenIdAuto').value = generarIdOrden();
+          document.getElementById('ordenEstado').value = 'no_visto';
+          document.getElementById('ordenClienteNombre').value = '';
+          document.getElementById('ordenClienteWhatsapp').value = '';
+          document.getElementById('ordenClienteDireccion').value = '';
+          document.getElementById('ordenModelo').value = '';
+          document.getElementById('ordenAccesorios').value = '';
+          const hoy = new Date().toISOString().slice(0,10);
+          document.getElementById('ordenFechaIngreso').value = hoy;
+          document.getElementById('ordenFechaSalida').value = '';
+          document.getElementById('ordenGarantia').value = 30;
+          document.getElementById('ordenFallaInicial').value = '';
+          document.getElementById('ordenDiagnostico').value = '';
+          document.getElementById('ordenTrabajoRealizado').value = '';
+          document.getElementById('ordenPresupuestoMano').value = 0;
+          document.getElementById('ordenRepuestosList').innerHTML = '';
+          calcularTotalPresupuesto();
+        }
+        modal.show();
+      }
+
+      function agregarRepuestoItem(id, nombre, cantidad, precio) {
+        const container = document.getElementById('ordenRepuestosList');
+        const div = document.createElement('div');
+        div.className = 'd-flex justify-content-between align-items-center border p-1 mt-1';
+        div.dataset.id = id;
+        div.innerHTML = `
+          <span>${nombre} (x${cantidad}) $${precio.toFixed(2)}</span>
+          <button class="btn btn-sm btn-danger eliminar-repuesto" type="button"><i class="bi bi-trash"></i></button>
+        `;
+        container.appendChild(div);
+        div.querySelector('.eliminar-repuesto').addEventListener('click', function() {
+          const repId = div.dataset.id;
+          const ordenId = document.getElementById('ordenId').value;
+          const prod = productos.find(p => p.id === repId);
+          if (prod) {
+            const orden = ordenes.find(o => o.id === ordenId);
+            if (orden && orden.repuestos) {
+              const rep = orden.repuestos.find(r => r.id === repId);
+              if (rep) {
+                prod.stock += rep.cantidad;
+              }
+            }
+          }
+          div.remove();
+          calcularTotalPresupuesto();
+          cargarSelectRepuestos();
+        });
+      }
+
+      function calcularTotalPresupuesto() {
+        const mano = parseFloat(document.getElementById('ordenPresupuestoMano').value) || 0;
+        let repuestosTotal = 0;
+        const items = document.querySelectorAll('#ordenRepuestosList .d-flex');
+        items.forEach(item => {
+          const precioText = item.querySelector('span').textContent.match(/\$([\d.]+)/);
+          if (precioText) {
+            repuestosTotal += parseFloat(precioText[1]);
+          }
+        });
+        const total = mano + repuestosTotal;
+        document.getElementById('ordenTotalPresupuesto').textContent = total.toFixed(2);
+      }
+
+      async function guardarOrden(e) {
+        e.preventDefault();
+        const id = document.getElementById('ordenId').value;
+        const estado = document.getElementById('ordenEstado').value;
+        const clienteNombre = document.getElementById('ordenClienteNombre').value.trim();
+        const clienteWhatsapp = document.getElementById('ordenClienteWhatsapp').value.trim();
+        const clienteDireccion = document.getElementById('ordenClienteDireccion').value.trim();
+        const modelo = document.getElementById('ordenModelo').value.trim();
+        const accesorios = document.getElementById('ordenAccesorios').value.trim();
+        const fechaIngreso = document.getElementById('ordenFechaIngreso').value;
+        const fechaSalida = document.getElementById('ordenFechaSalida').value;
+        const garantiaDias = parseInt(document.getElementById('ordenGarantia').value) || 0;
+        const fallaInicial = document.getElementById('ordenFallaInicial').value.trim();
+        const diagnostico = document.getElementById('ordenDiagnostico').value.trim();
+        const trabajoRealizado = document.getElementById('ordenTrabajoRealizado').value.trim();
+        const presupuestoMano = parseFloat(document.getElementById('ordenPresupuestoMano').value) || 0;
+
+        if (!clienteNombre || !clienteWhatsapp) {
+          alert('Nombre y WhatsApp del cliente son obligatorios');
+          return;
+        }
+
+        let clienteId = null;
+        let clienteExistente = clientes.find(c => c.whatsapp === clienteWhatsapp);
+        if (!clienteExistente) {
+          const newCliente = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            nombre: clienteNombre,
+            whatsapp: clienteWhatsapp,
+            direccion: clienteDireccion
+          };
+          clientes.push(newCliente);
+          clienteId = newCliente.id;
+        } else {
+          clienteId = clienteExistente.id;
+          clienteExistente.nombre = clienteNombre;
+          clienteExistente.direccion = clienteDireccion || clienteExistente.direccion;
+        }
+
+        const repuestos = [];
+        const items = document.querySelectorAll('#ordenRepuestosList .d-flex');
+        items.forEach(item => {
+          const span = item.querySelector('span');
+          const text = span.textContent;
+          const match = text.match(/(.+?) \(x(\d+)\) \$([\d.]+)/);
+          if (match) {
+            const nombre = match[1].trim();
+            const cantidad = parseInt(match[2]);
+            const precio = parseFloat(match[3]);
+            const prod = productos.find(p => p.nombre === nombre);
+            if (prod) {
+              repuestos.push({ id: prod.id, nombre: prod.nombre, cantidad, precio });
+            }
+          }
+        });
+
+        if (id) {
+          const ordenExistente = ordenes.find(o => o.id === id);
+          if (ordenExistente && estado === 'rechazado' && ordenExistente.estado !== 'rechazado') {
+            if (ordenExistente.repuestos && ordenExistente.repuestos.length) {
+              ordenExistente.repuestos.forEach(r => {
+                const prod = productos.find(p => p.id === r.id);
+                if (prod) {
+                  prod.stock += r.cantidad;
+                }
+              });
+              repuestos.length = 0;
+            }
+          }
+        }
+
+        const ordenData = {
+          id: id || generarIdOrden(),
+          clienteId,
+          clienteNombre,
+          clienteWhatsapp,
+          clienteDireccion,
+          modelo,
+          accesorios,
+          fechaIngreso,
+          fechaSalida,
+          garantiaDias,
+          fallaInicial,
+          diagnostico,
+          trabajoRealizado,
+          presupuestoMano,
+          repuestos,
+          estado
+        };
+
+        if (id) {
+          const idx = ordenes.findIndex(o => o.id === id);
+          if (idx !== -1) {
+            ordenes[idx] = ordenData;
+          }
+        } else {
+          ordenes.push(ordenData);
+        }
+        await saveAllData();
+        bootstrap.Modal.getInstance(document.getElementById('modalOrden')).hide();
+        renderOrdenes();
+        cargarSelectRepuestos();
+        renderClientes();
+        actualizarListaClientesSelect();
+        renderCatalogo();
+        renderAdminProductos();
+        actualizarReportes();
+      }
+
+      // -------- SELECT DE REPUESTOS --------
+      function cargarSelectRepuestos() {
+        const sel = document.getElementById('ordenRepuestoSelect');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">Seleccionar repuesto</option>';
+        productos.forEach(p => {
+          if (p.stock > 0) {
+            sel.innerHTML += `<option value="${p.id}" data-precio="${p.costo}">${p.nombre} (Stock: ${p.stock}) - $${p.costo}</option>`;
+          }
+        });
+      }
+
+      // -------- MI BICICLETA --------
+      function buscarOrdenPorWhatsapp() {
+        const numero = document.getElementById('clienteWhatsappBuscar').value.trim();
+        const container = document.getElementById('resultadoOrdenCliente');
+        if (!numero) {
+          container.innerHTML = '<p class="text-warning">Ingresa un número de WhatsApp</p>';
+          return;
+        }
+        const ordenesCliente = ordenes.filter(o => o.clienteWhatsapp === numero);
+        if (ordenesCliente.length === 0) {
+          container.innerHTML = '<p class="text-danger">No se encontraron órdenes para este número</p>';
+          return;
+        }
+        let html = '';
+        ordenesCliente.forEach(o => {
+          const estadoLabel = o.estado.replace('_', ' ').toUpperCase();
+          const total = calcularTotalOrden(o);
+          const garantia = o.estado === 'retirada' && o.fechaSalida ? calcularGarantiaRestante(o) : null;
+          html += `
+            <div class="card orden-card mb-2">
+              <div class="card-body">
+                <h6 class="card-title">Orden #${o.id} - <span class="badge estado-badge estado-${o.estado}">${estadoLabel}</span></h6>
+                <p><strong>Cliente:</strong> ${o.clienteNombre}</p>
+                <p><strong>Modelo:</strong> ${o.modelo || 'No especificado'}</p>
+                <p><strong>Accesorios:</strong> ${o.accesorios || 'Ninguno'}</p>
+                <p><strong>Ingreso:</strong> ${o.fechaIngreso || ''} ${o.fechaSalida ? '| Salida: '+o.fechaSalida : ''}</p>
+                <p><strong>Falla inicial:</strong> ${o.fallaInicial || 'No registrada'}</p>
+                <p><strong>Diagnóstico:</strong> ${o.diagnostico || 'No registrado'}</p>
+                <p><strong>Trabajo realizado:</strong> ${o.trabajoRealizado || 'No registrado'}</p>
+                <p><strong>Presupuesto total:</strong> $${total.toFixed(2)}</p>
+                ${o.repuestos && o.repuestos.length ? `<p><strong>Repuestos:</strong> ${o.repuestos.map(r => r.nombre+' (x'+r.cantidad+') $'+r.precio).join(', ')}</p>` : ''}
+                <p><strong>Garantía:</strong> ${garantia !== null ? (garantia > 0 ? garantia+' días restantes' : 'GARANTÍA EXPIRADA') : (o.garantiaDias ? o.garantiaDias+' días (en revisión)' : 'Sin garantía')}</p>
+                <button class="btn btn-sm btn-success" onclick="consultarOrdenWhatsapp('${o.id}')"><i class="bi bi-whatsapp"></i> Consultar por WhatsApp</button>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      }
+
+      window.consultarOrdenWhatsapp = function(id) {
+        const orden = ordenes.find(o => o.id === id);
+        if (!orden) return;
+        const wpp = orden.clienteWhatsapp;
+        if (!wpp) return;
+        const estadoLabel = orden.estado.replace('_', ' ').toUpperCase();
+        let msg = `Hola, consulto sobre mi orden #${orden.id} (${estadoLabel}) en ${ajustes.nombreEmpresa || 'el taller'}.%0A`;
+        msg += `Modelo: ${orden.modelo || 'No especificado'}%0A`;
+        msg += `¿Podrían darme más información?`;
+        const url = `https://wa.me/${wpp}?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+      };
+
+      // ================================================================
+      //  EVENTOS E INICIALIZACIÓN
+      // ================================================================
+
+      function initEventos() {
+        const btnCatalogo = document.getElementById('btnCatalogo');
+        const btnAdmin = document.getElementById('btnAdmin');
+
+        function setActiveButton(activeBtn) {
+          [btnCatalogo, btnAdmin].forEach(btn => btn.classList.remove('active'));
+          activeBtn.classList.add('active');
+        }
+
+        btnCatalogo.addEventListener('click', function(e) {
+          e.preventDefault();
+          setActiveButton(this);
+          mostrarSeccion('catalogo');
+        });
+
+        btnAdmin.addEventListener('click', function(e) {
+          e.preventDefault();
+          setActiveButton(this);
+          mostrarSeccion('admin');
+        });
+
+        document.getElementById('btnLoginAdmin').addEventListener('click', loginAdmin);
+        document.getElementById('btnAgregarProducto').addEventListener('click', () => abrirModalProducto());
+        document.getElementById('formProducto').addEventListener('submit', guardarProducto);
+        document.getElementById('prodTipo').addEventListener('change', toggleCamposTipo);
+        document.getElementById('prodCosto').addEventListener('input', calcularPrecios);
+        document.getElementById('prodPorcentaje').addEventListener('input', calcularPrecios);
+        document.getElementById('prodPrecioAcordado').addEventListener('input', calcularPrecios);
+        document.getElementById('prodPorcentajeReventa').addEventListener('input', calcularPrecios);
+
+        document.getElementById('prodFotoFile').addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+              document.getElementById('prodFotoUrl').value = ev.target.result;
+              document.getElementById('prodFotoPreview').src = ev.target.result;
+              document.getElementById('prodFotoPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+        document.getElementById('prodFotoUrl').addEventListener('input', function() {
+          const url = this.value;
+          const preview = document.getElementById('prodFotoPreview');
+          if (url) {
+            preview.src = url;
+            preview.style.display = 'block';
+          } else {
+            preview.style.display = 'none';
+          }
+        });
+
+        document.getElementById('btnRegistrarVenta').addEventListener('click', registrarVenta);
+
+        document.querySelectorAll('[data-periodo]').forEach(btn => {
+          btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-periodo]').forEach(b => b.classList.remove('btn-primary'));
+            this.classList.add('btn-primary');
+            actualizarReportes(this.dataset.periodo);
+          });
+        });
+        document.querySelector('[data-periodo="dia"]').classList.add('btn-primary');
+
+        document.getElementById('btnWhatsappSinStock').addEventListener('click', enviarWhatsappSinStock);
+        document.getElementById('btnExportarBackup').addEventListener('click', exportarBackup);
+        document.getElementById('btnImportarBackup').addEventListener('click', importarBackup);
+        document.getElementById('formAjustes').addEventListener('submit', guardarAjustes);
+        document.getElementById('btnGestionarCategorias').addEventListener('click', abrirModalGestionCategorias);
+        document.getElementById('btnAgregarCategoria').addEventListener('click', agregarCategoriaDesdeModal);
+
+        document.getElementById('ajusteTamLogo').addEventListener('input', function() {
+          document.getElementById('labelTamLogo').textContent = this.value;
+        });
+        document.getElementById('ajusteTamNombre').addEventListener('input', function() {
+          document.getElementById('labelTamNombre').textContent = this.value;
+        });
+        document.getElementById('ajusteTamCampos').addEventListener('input', function() {
+          document.getElementById('labelTamCampos').textContent = this.value;
+        });
+
+        document.getElementById('ajusteLogoFile').addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+              document.getElementById('ajusteLogoUrl').value = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        document.getElementById('btnResetFondo').addEventListener('click', function() {
+          document.getElementById('ajusteColorFondo').value = '#f8f9fa';
+          document.getElementById('ajusteFondoImagen').value = '';
+          ajustes.colorFondo = '#f8f9fa';
+          ajustes.fondoImagen = '';
+          saveAllData();
+          aplicarAjustes();
+        });
+
+        // Búsqueda
+        const inputBuscar = document.getElementById('buscarProducto');
+        if (inputBuscar) {
+          inputBuscar.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            const list = document.getElementById('suggestionsList');
+            if (query.length === 0) {
+              list.style.display = 'none';
+              renderCatalogo();
+              return;
+            }
+            const coincidencias = productos.filter(p => {
+              if (p.stock <= 0) return false;
+              return p.nombre.toLowerCase().includes(query) || (p.categoria && p.categoria.toLowerCase().includes(query));
+            }).slice(0, 8);
+            if (coincidencias.length === 0) {
+              list.innerHTML = '<div class="suggestion-item" style="justify-content:center; color:#999;">No hay coincidencias</div>';
+              list.style.display = 'block';
+              return;
+            }
+            list.innerHTML = coincidencias.map(p => `
+              <div class="suggestion-item" data-id="${p.id}">
+                <span class="suggestion-name">${p.nombre}</span>
+                <span class="suggestion-price">$${p.precioFinal}</span>
+              </div>
+            `).join('');
+            list.style.display = 'block';
+            list.querySelectorAll('.suggestion-item').forEach(el => {
+              el.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const prod = productos.find(p => p.id === id);
+                if (prod) {
+                  document.getElementById('buscarProducto').value = prod.nombre;
+                  list.style.display = 'none';
+                  renderCatalogo();
+                }
+              });
+            });
+          });
+          document.addEventListener('click', function(e) {
+            if (!e.target.closest('.suggestions-container')) {
+              document.getElementById('suggestionsList').style.display = 'none';
+            }
+          });
+        }
+
+        document.getElementById('filtroCategoria').addEventListener('change', renderCatalogo);
+        document.getElementById('ordenPrecio').addEventListener('change', renderCatalogo);
+
+        // ========== EVENTOS TALLER ==========
+        document.getElementById('btnNuevaOrden').addEventListener('click', () => abrirModalOrden(null));
+        document.getElementById('formOrden').addEventListener('submit', guardarOrden);
+        document.getElementById('btnSeleccionarCliente').addEventListener('click', function() {
+          const input = document.getElementById('ordenClienteBuscar');
+          const value = input.value.trim();
+          const cliente = clientes.find(c => c.nombre === value);
+          if (cliente) {
+            document.getElementById('ordenClienteNombre').value = cliente.nombre;
+            document.getElementById('ordenClienteWhatsapp').value = cliente.whatsapp;
+            document.getElementById('ordenClienteDireccion').value = cliente.direccion || '';
+          } else {
+            alert('Cliente no encontrado. Puedes escribirlo manualmente.');
+          }
+        });
+        document.getElementById('ordenPresupuestoMano').addEventListener('input', calcularTotalPresupuesto);
+        document.getElementById('btnAgregarRepuesto').addEventListener('click', function() {
+          const sel = document.getElementById('ordenRepuestoSelect');
+          const cant = parseInt(document.getElementById('ordenRepuestoCant').value) || 1;
+          const id = sel.value;
+          if (!id) return alert('Selecciona un repuesto');
+          const prod = productos.find(p => p.id === id);
+          if (!prod) return alert('Producto no encontrado');
+          if (prod.stock < cant) return alert(`Stock insuficiente. Disponible: ${prod.stock}`);
+          prod.stock -= cant;
+          agregarRepuestoItem(prod.id, prod.nombre, cant, prod.costo);
+          calcularTotalPresupuesto();
+          cargarSelectRepuestos();
+          saveAllData();
+        });
+        document.getElementById('btnEnviarWhatsappOrden').addEventListener('click', function() {
+          const id = document.getElementById('ordenId').value;
+          if (id) {
+            enviarWhatsappOrden(id);
+          } else {
+            alert('Primero guarda la orden');
+          }
+        });
+
+        // ========== EVENTOS CLIENTES ==========
+        document.getElementById('btnNuevoCliente').addEventListener('click', function() {
+          document.getElementById('clienteId').value = '';
+          document.getElementById('clienteNombre').value = '';
+          document.getElementById('clienteWhatsapp').value = '';
+          document.getElementById('clienteDireccion').value = '';
+          document.getElementById('modalClienteTitle').textContent = 'Nuevo Cliente';
+          const modal = new bootstrap.Modal(document.getElementById('modalCliente'));
+          modal.show();
+        });
+        document.getElementById('formCliente').addEventListener('submit', guardarCliente);
+
+        // ========== EVENTOS MI BICICLETA ==========
+        document.getElementById('btnMiBicicleta').addEventListener('click', function(e) {
+          e.preventDefault();
+          document.getElementById('clienteWhatsappBuscar').value = '';
+          document.getElementById('resultadoOrdenCliente').innerHTML = '';
+          const modal = new bootstrap.Modal(document.getElementById('modalMiBicicleta'));
+          modal.show();
+        });
+        document.getElementById('btnBuscarOrdenCliente').addEventListener('click', buscarOrdenPorWhatsapp);
+        document.getElementById('clienteWhatsappBuscar').addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') buscarOrdenPorWhatsapp();
+        });
+      }
+
+      function mostrarSeccion(seccion) {
+        document.getElementById('seccionCatalogo').style.display = (seccion === 'catalogo') ? 'block' : 'none';
+        document.getElementById('seccionAdmin').style.display = (seccion === 'admin') ? 'block' : 'none';
+      }
+
+      function loginAdmin() {
+        const clave = document.getElementById('claveAdmin').value;
+        if (clave === DEFAULT_PASSWORD) {
+          document.getElementById('loginAdmin').style.display = 'none';
+          document.getElementById('panelAdmin').style.display = 'block';
+          document.getElementById('msjLogin').textContent = '';
+          renderClientes();
+          renderOrdenes();
+          cargarSelectRepuestos();
+          actualizarListaClientesSelect();
+        } else {
+          document.getElementById('msjLogin').textContent = 'Clave incorrecta';
+        }
+      }
+
+      function abrirModalGestionCategorias() {
+        renderizarCategorias();
+        const modal = new bootstrap.Modal(document.getElementById('modalGestionCategorias'));
+        modal.show();
+      }
+
+      async function agregarCategoriaDesdeModal() {
+        const input = document.getElementById('nuevaCategoriaInput');
+        const nombre = input.value.trim();
+        if (!nombre) return alert('Ingresa un nombre de categoría');
+        let cats = obtenerCategorias();
+        if (cats.includes(nombre)) return alert('La categoría ya existe');
+        cats.push(nombre);
+        await guardarCategorias(cats);
+        renderizarCategorias();
+        input.value = '';
+        renderCatalogo();
+      }
+
+      // ========== INICIALIZACIÓN ==========
+      async function init() {
+        await loadAllData();
+        aplicarAjustes();
+        renderizarCategorias();
+        renderCatalogo();
+        renderAdminProductos();
+        renderAdminVentas();
+        actualizarReportes();
+        cargarSelectVentas();
+        cargarAjustesForm();
+        initEventos();
+        mostrarSeccion('catalogo');
+        document.getElementById('btnCatalogo').classList.add('active');
+        console.log('✅ Catálogo inicializado con Firebase');
+      }
+
+      // Ejecutar
+      await init();
+
+    })();
+  </script>
+</body>
+</html>
