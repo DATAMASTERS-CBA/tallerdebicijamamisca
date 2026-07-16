@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Taller de Bicicletas</title>
+  <title>Catálogo</title>
   <!-- Bootstrap 5 + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -494,7 +494,7 @@
     <div class="container-fluid">
       <div class="logo-container" id="logoContainer">
         <img id="logoImg" src="" alt="Logo" class="logo-img me-2" style="display:none;">
-        <span class="navbar-brand" id="empresaNombre">JAMA MISCA</span>
+        <span class="navbar-brand" id="empresaNombre">Mi Catálogo</span>
       </div>
 
       <!-- Botón Mi Bicicleta -->
@@ -2220,16 +2220,58 @@
         container.innerHTML = html;
       }
 
+      // ================================================================
+      // FUNCIÓN MODIFICADA: consultarOrdenWhatsapp - ENVÍA MENSAJE A LA EMPRESA
+      // ================================================================
       window.consultarOrdenWhatsapp = function(id) {
         const orden = ordenes.find(o => o.id === id);
-        if (!orden) return;
-        const wpp = orden.clienteWhatsapp;
-        if (!wpp) return;
+        if (!orden) {
+          alert('Orden no encontrada');
+          return;
+        }
+
+        // Número de la empresa desde ajustes
+        const empresaWpp = ajustes.whatsapp;
+        if (!empresaWpp) {
+          alert('No hay número de WhatsApp configurado para la empresa. Ve a Ajustes y agrégalo.');
+          return;
+        }
+
+        // Construir mensaje para la empresa
         const estadoLabel = orden.estado.replace('_', ' ').toUpperCase();
-        let msg = `Hola, consulto sobre mi orden #${orden.id} (${estadoLabel}) en ${ajustes.nombreEmpresa || 'el taller'}.%0A`;
-        msg += `Modelo: ${orden.modelo || 'No especificado'}%0A`;
-        msg += `¿Podrían darme más información?`;
-        const url = `https://wa.me/${wpp}?text=${encodeURIComponent(msg)}`;
+        let msg = `🚲 *NUEVA CONSULTA DE CLIENTE*%0A`;
+        msg += `📋 *Orden N°:* ${orden.id}%0A`;
+        msg += `👤 *Cliente:* ${orden.clienteNombre}%0A`;
+        msg += `📱 *WhatsApp del cliente:* ${orden.clienteWhatsapp}%0A`;
+        msg += `🚲 *Modelo:* ${orden.modelo || 'No especificado'}%0A`;
+        msg += `📌 *Estado actual:* ${estadoLabel}%0A`;
+        msg += `📅 *Ingreso:* ${orden.fechaIngreso || ''}%0A`;
+        if (orden.fechaSalida) msg += `📅 *Salida prevista:* ${orden.fechaSalida}%0A`;
+        if (orden.fallaInicial) msg += `🔧 *Falla inicial:* ${orden.fallaInicial}%0A`;
+        if (orden.diagnostico) msg += `🩺 *Diagnóstico:* ${orden.diagnostico}%0A`;
+        if (orden.trabajoRealizado) msg += `✅ *Trabajo realizado:* ${orden.trabajoRealizado}%0A`;
+        const total = calcularTotalOrden(orden);
+        msg += `💰 *Presupuesto total:* $${total.toFixed(2)}%0A`;
+        if (orden.repuestos && orden.repuestos.length) {
+          msg += `🔩 *Repuestos colocados:*%0A`;
+          orden.repuestos.forEach(r => {
+            msg += `  - ${r.nombre} (x${r.cantidad}) $${r.precio}%0A`;
+          });
+        }
+        if (orden.estado === 'retirada' && orden.fechaSalida && orden.garantiaDias) {
+          const diasRestantes = calcularGarantiaRestante(orden);
+          if (diasRestantes > 0) {
+            msg += `🛡️ *Garantía restante:* ${diasRestantes} días%0A`;
+          } else {
+            msg += `🛡️ *Garantía expirada*%0A`;
+          }
+        } else {
+          msg += `🛡️ *Garantía:* ${orden.garantiaDias || 0} días (en revisión)%0A`;
+        }
+        msg += `%0A_El cliente ${orden.clienteNombre} está consultando el estado de su orden. Por favor, comuníquese con él al ${orden.clienteWhatsapp} para brindarle atención._`;
+
+        // Abrir WhatsApp con el número de la empresa
+        const url = `https://wa.me/${empresaWpp}?text=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
       };
 
