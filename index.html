@@ -485,12 +485,6 @@
     .orden-card:hover {
       transform: scale(1.01);
     }
-
-    /* Ajuste para que el botón Mi Bicicleta sea visible en móviles (se añade con JS) */
-    .btn-bicicleta-movil {
-      display: inline-block !important;
-      margin: 0.2rem 0.5rem;
-    }
   </style>
 </head>
 <body>
@@ -503,7 +497,7 @@
         <span class="navbar-brand" id="empresaNombre">Mi Catálogo</span>
       </div>
 
-      <!-- Botón Mi Bicicleta (visible en desktop, se hará visible en móvil con JS) -->
+      <!-- Botón Mi Bicicleta -->
       <a href="#" class="btn-bicicleta d-none d-lg-inline-block" id="btnMiBicicleta" title="Consultar estado de tu bicicleta">
         <i class="bi bi-bicycle"></i> Mi Bicicleta
       </a>
@@ -979,9 +973,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // =================================================================
-    // SCRIPT COMPLETO - CON FIREBASE (optimizado)
+    // SCRIPT COMPLETO - CON FIREBASE (reemplaza localStorage)
     // =================================================================
-    (function() {
+    (async function() {
       "use strict";
 
       if (window.__inicializado) return;
@@ -997,29 +991,14 @@
         appId: "1:679191807904:web:327bbd8284986a5abf06c5"
       };
 
-      // Cargar Firebase dinámicamente con <script> en lugar de módulos
-      function loadFirebase() {
-        return new Promise((resolve, reject) => {
-          if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
-            resolve(firebase);
-            return;
-          }
-          // Cargar app y firestore
-          const scriptApp = document.createElement('script');
-          scriptApp.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
-          scriptApp.onload = () => {
-            const scriptFirestore = document.createElement('script');
-            scriptFirestore.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js';
-            scriptFirestore.onload = () => {
-              resolve(firebase);
-            };
-            scriptFirestore.onerror = reject;
-            document.head.appendChild(scriptFirestore);
-          };
-          scriptApp.onerror = reject;
-          document.head.appendChild(scriptApp);
-        });
-      }
+      // Importar Firebase dinámicamente
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+      const { getFirestore, doc, getDoc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const COLLECTION = 'appData';
+      const DOC_ID = 'main';
 
       // ========== VARIABLES GLOBALES ==========
       let productos = [];
@@ -1029,10 +1008,6 @@
       let ordenes = [];
       let categorias = [];
 
-      let db = null;
-      let docRef = null;
-      const COLLECTION = 'appData';
-      const DOC_ID = 'main';
       const DEFAULT_PASSWORD = 'admin123';
       const CATEGORIAS_PREDEFINIDAS = [
         "Cuadro", "Ruedas", "Llantas", "Cubiertas", "Cámaras", "Frenos", "Pastillas de freno",
@@ -1047,104 +1022,72 @@
 
       // ========== FUNCIONES DE PERSISTENCIA ==========
       async function loadAllData() {
-        try {
-          const docSnap = await docRef.get();
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            productos = data.productos || [];
-            ventas = data.ventas || [];
-            ajustes = data.ajustes || {};
-            clientes = data.clientes || [];
-            ordenes = data.ordenes || [];
-            categorias = data.categorias || CATEGORIAS_PREDEFINIDAS.slice();
-          } else {
-            // Datos por defecto
-            productos = [];
-            ventas = [];
-            ajustes = {
-              nombreEmpresa: 'Mi Catálogo',
-              whatsapp: '5491123456789',
-              direccion: 'Calle Falsa 123',
-              horarios: 'Lun-Vie 9-18',
-              logo: '',
-              logoTamano: 100,
-              logoAlineacion: 'centro',
-              tamanoCampos: 16,
-              tamNombre: 24,
-              fuenteNombre: "'Segoe UI', Roboto, sans-serif",
-              alineacionNombre: 'center',
-              verticalNombre: 'middle',
-              colorFondo: '#f8f9fa',
-              fondoImagen: '',
-              tema: 'default',
-              separacionLogo: 8,
-              nombreOffsetX: 0,
-              nombreOffsetY: 0,
-              mensajePresentacion: 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?'
-            };
-            clientes = [];
-            ordenes = [];
-            categorias = CATEGORIAS_PREDEFINIDAS.slice();
-            await saveAllData(); // guardar defaults
-          }
-          // Asegurar propiedades de ajustes
-          if (!ajustes.tamNombre) ajustes.tamNombre = 24;
-          if (!ajustes.fuenteNombre) ajustes.fuenteNombre = "'Segoe UI', Roboto, sans-serif";
-          if (!ajustes.alineacionNombre) ajustes.alineacionNombre = 'center';
-          if (!ajustes.verticalNombre) ajustes.verticalNombre = 'middle';
-          if (!ajustes.colorFondo) ajustes.colorFondo = '#f8f9fa';
-          if (!ajustes.fondoImagen) ajustes.fondoImagen = '';
-          if (!ajustes.tema) ajustes.tema = 'default';
-          if (ajustes.separacionLogo === undefined) ajustes.separacionLogo = 8;
-          if (ajustes.nombreOffsetX === undefined) ajustes.nombreOffsetX = 0;
-          if (ajustes.nombreOffsetY === undefined) ajustes.nombreOffsetY = 0;
-          if (!ajustes.mensajePresentacion) {
-            ajustes.mensajePresentacion = 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
-          }
-          // Guardar nuevamente si se agregaron propiedades
-          await saveAllData();
-          console.log('✅ Datos cargados desde Firebase');
-        } catch (error) {
-          console.error('Error cargando datos:', error);
-          // Si falla, usar datos locales de localStorage como fallback (si existen)
-          try {
-            const local = localStorage.getItem('firebase_fallback');
-            if (local) {
-              const data = JSON.parse(local);
-              productos = data.productos || [];
-              ventas = data.ventas || [];
-              ajustes = data.ajustes || {};
-              clientes = data.clientes || [];
-              ordenes = data.ordenes || [];
-              categorias = data.categorias || CATEGORIAS_PREDEFINIDAS.slice();
-              console.warn('Usando datos de localStorage (fallback)');
-            }
-          } catch (e) {}
+        const docRef = doc(db, COLLECTION, DOC_ID);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          productos = data.productos || [];
+          ventas = data.ventas || [];
+          ajustes = data.ajustes || {};
+          clientes = data.clientes || [];
+          ordenes = data.ordenes || [];
+          categorias = data.categorias || CATEGORIAS_PREDEFINIDAS.slice();
+        } else {
+          // Datos por defecto
+          productos = [];
+          ventas = [];
+          ajustes = {
+            nombreEmpresa: 'Mi Catálogo',
+            whatsapp: '5491123456789',
+            direccion: 'Calle Falsa 123',
+            horarios: 'Lun-Vie 9-18',
+            logo: '',
+            logoTamano: 100,
+            logoAlineacion: 'centro',
+            tamanoCampos: 16,
+            tamNombre: 24,
+            fuenteNombre: "'Segoe UI', Roboto, sans-serif",
+            alineacionNombre: 'center',
+            verticalNombre: 'middle',
+            colorFondo: '#f8f9fa',
+            fondoImagen: '',
+            tema: 'default',
+            separacionLogo: 8,
+            nombreOffsetX: 0,
+            nombreOffsetY: 0,
+            mensajePresentacion: 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?'
+          };
+          clientes = [];
+          ordenes = [];
+          categorias = CATEGORIAS_PREDEFINIDAS.slice();
+          await saveAllData(); // guardar los defaults
+        }
+        // Asegurar que ajustes tenga todas las propiedades
+        if (!ajustes.tamNombre) ajustes.tamNombre = 24;
+        if (!ajustes.fuenteNombre) ajustes.fuenteNombre = "'Segoe UI', Roboto, sans-serif";
+        if (!ajustes.alineacionNombre) ajustes.alineacionNombre = 'center';
+        if (!ajustes.verticalNombre) ajustes.verticalNombre = 'middle';
+        if (!ajustes.colorFondo) ajustes.colorFondo = '#f8f9fa';
+        if (!ajustes.fondoImagen) ajustes.fondoImagen = '';
+        if (!ajustes.tema) ajustes.tema = 'default';
+        if (ajustes.separacionLogo === undefined) ajustes.separacionLogo = 8;
+        if (ajustes.nombreOffsetX === undefined) ajustes.nombreOffsetX = 0;
+        if (ajustes.nombreOffsetY === undefined) ajustes.nombreOffsetY = 0;
+        if (!ajustes.mensajePresentacion) {
+          ajustes.mensajePresentacion = 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
         }
       }
 
       async function saveAllData() {
-        try {
-          // Usar setDoc con merge para no sobrescribir otros campos
-          await docRef.set({
-            productos,
-            ventas,
-            ajustes,
-            clientes,
-            ordenes,
-            categorias
-          }, { merge: true });
-          // Guardar copia en localStorage para fallback
-          localStorage.setItem('firebase_fallback', JSON.stringify({
-            productos, ventas, ajustes, clientes, ordenes, categorias
-          }));
-        } catch (error) {
-          console.error('Error guardando datos:', error);
-          // Guardar en localStorage como fallback
-          localStorage.setItem('firebase_fallback', JSON.stringify({
-            productos, ventas, ajustes, clientes, ordenes, categorias
-          }));
-        }
+        const docRef = doc(db, COLLECTION, DOC_ID);
+        await setDoc(docRef, {
+          productos,
+          ventas,
+          ajustes,
+          clientes,
+          ordenes,
+          categorias
+        });
       }
 
       // ========== FUNCIONES DE CATEGORÍAS ==========
@@ -1158,7 +1101,7 @@
         await saveAllData();
       }
 
-      // ========== FUNCIONES DE APLICACIÓN ==========
+      // ========== FUNCIONES DE APLICACIÓN (adaptadas) ==========
       function aplicarAjustes() {
         // Tema
         document.body.className = document.body.className
@@ -1827,7 +1770,7 @@
       }
 
       // ================================================================
-      //  NUEVAS FUNCIONES: TALLER, CLIENTES, MI BICICLETA
+      //  NUEVAS FUNCIONES: TALLER, CLIENTES, MI BICICLETA (adaptadas)
       // ================================================================
 
       // -------- CLIENTES --------
@@ -2612,50 +2555,23 @@
 
       // ========== INICIALIZACIÓN ==========
       async function init() {
-        try {
-          // Hacer visible el botón "Mi Bicicleta" en móviles (eliminar d-none y d-lg-inline-block)
-          const btnBici = document.getElementById('btnMiBicicleta');
-          if (btnBici) {
-            btnBici.classList.remove('d-none', 'd-lg-inline-block');
-            btnBici.classList.add('d-inline-block');
-            // Ajustar margen para móvil
-            btnBici.style.margin = '0.2rem 0.5rem';
-          }
-
-          // Cargar Firebase
-          await loadFirebase();
-          firebase.initializeApp(firebaseConfig);
-          db = firebase.firestore();
-          docRef = db.collection(COLLECTION).doc(DOC_ID);
-
-          // Cargar datos
-          await loadAllData();
-
-          // Aplicar ajustes y renderizar
-          aplicarAjustes();
-          renderizarCategorias();
-          renderCatalogo();
-          renderAdminProductos();
-          renderAdminVentas();
-          actualizarReportes();
-          cargarSelectVentas();
-          cargarAjustesForm();
-          initEventos();
-          mostrarSeccion('catalogo');
-          document.getElementById('btnCatalogo').classList.add('active');
-          console.log('✅ Catálogo inicializado con Firebase (optimizado)');
-        } catch (error) {
-          console.error('Error en la inicialización:', error);
-          alert('Hubo un error al conectar con Firebase. Revisa tu conexión a internet.');
-        }
+        await loadAllData();
+        aplicarAjustes();
+        renderizarCategorias();
+        renderCatalogo();
+        renderAdminProductos();
+        renderAdminVentas();
+        actualizarReportes();
+        cargarSelectVentas();
+        cargarAjustesForm();
+        initEventos();
+        mostrarSeccion('catalogo');
+        document.getElementById('btnCatalogo').classList.add('active');
+        console.log('✅ Catálogo inicializado con Firebase');
       }
 
       // Ejecutar
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-      } else {
-        init();
-      }
+      await init();
 
     })();
   </script>
