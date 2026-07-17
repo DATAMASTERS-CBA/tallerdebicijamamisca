@@ -980,7 +980,7 @@
     // =================================================================
     // SCRIPT MEJORADO - TIEMPO REAL CON FIREBASE (usando compat)
     // + NUEVAS FUNCIONALIDADES: ajuste de precios, "consultar precio",
-    //   reportes de taller.
+    //   reportes de taller, resumen combinado, botón único.
     // =================================================================
     (function() {
       "use strict";
@@ -1022,9 +1022,9 @@
 
       let db = null;
       let docRef = null;
-      let unsub = null; // para cancelar la suscripción
+      let unsub = null;
 
-      // ========== FUNCIONES DE APLICACIÓN (sin cambios) ==========
+      // ========== FUNCIONES DE APLICACIÓN ==========
       function aplicarAjustes() {
         document.body.className = document.body.className
           .split(' ')
@@ -1102,7 +1102,7 @@
         return categorias.slice();
       }
 
-      // ========== RENDERIZADO (todas las funciones de render) ==========
+      // ========== RENDERIZADO ==========
       function renderizarCategorias() {
         const cats = obtenerCategorias();
         const selFiltro = document.getElementById('filtroCategoria');
@@ -1146,7 +1146,7 @@
         }
       }
 
-      // FUNCIÓN AUXILIAR para formatear precio o mostrar "Consultar precio"
+      // Función para formatear precio: si es 0 o nulo muestra "Consultar precio"
       function formatearPrecio(precio) {
         if (precio === null || precio === undefined || precio === 0) {
           return '<span class="text-muted">Consultar precio</span>';
@@ -1179,8 +1179,7 @@
         list.forEach(p => {
           const foto = p.foto ? `<img src="${p.foto}" class="card-img-top" style="height:200px;object-fit:contain;" alt="${p.nombre}">` :
             `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;"><i class="bi bi-image" style="font-size:3rem;"></i></div>`;
-          const tipo = p.tipo === 'consignacion' ? '⚠️ Consignación' : 'Propio';
-          // Precio formateado
+          // Ya NO mostramos "Propio/Consignación"
           const precioFormateado = formatearPrecio(p.precioFinal);
           const stock = p.stock > 0 ? `Stock: ${p.stock}` : '<span class="text-danger">Sin stock</span>';
           const mensajeWhatsApp = 
@@ -1198,7 +1197,6 @@
                 <div class="card-body">
                   <h5 class="card-title">${p.nombre}</h5>
                   <p class="card-text"><small>Categoría: ${p.categoria}</small><br>
-                  <span class="badge bg-secondary">${tipo}</span><br>
                   <strong>${precioFormateado}</strong><br>
                   ${stock}</p>
                   <a href="${wpp}" target="_blank" class="btn btn-success btn-sm ${!ajustes.whatsapp ? 'disabled' : ''}"><i class="bi bi-whatsapp"></i> Consultar</a>
@@ -1275,8 +1273,9 @@
         });
       }
 
+      // ========== ACTUALIZAR REPORTES (incluye taller) ==========
       function actualizarReportes(periodo = 'dia') {
-        // Stock
+        // --- Stock ---
         const totalStock = productos.reduce((acc, p) => acc + p.stock, 0);
         document.getElementById('stockTotal').textContent = totalStock;
         const sinStock = productos.filter(p => p.stock <= 0);
@@ -1295,7 +1294,7 @@
           container.innerHTML = html;
         }
 
-        // Ventas
+        // --- Ventas y Taller ---
         let now = new Date();
         let inicio;
         switch (periodo) {
@@ -1305,24 +1304,41 @@
           case 'anual': inicio = new Date(now.getFullYear(), 0, 1); break;
           default: inicio = new Date(0);
         }
+
+        // Ventas de productos
         const ventasPeriodo = ventas.filter(v => new Date(v.fecha) >= inicio);
         const totalVentas = ventasPeriodo.reduce((acc, v) => acc + v.total, 0);
         const cantidad = ventasPeriodo.reduce((acc, v) => acc + v.cantidad, 0);
+
+        // Órdenes de taller (ingresos: retiradas o confirmadas)
+        const ordenesPeriodo = ordenes.filter(o => {
+          // Usamos fecha de ingreso como referencia (o salida si está disponible, pero mejor usar ingreso)
+          const fecha = new Date(o.fechaIngreso);
+          return fecha >= inicio;
+        });
+        const ordenesConIngreso = ordenesPeriodo.filter(o => o.estado === 'retirada' || o.estado === 'confirmada');
+        const ingresosTaller = ordenesConIngreso.reduce((acc, o) => acc + calcularTotalOrden(o), 0);
+        const cantidadOrdenes = ordenesConIngreso.length;
+
+        // Total general
+        const totalGeneral = totalVentas + ingresosTaller;
+
         const resumen = document.getElementById('resumenVentas');
         resumen.innerHTML = `
           <div class="card p-2">
-            <h6>Resumen de Ventas (${periodo})</h6>
-            <p><strong>Total vendido:</strong> $${totalVentas.toFixed(2)}</p>
-            <p><strong>Unidades vendidas:</strong> ${cantidad}</p>
-            <p><strong>Nº de transacciones:</strong> ${ventasPeriodo.length}</p>
+            <h6>Resumen de Ventas + Trabajos de Taller (${periodo})</h6>
+            <p><strong>Total recaudado (ventas + taller):</strong> $${totalGeneral.toFixed(2)}</p>
+            <hr>
+            <p><strong>Ventas de productos:</strong> $${totalVentas.toFixed(2)} (${ventasPeriodo.length} transacciones, ${cantidad} unidades)</p>
+            <p><strong>Ingresos de taller:</strong> $${ingresosTaller.toFixed(2)} (${cantidadOrdenes} órdenes finalizadas)</p>
           </div>
         `;
 
-        // ===== NUEVO: REPORTES DE TALLER =====
+        // Reportes de taller (resumen adicional, se mantiene)
         renderReportesTaller();
       }
 
-      // ===== NUEVA FUNCIÓN: REPORTES DE TALLER =====
+      // ===== REPORTES DE TALLER (resumen general) =====
       function renderReportesTaller() {
         const container = document.getElementById('reportesTaller');
         if (!container) return;
@@ -1336,18 +1352,15 @@
         const activas = ordenes.filter(o => o.estado !== 'retirada' && o.estado !== 'rechazado').length;
         const cerradas = ordenes.filter(o => o.estado === 'retirada' || o.estado === 'rechazado').length;
 
-        // Agrupar por estado
         const estados = {};
         ordenes.forEach(o => {
           const e = o.estado || 'no_visto';
           estados[e] = (estados[e] || 0) + 1;
         });
 
-        // Ingresos: sumar total de órdenes que están retiradas o confirmadas (consideramos que generan ingreso)
         const ingresos = ordenes.filter(o => o.estado === 'retirada' || o.estado === 'confirmada')
           .reduce((acc, o) => acc + calcularTotalOrden(o), 0);
 
-        // Ingresos por estado
         const ingresosPorEstado = {};
         ordenes.forEach(o => {
           const e = o.estado || 'no_visto';
@@ -1356,7 +1369,7 @@
         });
 
         let html = `
-          <h5 class="mt-3">📊 Trabajos de Taller</h5>
+          <h5 class="mt-3">📊 Trabajos de Taller (general)</h5>
           <div class="row">
             <div class="col-md-6">
               <div class="card p-2">
@@ -1393,14 +1406,13 @@
         container.innerHTML = html;
       }
 
-      // ========== FUNCIONES DE CATEGORÍAS (con persistencia) ==========
+      // ========== FUNCIONES DE PERSISTENCIA ==========
       async function guardarCategorias(cats) {
         categorias = cats.slice();
         categorias.sort((a, b) => a.localeCompare(b));
         await guardarTodo();
       }
 
-      // ========== FUNCIONES DE PERSISTENCIA (guardado) ==========
       async function guardarTodo() {
         try {
           await docRef.set({
@@ -1411,7 +1423,6 @@
             ordenes,
             categorias
           }, { merge: true });
-          // Guardar copia local para fallback
           localStorage.setItem('firebase_fallback', JSON.stringify({
             productos, ventas, ajustes, clientes, ordenes, categorias
           }));
@@ -1800,7 +1811,7 @@
       }
 
       // ================================================================
-      //  TALLER, CLIENTES, MI BICICLETA (adaptadas con guardarTodo)
+      //  TALLER, CLIENTES, MI BICICLETA
       // ================================================================
 
       // -------- CLIENTES --------
@@ -2312,9 +2323,6 @@
         container.innerHTML = html;
       }
 
-      // ================================================================
-      // FUNCIÓN MODIFICADA: consultarOrdenWhatsapp - ENVÍA MENSAJE A LA EMPRESA
-      // ================================================================
       window.consultarOrdenWhatsapp = function(id) {
         const orden = ordenes.find(o => o.id === id);
         if (!orden) {
@@ -2365,22 +2373,22 @@
       };
 
       // ================================================================
-      //  NUEVA FUNCIÓN: AJUSTE DE PRECIOS (AUMENTO SEMANAL)
+      //  NUEVA FUNCIÓN: AJUSTE DE PRECIOS (BOTÓN ÚNICO)
       // ================================================================
 
-      // Crear el botón y el modal dinámicamente
       function crearBotonAjustePrecios() {
+        // Si ya existe el botón, no lo creamos de nuevo
+        if (document.getElementById('btnAjustePrecios')) return;
+
         const container = document.querySelector('#tabProductos .d-flex');
         if (!container) return;
 
-        // Crear el botón
         const btn = document.createElement('button');
         btn.className = 'btn btn-warning ms-2';
         btn.id = 'btnAjustePrecios';
         btn.innerHTML = '<i class="bi bi-percent"></i> Ajuste de precios';
         btn.title = 'Aplicar aumento o descuento a todos los productos';
 
-        // Insertar después del botón "Agregar"
         const btnAgregar = document.getElementById('btnAgregarProducto');
         if (btnAgregar) {
           btnAgregar.parentNode.insertBefore(btn, btnAgregar.nextSibling);
@@ -2388,13 +2396,10 @@
           container.appendChild(btn);
         }
 
-        // Evento click: abre el modal
         btn.addEventListener('click', abrirModalAjustePrecios);
       }
 
-      // Crear el modal de ajuste de precios
       function crearModalAjustePrecios() {
-        // Si ya existe, no lo creamos de nuevo
         if (document.getElementById('modalAjustePrecios')) return;
 
         const modalHTML = `
@@ -2450,9 +2455,7 @@
         const modal = new bootstrap.Modal(document.getElementById('modalAjustePrecios'));
         modal.show();
 
-        // Configurar evento del botón aplicar
         const btnAplicar = document.getElementById('btnAplicarAjuste');
-        // Remover listeners anteriores
         btnAplicar.replaceWith(btnAplicar.cloneNode(true));
         document.getElementById('btnAplicarAjuste').addEventListener('click', aplicarAjustePrecios);
       }
@@ -2468,17 +2471,13 @@
         const tipo = document.querySelector('input[name="tipoAjuste"]:checked').value;
         const factor = tipo === 'aumento' ? 1 + porcentaje / 100 : 1 - porcentaje / 100;
 
-        // Confirmar
         if (!confirm(`¿Aplicar ${tipo === 'aumento' ? 'aumento' : 'descuento'} del ${porcentaje}% a los productos ${soloConStock ? 'con stock' : 'todos'}?`)) return;
 
         let contador = 0;
         productos.forEach(p => {
           if (soloConStock && p.stock <= 0) return;
-          // Solo modificar si tiene precio definido y > 0
           if (p.precioFinal && p.precioFinal > 0) {
             p.precioFinal = Math.round((p.precioFinal * factor) * 100) / 100;
-            // Si es tipo 'propio', actualizar el costo también para mantener coherencia? No, mejor solo el precio final.
-            // Opcional: también actualizar el costo si se desea, pero dejamos solo precioFinal.
             contador++;
           }
         });
@@ -2489,9 +2488,7 @@
         }
 
         await guardarTodo();
-        // Cerrar modal
         bootstrap.Modal.getInstance(document.getElementById('modalAjustePrecios')).hide();
-        // Refrescar vistas
         renderAdminProductos();
         renderCatalogo();
         cargarSelectVentas();
@@ -2732,7 +2729,7 @@
           renderOrdenes();
           cargarSelectRepuestos();
           actualizarListaClientesSelect();
-          // Crear el botón de ajuste de precios (si no existe)
+          // Crear el botón de ajuste de precios (una sola vez)
           crearBotonAjustePrecios();
         } else {
           document.getElementById('msjLogin').textContent = 'Clave incorrecta';
@@ -2847,12 +2844,10 @@
                 ajustes.mensajePresentacion = 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
               }
 
-              // Guardar copia en localStorage
               localStorage.setItem('firebase_fallback', JSON.stringify({
                 productos, ventas, ajustes, clientes, ordenes, categorias
               }));
 
-              // Aplicar cambios en la interfaz
               aplicarAjustes();
               renderizarCategorias();
               renderCatalogo();
@@ -2866,7 +2861,7 @@
                 renderOrdenes();
                 cargarSelectRepuestos();
                 actualizarListaClientesSelect();
-                // Asegurar que el botón de ajuste de precios esté creado
+                // Asegurar que el botón esté creado (solo una vez)
                 crearBotonAjustePrecios();
               }
               console.log('🔄 Datos actualizados en tiempo real');
@@ -2875,7 +2870,6 @@
             console.error('Error en la suscripción:', error);
           });
 
-          // Cargar eventos y mostrar catálogo
           initEventos();
           mostrarSeccion('catalogo');
           document.getElementById('btnCatalogo').classList.add('active');
@@ -2910,7 +2904,6 @@
         }
       }
 
-      // Ejecutar cuando el DOM esté listo
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
       } else {
