@@ -7,11 +7,14 @@
   <!-- Bootstrap 5 + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     /* --- ESTILOS BASE (sin cambios) --- */
     body {
       background: #f8f9fa;
       transition: background 0.3s, color 0.3s;
+      padding-top: 56px; /* espacio para navbar fija */
     }
     .logo-img {
       max-height: 60px;
@@ -106,6 +109,30 @@
     .suggestions-list .suggestion-item .suggestion-price {
       color: #e65100;
       font-weight: 700;
+    }
+
+    /* --- BARRA FIJA --- */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1030;
+      background-color: var(--navbar-bg, #0d6efd) !important;
+    }
+    .search-bar-fixed {
+      position: sticky;
+      top: 56px; /* altura de la navbar */
+      z-index: 1020;
+      background-color: var(--body-bg, #f8f9fa);
+      padding: 10px 0;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .catalogo-scroll {
+      max-height: calc(100vh - 180px);
+      overflow-y: auto;
+      padding-bottom: 20px;
     }
 
     /* --- TEMAS (se aplican dinámicamente) --- */
@@ -485,6 +512,22 @@
     .orden-card:hover {
       transform: scale(1.01);
     }
+
+    /* Gráficos */
+    .chart-container {
+      position: relative;
+      height: 200px;
+      margin-top: 10px;
+    }
+    .chart-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Buscador en productos admin */
+    .admin-search {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -526,25 +569,31 @@
 
     <!-- SECCIÓN CATÁLOGO -->
     <div id="seccionCatalogo">
-      <div class="row mb-3">
-        <div class="col-md-4 position-relative suggestions-container">
-          <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto..." autocomplete="off">
-          <div id="suggestionsList" class="suggestions-list"></div>
-        </div>
-        <div class="col-md-3">
-          <select id="filtroCategoria" class="form-select">
-            <option value="">Todas las categorías</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <select id="ordenPrecio" class="form-select">
-            <option value="">Sin orden</option>
-            <option value="asc">Precio más bajo</option>
-            <option value="desc">Precio más alto</option>
-          </select>
+      <!-- Barra de búsqueda fija -->
+      <div class="search-bar-fixed">
+        <div class="row g-2">
+          <div class="col-md-4 position-relative suggestions-container">
+            <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto..." autocomplete="off">
+            <div id="suggestionsList" class="suggestions-list"></div>
+          </div>
+          <div class="col-md-3">
+            <select id="filtroCategoria" class="form-select">
+              <option value="">Todas las categorías</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select id="ordenPrecio" class="form-select">
+              <option value="">Sin orden</option>
+              <option value="asc">Precio más bajo</option>
+              <option value="desc">Precio más alto</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div id="productosCatalogo" class="row row-cols-1 row-cols-md-3 g-4"></div>
+      <!-- Catálogo con scroll -->
+      <div class="catalogo-scroll">
+        <div id="productosCatalogo" class="row row-cols-1 row-cols-md-3 g-4"></div>
+      </div>
     </div>
 
     <!-- SECCIÓN ADMIN (requiere login) -->
@@ -566,23 +615,26 @@
           <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabReportes">Reportes</a></li>
           <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabBackup">Backup</a></li>
           <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAjustesAdmin">Ajustes</a></li>
-          <!-- NUEVAS PESTAÑAS -->
           <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabTaller">Taller</a></li>
           <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabClientes">Clientes</a></li>
         </ul>
         <div class="tab-content">
-          <!-- Productos (sin cambios) -->
+          <!-- Productos -->
           <div class="tab-pane fade show active" id="tabProductos">
             <div class="d-flex justify-content-between mt-2">
               <h5>Gestión de Productos</h5>
               <div>
                 <button class="btn btn-success" id="btnAgregarProducto">+ Agregar</button>
-                <!-- El botón de ajuste de precios se inyectará aquí con JS -->
+                <button class="btn btn-warning ms-2" id="btnAjustePrecios"><i class="bi bi-percent"></i> Ajuste de precios</button>
               </div>
+            </div>
+            <!-- Buscador de productos admin -->
+            <div class="admin-search">
+              <input type="text" id="buscarProductoAdmin" class="form-control" placeholder="Buscar producto por nombre...">
             </div>
             <div id="listaProductosAdmin" class="mt-2"></div>
           </div>
-          <!-- Ventas (sin cambios) -->
+          <!-- Ventas -->
           <div class="tab-pane fade" id="tabVentas">
             <h5>Registrar Venta</h5>
             <div class="row g-2">
@@ -594,7 +646,7 @@
             <h5>Historial de Ventas</h5>
             <div id="listaVentas" class="mt-2"></div>
           </div>
-          <!-- Reportes (sin cambios) -->
+          <!-- Reportes -->
           <div class="tab-pane fade" id="tabReportes">
             <h5>Reportes</h5>
             <div class="btn-group mb-2">
@@ -604,16 +656,30 @@
               <button class="btn btn-outline-secondary" data-periodo="anual">Anual</button>
             </div>
             <div id="resumenVentas"></div>
+            <!-- Gráficos -->
+            <div class="row mt-3">
+              <div class="col-md-6">
+                <div class="card p-2">
+                  <h6>Ventas por día (periodo)</h6>
+                  <div class="chart-container"><canvas id="chartVentasPeriodo"></canvas></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card p-2">
+                  <h6>Top 5 productos más vendidos (mes actual)</h6>
+                  <div class="chart-container"><canvas id="chartTopProductos"></canvas></div>
+                </div>
+              </div>
+            </div>
             <hr>
             <h5>Stock</h5>
             <p><strong>Stock total:</strong> <span id="stockTotal">0</span></p>
             <p><strong>Sin stock (agotados):</strong> <span id="sinStockCount">0</span></p>
             <div id="alertasStockMinimo" class="mt-2"></div>
             <button class="btn btn-warning mt-2" id="btnWhatsappSinStock">Enviar lista sin stock por WhatsApp</button>
-            <!-- Aquí se inyectará la sección de reportes de taller -->
             <div id="reportesTaller" class="mt-4"></div>
           </div>
-          <!-- Backup (sin cambios) -->
+          <!-- Backup -->
           <div class="tab-pane fade" id="tabBackup">
             <h5>Backup de Base de Datos</h5>
             <button class="btn btn-primary" id="btnExportarBackup">Exportar Backup (JSON)</button>
@@ -623,7 +689,7 @@
               <button class="btn btn-secondary mt-1" id="btnImportarBackup">Cargar Backup</button>
             </div>
           </div>
-          <!-- Ajustes (sin cambios) -->
+          <!-- Ajustes -->
           <div class="tab-pane fade" id="tabAjustesAdmin">
             <h5>Ajustes Generales</h5>
             <form id="formAjustes">
@@ -712,7 +778,7 @@
             </form>
           </div>
 
-          <!-- ========== NUEVA PESTAÑA: TALLER ========== -->
+          <!-- Taller -->
           <div class="tab-pane fade" id="tabTaller">
             <h5 class="mt-2">Gestión de Órdenes de Taller</h5>
             <button class="btn btn-primary mb-2" id="btnNuevaOrden">+ Nueva Orden</button>
@@ -729,10 +795,13 @@
             </div>
           </div>
 
-          <!-- ========== NUEVA PESTAÑA: CLIENTES ========== -->
+          <!-- Clientes -->
           <div class="tab-pane fade" id="tabClientes">
             <h5 class="mt-2">Gestión de Clientes</h5>
             <button class="btn btn-success mb-2" id="btnNuevoCliente">+ Nuevo Cliente</button>
+            <div class="mb-2">
+              <input type="text" id="buscarCliente" class="form-control" placeholder="Buscar cliente por nombre o WhatsApp...">
+            </div>
             <div id="listaClientes" class="mt-2"></div>
           </div>
 
@@ -786,6 +855,10 @@
                 <input type="text" id="ordenIdAuto" class="form-control" readonly>
               </div>
               <div class="col-md-4">
+                <label>N° Comprobante/Factura</label>
+                <input type="text" id="ordenComprobante" class="form-control" placeholder="Número de comprobante">
+              </div>
+              <div class="col-md-4">
                 <label>Estado</label>
                 <select id="ordenEstado" class="form-select">
                   <option value="no_visto">NO VISTO</option>
@@ -796,6 +869,8 @@
                   <option value="retirada">RETIRADA</option>
                 </select>
               </div>
+            </div>
+            <div class="row g-2 mt-2">
               <div class="col-md-4">
                 <label>Cliente</label>
                 <div class="d-flex">
@@ -809,21 +884,15 @@
                   <input type="text" id="ordenClienteDireccion" class="form-control form-control-sm mt-1" placeholder="Dirección">
                 </div>
               </div>
-            </div>
-            <div class="row g-2 mt-2">
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label>Modelo / Bicicleta</label>
                 <input type="text" id="ordenModelo" class="form-control" placeholder="Modelo">
-              </div>
-              <div class="col-md-3">
                 <label>Accesorios</label>
                 <input type="text" id="ordenAccesorios" class="form-control" placeholder="Accesorios">
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <label>Fecha Ingreso</label>
                 <input type="date" id="ordenFechaIngreso" class="form-control">
-              </div>
-              <div class="col-md-3">
                 <label>Fecha Salida (retiro)</label>
                 <input type="date" id="ordenFechaSalida" class="form-control">
               </div>
@@ -831,7 +900,7 @@
             <div class="row g-2 mt-2">
               <div class="col-md-3">
                 <label>Garantía (días)</label>
-                <input type="number" id="ordenGarantia" class="form-control" value="30" min="0">
+                <input type="number" id="ordenGarantia" class="form-control" value="0" min="0">
               </div>
               <div class="col-md-9">
                 <label>Falla Inicial</label>
@@ -908,7 +977,7 @@
     </div>
   </div>
 
-  <!-- ========== MODAL PRODUCTO (existente) ========== -->
+  <!-- ========== MODAL PRODUCTO ========== -->
   <div class="modal fade" id="modalProducto" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -956,7 +1025,7 @@
     </div>
   </div>
 
-  <!-- MODAL GESTIÓN DE CATEGORÍAS (existente) -->
+  <!-- MODAL GESTIÓN DE CATEGORÍAS -->
   <div class="modal fade" id="modalGestionCategorias" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -970,6 +1039,42 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PARA PRECIO EN VENTA (cuando precio=0) -->
+  <div class="modal fade" id="modalPrecioVenta" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ingresar precio para la venta</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Producto: <strong id="precioVentaProductoNombre"></strong></p>
+          <label>Precio a cobrar ($)</label>
+          <input type="number" step="0.01" id="precioVentaInput" class="form-control" min="0.01" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btnConfirmarPrecioVenta">Confirmar venta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL BACKUP OBLIGATORIO (18:00) -->
+  <div class="modal fade" id="modalBackupObligatorio" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Recordatorio de Backup</h5>
+        </div>
+        <div class="modal-body">
+          <p>Es la hora del backup diario (18:00). Realice una copia de seguridad de la base de datos para evitar pérdidas de información.</p>
+          <button class="btn btn-primary w-100" id="btnBackupObligatorio"><i class="bi bi-download"></i> Hacer Backup</button>
         </div>
       </div>
     </div>
@@ -1023,6 +1128,14 @@
       let db = null;
       let docRef = null;
       let unsub = null;
+
+      // Variables para gráficos
+      let chartVentasPeriodo = null;
+      let chartTopProductos = null;
+
+      // Backup obligatorio
+      let backupObligatorioModal = null;
+      let ultimoBackupDate = '';
 
       // ========== FUNCIONES DE APLICACIÓN ==========
       function aplicarAjustes() {
@@ -1146,7 +1259,6 @@
         }
       }
 
-      // Función para formatear precio: si es 0 o nulo muestra "Consultar precio"
       function formatearPrecio(precio) {
         if (precio === null || precio === undefined || precio === 0) {
           return '<span class="text-muted">Consultar precio</span>';
@@ -1179,7 +1291,6 @@
         list.forEach(p => {
           const foto = p.foto ? `<img src="${p.foto}" class="card-img-top" style="height:200px;object-fit:contain;" alt="${p.nombre}">` :
             `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;"><i class="bi bi-image" style="font-size:3rem;"></i></div>`;
-          // Ya NO mostramos "Propio/Consignación"
           const precioFormateado = formatearPrecio(p.precioFinal);
           const stock = p.stock > 0 ? `Stock: ${p.stock}` : '<span class="text-danger">Sin stock</span>';
           const mensajeWhatsApp = 
@@ -1211,12 +1322,17 @@
       function renderAdminProductos() {
         const container = document.getElementById('listaProductosAdmin');
         if (!container) return;
-        if (productos.length === 0) {
+        const search = (document.getElementById('buscarProductoAdmin')?.value || '').toLowerCase();
+        let filtered = productos;
+        if (search) {
+          filtered = productos.filter(p => p.nombre.toLowerCase().includes(search));
+        }
+        if (filtered.length === 0) {
           container.innerHTML = '<p>No hay productos</p>';
           return;
         }
         let html = '<table class="table table-striped table-hover"><thead><tr><th>Foto</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Tipo</th><th>Acciones</th></tr></thead><tbody>';
-        productos.forEach(p => {
+        filtered.forEach(p => {
           const foto = p.foto ? `<img src="${p.foto}" class="foto-preview" alt="foto">` : '<i class="bi bi-image"></i>';
           const precio = p.tipo === 'consignacion' ? `Acordado: ${formatearPrecio(p.precioFinal)}` : formatearPrecio(p.precioFinal);
           html += `
@@ -1312,7 +1428,6 @@
 
         // Órdenes de taller (ingresos: retiradas o confirmadas)
         const ordenesPeriodo = ordenes.filter(o => {
-          // Usamos fecha de ingreso como referencia (o salida si está disponible, pero mejor usar ingreso)
           const fecha = new Date(o.fechaIngreso);
           return fecha >= inicio;
         });
@@ -1320,7 +1435,6 @@
         const ingresosTaller = ordenesConIngreso.reduce((acc, o) => acc + calcularTotalOrden(o), 0);
         const cantidadOrdenes = ordenesConIngreso.length;
 
-        // Total general
         const totalGeneral = totalVentas + ingresosTaller;
 
         const resumen = document.getElementById('resumenVentas');
@@ -1334,11 +1448,92 @@
           </div>
         `;
 
-        // Reportes de taller (resumen adicional, se mantiene)
+        // Gráficos
+        dibujarGraficos(periodo, ventasPeriodo);
+
+        // Reportes de taller
         renderReportesTaller();
       }
 
-      // ===== REPORTES DE TALLER (resumen general) =====
+      // ===== GRÁFICOS =====
+      function dibujarGraficos(periodo, ventasPeriodo) {
+        // Gráfico 1: Ventas por día en el periodo (barras)
+        const ctx1 = document.getElementById('chartVentasPeriodo').getContext('2d');
+        if (chartVentasPeriodo) chartVentasPeriodo.destroy();
+
+        const ventasPorDia = {};
+        ventasPeriodo.forEach(v => {
+          const fecha = new Date(v.fecha).toISOString().slice(0,10);
+          ventasPorDia[fecha] = (ventasPorDia[fecha] || 0) + v.total;
+        });
+        const labels = Object.keys(ventasPorDia).sort();
+        const data = labels.map(d => ventasPorDia[d]);
+
+        chartVentasPeriodo = new Chart(ctx1, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Ventas ($)',
+              data: data,
+              backgroundColor: 'rgba(54, 162, 235, 0.5)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+
+        // Gráfico 2: Top 5 productos más vendidos en el mes actual
+        const ctx2 = document.getElementById('chartTopProductos').getContext('2d');
+        if (chartTopProductos) chartTopProductos.destroy();
+
+        const now = new Date();
+        const mesInicio = new Date(now.getFullYear(), now.getMonth(), 1);
+        const ventasMes = ventas.filter(v => new Date(v.fecha) >= mesInicio);
+        const productosVendidos = {};
+        ventasMes.forEach(v => {
+          productosVendidos[v.nombreProducto] = (productosVendidos[v.nombreProducto] || 0) + v.cantidad;
+        });
+        const sorted = Object.entries(productosVendidos).sort((a,b) => b[1] - a[1]).slice(0,5);
+        const labels2 = sorted.map(item => item[0]);
+        const data2 = sorted.map(item => item[1]);
+
+        chartTopProductos = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: labels2,
+            datasets: [{
+              label: 'Unidades vendidas',
+              data: data2,
+              backgroundColor: 'rgba(255, 159, 64, 0.5)',
+              borderColor: 'rgba(255, 159, 64, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+      }
+
+      // ===== REPORTES DE TALLER =====
       function renderReportesTaller() {
         const container = document.getElementById('reportesTaller');
         if (!container) return;
@@ -1616,13 +1811,49 @@
         const prod = productos.find(p => p.id === prodId);
         if (!prod) return alert('Producto no encontrado');
         if (prod.stock < cantidad) return alert(`Stock insuficiente. Disponible: ${prod.stock}`);
+
+        // Verificar si el precio es 0 o null -> pedir precio en modal
+        if (prod.precioFinal === 0 || prod.precioFinal === null || prod.precioFinal === undefined) {
+          // Mostrar modal para ingresar precio
+          document.getElementById('precioVentaProductoNombre').textContent = prod.nombre;
+          document.getElementById('precioVentaInput').value = '';
+          const modalPrecio = new bootstrap.Modal(document.getElementById('modalPrecioVenta'));
+          modalPrecio.show();
+          // Esperar a que el usuario confirme
+          return new Promise((resolve) => {
+            const confirmBtn = document.getElementById('btnConfirmarPrecioVenta');
+            const handler = async () => {
+              const precio = parseFloat(document.getElementById('precioVentaInput').value);
+              if (isNaN(precio) || precio <= 0) {
+                alert('Ingrese un precio válido mayor a 0');
+                return;
+              }
+              modalPrecio.hide();
+              confirmBtn.removeEventListener('click', handler);
+              // Registrar venta con el precio ingresado
+              await registrarVentaConPrecio(prod, cantidad, precio);
+              resolve();
+            };
+            confirmBtn.addEventListener('click', handler);
+            // Si se cierra el modal sin confirmar, cancelar
+            document.getElementById('modalPrecioVenta').addEventListener('hidden.bs.modal', function() {
+              confirmBtn.removeEventListener('click', handler);
+              resolve();
+            });
+          });
+        } else {
+          await registrarVentaConPrecio(prod, cantidad, prod.precioFinal);
+        }
+      }
+
+      async function registrarVentaConPrecio(prod, cantidad, precioUnitario) {
         const venta = {
           id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
           productoId: prod.id,
           nombreProducto: prod.nombre,
           cantidad: cantidad,
-          precioUnitario: prod.precioFinal,
-          total: prod.precioFinal * cantidad,
+          precioUnitario: precioUnitario,
+          total: precioUnitario * cantidad,
           fecha: new Date().toISOString()
         };
         ventas.push(venta);
@@ -1666,6 +1897,14 @@
         a.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
         a.click();
         URL.revokeObjectURL(url);
+        // Actualizar fecha de último backup
+        ultimoBackupDate = new Date().toISOString().slice(0,10);
+        localStorage.setItem('ultimoBackupDate', ultimoBackupDate);
+        // Si el modal obligatorio está abierto, cerrarlo
+        if (backupObligatorioModal) {
+          backupObligatorioModal.hide();
+        }
+        alert('Backup generado correctamente.');
       }
 
       async function importarBackup() {
@@ -1818,12 +2057,20 @@
       function renderClientes() {
         const container = document.getElementById('listaClientes');
         if (!container) return;
-        if (clientes.length === 0) {
+        const search = (document.getElementById('buscarCliente')?.value || '').toLowerCase();
+        let filtered = clientes;
+        if (search) {
+          filtered = clientes.filter(c => 
+            c.nombre.toLowerCase().includes(search) || 
+            c.whatsapp.includes(search)
+          );
+        }
+        if (filtered.length === 0) {
           container.innerHTML = '<p>No hay clientes registrados</p>';
           return;
         }
         let html = '<table class="table table-striped table-hover"><thead><tr><th>Nombre</th><th>WhatsApp</th><th>Dirección</th><th>Acciones</th></tr></thead><tbody>';
-        clientes.forEach(c => {
+        filtered.forEach(c => {
           html += `
             <tr>
               <td>${c.nombre}</td>
@@ -1909,6 +2156,19 @@
           opt.dataset.id = c.id;
           datalist.appendChild(opt);
         });
+        // Evento para autocompletar al seleccionar del datalist
+        const input = document.getElementById('ordenClienteBuscar');
+        if (input) {
+          input.addEventListener('input', function() {
+            const val = this.value;
+            const option = Array.from(datalist.options).find(o => o.value === val);
+            if (option) {
+              document.getElementById('ordenClienteNombre').value = option.value;
+              document.getElementById('ordenClienteWhatsapp').value = option.dataset.whatsapp;
+              document.getElementById('ordenClienteDireccion').value = option.dataset.direccion;
+            }
+          });
+        }
       }
 
       // -------- ÓRDENES --------
@@ -2019,6 +2279,7 @@
         const estadoLabel = orden.estado.replace('_', ' ').toUpperCase();
         let msg = `🚲 *${ajustes.nombreEmpresa || 'Taller'}* - Estado de tu orden%0A%0A`;
         msg += `📋 *Orden N°:* ${orden.id}%0A`;
+        if (orden.comprobante) msg += `🧾 *Comprobante:* ${orden.comprobante}%0A`;
         msg += `👤 *Cliente:* ${orden.clienteNombre}%0A`;
         msg += `🚲 *Modelo:* ${orden.modelo || 'No especificado'}%0A`;
         msg += `📌 *Estado:* ${estadoLabel}%0A`;
@@ -2074,6 +2335,7 @@
           document.getElementById('modalOrdenTitle').textContent = 'Editar Orden';
           document.getElementById('ordenId').value = data.id;
           document.getElementById('ordenIdAuto').value = data.id;
+          document.getElementById('ordenComprobante').value = data.comprobante || '';
           document.getElementById('ordenEstado').value = data.estado || 'no_visto';
           document.getElementById('ordenClienteNombre').value = data.clienteNombre || '';
           document.getElementById('ordenClienteWhatsapp').value = data.clienteWhatsapp || '';
@@ -2082,7 +2344,7 @@
           document.getElementById('ordenAccesorios').value = data.accesorios || '';
           document.getElementById('ordenFechaIngreso').value = data.fechaIngreso || '';
           document.getElementById('ordenFechaSalida').value = data.fechaSalida || '';
-          document.getElementById('ordenGarantia').value = data.garantiaDias || 30;
+          document.getElementById('ordenGarantia').value = data.garantiaDias || 0;
           document.getElementById('ordenFallaInicial').value = data.fallaInicial || '';
           document.getElementById('ordenDiagnostico').value = data.diagnostico || '';
           document.getElementById('ordenTrabajoRealizado').value = data.trabajoRealizado || '';
@@ -2099,6 +2361,7 @@
           document.getElementById('modalOrdenTitle').textContent = 'Nueva Orden';
           document.getElementById('ordenId').value = '';
           document.getElementById('ordenIdAuto').value = generarIdOrden();
+          document.getElementById('ordenComprobante').value = '';
           document.getElementById('ordenEstado').value = 'no_visto';
           document.getElementById('ordenClienteNombre').value = '';
           document.getElementById('ordenClienteWhatsapp').value = '';
@@ -2108,7 +2371,7 @@
           const hoy = new Date().toISOString().slice(0,10);
           document.getElementById('ordenFechaIngreso').value = hoy;
           document.getElementById('ordenFechaSalida').value = '';
-          document.getElementById('ordenGarantia').value = 30;
+          document.getElementById('ordenGarantia').value = 0;
           document.getElementById('ordenFallaInicial').value = '';
           document.getElementById('ordenDiagnostico').value = '';
           document.getElementById('ordenTrabajoRealizado').value = '';
@@ -2166,6 +2429,7 @@
         e.preventDefault();
         const id = document.getElementById('ordenId').value;
         const estado = document.getElementById('ordenEstado').value;
+        const comprobante = document.getElementById('ordenComprobante').value.trim();
         const clienteNombre = document.getElementById('ordenClienteNombre').value.trim();
         const clienteWhatsapp = document.getElementById('ordenClienteWhatsapp').value.trim();
         const clienteDireccion = document.getElementById('ordenClienteDireccion').value.trim();
@@ -2235,6 +2499,7 @@
 
         const ordenData = {
           id: id || generarIdOrden(),
+          comprobante,
           clienteId,
           clienteNombre,
           clienteWhatsapp,
@@ -2296,6 +2561,8 @@
           container.innerHTML = '<p class="text-danger">No se encontraron órdenes para este número</p>';
           return;
         }
+        // Ordenar de más reciente a más antiguo por fecha de ingreso
+        ordenesCliente.sort((a, b) => new Date(b.fechaIngreso) - new Date(a.fechaIngreso));
         let html = '';
         ordenesCliente.forEach(o => {
           const estadoLabel = o.estado.replace('_', ' ').toUpperCase();
@@ -2305,6 +2572,7 @@
             <div class="card orden-card mb-2">
               <div class="card-body">
                 <h6 class="card-title">Orden #${o.id} - <span class="badge estado-badge estado-${o.estado}">${estadoLabel}</span></h6>
+                ${o.comprobante ? `<p><strong>Comprobante:</strong> ${o.comprobante}</p>` : ''}
                 <p><strong>Cliente:</strong> ${o.clienteNombre}</p>
                 <p><strong>Modelo:</strong> ${o.modelo || 'No especificado'}</p>
                 <p><strong>Accesorios:</strong> ${o.accesorios || 'Ninguno'}</p>
@@ -2339,6 +2607,7 @@
         const estadoLabel = orden.estado.replace('_', ' ').toUpperCase();
         let msg = `🚲 *NUEVA CONSULTA DE CLIENTE*%0A`;
         msg += `📋 *Orden N°:* ${orden.id}%0A`;
+        if (orden.comprobante) msg += `🧾 *Comprobante:* ${orden.comprobante}%0A`;
         msg += `👤 *Cliente:* ${orden.clienteNombre}%0A`;
         msg += `📱 *WhatsApp del cliente:* ${orden.clienteWhatsapp}%0A`;
         msg += `🚲 *Modelo:* ${orden.modelo || 'No especificado'}%0A`;
@@ -2373,126 +2642,28 @@
       };
 
       // ================================================================
-      //  NUEVA FUNCIÓN: AJUSTE DE PRECIOS (BOTÓN ÚNICO)
+      //  BACKUP OBLIGATORIO (18:00)
       // ================================================================
+      function verificarBackupObligatorio() {
+        const now = new Date();
+        const hora = now.getHours();
+        const min = now.getMinutes();
+        // Solo entre las 18:00 y 18:05 para evitar múltiples disparos
+        if (hora === 18 && min >= 0 && min <= 5) {
+          const hoy = now.toISOString().slice(0,10);
+          const ultimo = localStorage.getItem('ultimoBackupDate') || '';
+          // Si ya se hizo backup hoy, no mostrar
+          if (ultimo === hoy) return;
 
-      function crearBotonAjustePrecios() {
-        // Si ya existe el botón, no lo creamos de nuevo
-        if (document.getElementById('btnAjustePrecios')) return;
-
-        const container = document.querySelector('#tabProductos .d-flex');
-        if (!container) return;
-
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-warning ms-2';
-        btn.id = 'btnAjustePrecios';
-        btn.innerHTML = '<i class="bi bi-percent"></i> Ajuste de precios';
-        btn.title = 'Aplicar aumento o descuento a todos los productos';
-
-        const btnAgregar = document.getElementById('btnAgregarProducto');
-        if (btnAgregar) {
-          btnAgregar.parentNode.insertBefore(btn, btnAgregar.nextSibling);
-        } else {
-          container.appendChild(btn);
-        }
-
-        btn.addEventListener('click', abrirModalAjustePrecios);
-      }
-
-      function crearModalAjustePrecios() {
-        if (document.getElementById('modalAjustePrecios')) return;
-
-        const modalHTML = `
-          <div class="modal fade" id="modalAjustePrecios" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Ajuste de precios (semanal)</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                  <form id="formAjustePrecios">
-                    <div class="mb-3">
-                      <label for="ajustePorcentaje" class="form-label">Porcentaje (%)</label>
-                      <input type="number" step="0.1" class="form-control" id="ajustePorcentaje" value="10" required>
-                      <small class="text-muted">Usar números positivos para aumentar, negativos para disminuir.</small>
-                    </div>
-                    <div class="mb-3 form-check">
-                      <input type="checkbox" class="form-check-input" id="ajusteSoloConStock" checked>
-                      <label class="form-check-label" for="ajusteSoloConStock">Aplicar solo a productos con stock > 0</label>
-                    </div>
-                    <div class="mb-3">
-                      <label class="form-label">Tipo de ajuste</label>
-                      <div>
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="tipoAjuste" id="tipoAjusteAumento" value="aumento" checked>
-                          <label class="form-check-label" for="tipoAjusteAumento">Aumento</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="tipoAjuste" id="tipoAjusteDescuento" value="descuento">
-                          <label class="form-check-label" for="tipoAjusteDescuento">Descuento</label>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="alert alert-warning">
-                      <i class="bi bi-exclamation-triangle"></i> Esta acción modificará los precios de todos los productos seleccionados. Se recomienda hacer un backup antes.
-                    </div>
-                  </form>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="button" class="btn btn-primary" id="btnAplicarAjuste">Aplicar ajuste</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-      }
-
-      function abrirModalAjustePrecios() {
-        crearModalAjustePrecios();
-        const modal = new bootstrap.Modal(document.getElementById('modalAjustePrecios'));
-        modal.show();
-
-        const btnAplicar = document.getElementById('btnAplicarAjuste');
-        btnAplicar.replaceWith(btnAplicar.cloneNode(true));
-        document.getElementById('btnAplicarAjuste').addEventListener('click', aplicarAjustePrecios);
-      }
-
-      async function aplicarAjustePrecios() {
-        const porcentaje = parseFloat(document.getElementById('ajustePorcentaje').value);
-        if (isNaN(porcentaje) || porcentaje === 0) {
-          alert('Ingrese un porcentaje válido (distinto de 0)');
-          return;
-        }
-
-        const soloConStock = document.getElementById('ajusteSoloConStock').checked;
-        const tipo = document.querySelector('input[name="tipoAjuste"]:checked').value;
-        const factor = tipo === 'aumento' ? 1 + porcentaje / 100 : 1 - porcentaje / 100;
-
-        if (!confirm(`¿Aplicar ${tipo === 'aumento' ? 'aumento' : 'descuento'} del ${porcentaje}% a los productos ${soloConStock ? 'con stock' : 'todos'}?`)) return;
-
-        let contador = 0;
-        productos.forEach(p => {
-          if (soloConStock && p.stock <= 0) return;
-          if (p.precioFinal && p.precioFinal > 0) {
-            p.precioFinal = Math.round((p.precioFinal * factor) * 100) / 100;
-            contador++;
+          // Mostrar modal obligatorio
+          if (!backupObligatorioModal) {
+            backupObligatorioModal = new bootstrap.Modal(document.getElementById('modalBackupObligatorio'), {
+              backdrop: 'static',
+              keyboard: false
+            });
           }
-        });
-
-        if (contador === 0) {
-          alert('No se encontraron productos para ajustar');
-          return;
+          backupObligatorioModal.show();
         }
-
-        await guardarTodo();
-        bootstrap.Modal.getInstance(document.getElementById('modalAjustePrecios')).hide();
-        renderAdminProductos();
-        renderCatalogo();
-        cargarSelectVentas();
-        alert(`Ajuste aplicado a ${contador} productos.`);
       }
 
       // ================================================================
@@ -2600,7 +2771,7 @@
           aplicarAjustes();
         });
 
-        // Búsqueda
+        // Búsqueda catálogo
         const inputBuscar = document.getElementById('buscarProducto');
         if (inputBuscar) {
           inputBuscar.addEventListener('input', function() {
@@ -2648,6 +2819,8 @@
 
         document.getElementById('filtroCategoria').addEventListener('change', renderCatalogo);
         document.getElementById('ordenPrecio').addEventListener('change', renderCatalogo);
+        document.getElementById('buscarProductoAdmin').addEventListener('input', renderAdminProductos);
+        document.getElementById('buscarCliente').addEventListener('input', renderClientes);
 
         // ========== EVENTOS TALLER ==========
         document.getElementById('btnNuevaOrden').addEventListener('click', () => abrirModalOrden(null));
@@ -2712,6 +2885,19 @@
         document.getElementById('clienteWhatsappBuscar').addEventListener('keypress', function(e) {
           if (e.key === 'Enter') buscarOrdenPorWhatsapp();
         });
+
+        // ========== BOTÓN AJUSTE PRECIOS ==========
+        document.getElementById('btnAjustePrecios').addEventListener('click', abrirModalAjustePrecios);
+
+        // ========== BACKUP OBLIGATORIO ==========
+        document.getElementById('btnBackupObligatorio').addEventListener('click', function() {
+          exportarBackup();
+        });
+
+        // Verificar backup cada minuto
+        setInterval(verificarBackupObligatorio, 60000);
+        // Verificar al cargar
+        verificarBackupObligatorio();
       }
 
       function mostrarSeccion(seccion) {
@@ -2729,8 +2915,6 @@
           renderOrdenes();
           cargarSelectRepuestos();
           actualizarListaClientesSelect();
-          // Crear el botón de ajuste de precios (una sola vez)
-          crearBotonAjustePrecios();
         } else {
           document.getElementById('msjLogin').textContent = 'Clave incorrecta';
         }
@@ -2753,6 +2937,102 @@
         renderizarCategorias();
         input.value = '';
         renderCatalogo();
+      }
+
+      // ========== MODAL AJUSTE PRECIOS ==========
+      function crearModalAjustePrecios() {
+        if (document.getElementById('modalAjustePrecios')) return;
+        const modalHTML = `
+          <div class="modal fade" id="modalAjustePrecios" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Ajuste de precios (semanal)</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="formAjustePrecios">
+                    <div class="mb-3">
+                      <label for="ajustePorcentaje" class="form-label">Porcentaje (%)</label>
+                      <input type="number" step="0.1" class="form-control" id="ajustePorcentaje" value="10" required>
+                      <small class="text-muted">Usar números positivos para aumentar, negativos para disminuir.</small>
+                    </div>
+                    <div class="mb-3 form-check">
+                      <input type="checkbox" class="form-check-input" id="ajusteSoloConStock" checked>
+                      <label class="form-check-label" for="ajusteSoloConStock">Aplicar solo a productos con stock > 0</label>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Tipo de ajuste</label>
+                      <div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="tipoAjuste" id="tipoAjusteAumento" value="aumento" checked>
+                          <label class="form-check-label" for="tipoAjusteAumento">Aumento</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="tipoAjuste" id="tipoAjusteDescuento" value="descuento">
+                          <label class="form-check-label" for="tipoAjusteDescuento">Descuento</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="alert alert-warning">
+                      <i class="bi bi-exclamation-triangle"></i> Esta acción modificará los precios de todos los productos seleccionados. Se recomienda hacer un backup antes.
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-primary" id="btnAplicarAjuste">Aplicar ajuste</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+      }
+
+      function abrirModalAjustePrecios() {
+        crearModalAjustePrecios();
+        const modal = new bootstrap.Modal(document.getElementById('modalAjustePrecios'));
+        modal.show();
+
+        const btnAplicar = document.getElementById('btnAplicarAjuste');
+        btnAplicar.replaceWith(btnAplicar.cloneNode(true));
+        document.getElementById('btnAplicarAjuste').addEventListener('click', aplicarAjustePrecios);
+      }
+
+      async function aplicarAjustePrecios() {
+        const porcentaje = parseFloat(document.getElementById('ajustePorcentaje').value);
+        if (isNaN(porcentaje) || porcentaje === 0) {
+          alert('Ingrese un porcentaje válido (distinto de 0)');
+          return;
+        }
+
+        const soloConStock = document.getElementById('ajusteSoloConStock').checked;
+        const tipo = document.querySelector('input[name="tipoAjuste"]:checked').value;
+        const factor = tipo === 'aumento' ? 1 + porcentaje / 100 : 1 - porcentaje / 100;
+
+        if (!confirm(`¿Aplicar ${tipo === 'aumento' ? 'aumento' : 'descuento'} del ${porcentaje}% a los productos ${soloConStock ? 'con stock' : 'todos'}?`)) return;
+
+        let contador = 0;
+        productos.forEach(p => {
+          if (soloConStock && p.stock <= 0) return;
+          if (p.precioFinal && p.precioFinal > 0) {
+            p.precioFinal = Math.round((p.precioFinal * factor) * 100) / 100;
+            contador++;
+          }
+        });
+
+        if (contador === 0) {
+          alert('No se encontraron productos para ajustar');
+          return;
+        }
+
+        await guardarTodo();
+        bootstrap.Modal.getInstance(document.getElementById('modalAjustePrecios')).hide();
+        renderAdminProductos();
+        renderCatalogo();
+        cargarSelectVentas();
+        alert(`Ajuste aplicado a ${contador} productos.`);
       }
 
       // ========== INICIALIZACIÓN CON TIEMPO REAL ==========
@@ -2861,8 +3141,6 @@
                 renderOrdenes();
                 cargarSelectRepuestos();
                 actualizarListaClientesSelect();
-                // Asegurar que el botón esté creado (solo una vez)
-                crearBotonAjustePrecios();
               }
               console.log('🔄 Datos actualizados en tiempo real');
             }
