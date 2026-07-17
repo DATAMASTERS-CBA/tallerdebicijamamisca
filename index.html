@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JAMA-MISCA</title>
+  <title>JAMA MISCA</title>
   <!-- Bootstrap 5 + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -636,6 +636,14 @@
       color: var(--btn-primary-bg, #0d6efd);
       text-decoration: none;
     }
+
+    /* ===== AJUSTE PARA QUE EL LOGIN ADMIN NO QUEDE OCULTO ===== */
+    #seccionAdmin {
+      padding-top: 20px;
+    }
+    #loginAdmin .card {
+      margin-top: 80px; /* suficiente espacio para que no quede debajo de la navbar */
+    }
   </style>
 </head>
 <body>
@@ -645,7 +653,7 @@
     <div class="container-fluid">
       <div class="logo-container" id="logoContainer">
         <img id="logoImg" src="" alt="Logo" class="logo-img me-2" style="display:none;">
-        <span class="navbar-brand" id="empresaNombre">JAMA-MISCA</span>
+        <span class="navbar-brand" id="empresaNombre">JAMA MISCA</span>
       </div>
 
       <!-- Botón Mi Bicicleta (más llamativo) -->
@@ -2792,6 +2800,13 @@
           e.preventDefault();
           setActiveButton(this);
           mostrarSeccion('admin');
+          // Hacer scroll para mostrar el login (ahora con margen superior)
+          setTimeout(() => {
+            const loginEl = document.getElementById('loginAdmin');
+            if (loginEl) {
+              loginEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 300);
         });
 
         document.getElementById('btnLoginAdmin').addEventListener('click', loginAdmin);
