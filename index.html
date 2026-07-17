@@ -15,6 +15,7 @@
       background: #f8f9fa;
       transition: background 0.3s, color 0.3s;
       padding-top: 56px; /* espacio para navbar fija */
+      overflow-x: hidden; /* Evita scroll horizontal en todo el body */
     }
     .logo-img {
       max-height: 60px;
@@ -83,8 +84,8 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: white;
-      border: 1px solid #ddd;
+      background: var(--card-bg, #fff);
+      border: 1px solid var(--input-border, #ced4da);
       border-radius: 0 0 8px 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       max-height: 300px;
@@ -95,19 +96,20 @@
     .suggestions-list .suggestion-item {
       padding: 10px 16px;
       cursor: pointer;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid var(--table-stripe, #f0f0f0);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      color: var(--text-color, #212529);
     }
     .suggestions-list .suggestion-item:hover {
-      background-color: #e9f5e9;
+      background-color: var(--table-stripe, #e9f5e9);
     }
     .suggestions-list .suggestion-item .suggestion-name {
       font-weight: 500;
     }
     .suggestions-list .suggestion-item .suggestion-price {
-      color: #e65100;
+      color: var(--btn-primary-bg, #e65100);
       font-weight: 700;
     }
 
@@ -133,6 +135,7 @@
       max-height: calc(100vh - 180px);
       overflow-y: auto;
       padding-bottom: 20px;
+      overflow-x: hidden; /* Evita scroll horizontal en el catálogo */
     }
 
     /* --- TEMAS (se aplican dinámicamente) --- */
@@ -150,6 +153,10 @@
       --modal-bg: #fff;
       --input-bg: #fff;
       --input-border: #ced4da;
+      --link-color: #0d6efd;
+      --shadow-color: rgba(0,0,0,0.15);
+      --border-radius: 0.375rem;
+      --transition-speed: 0.3s;
     }
     .tema-android {
       --navbar-bg: #3ddc84;
@@ -165,6 +172,10 @@
       --modal-bg: #fff;
       --input-bg: #fff;
       --input-border: #a5d6a7;
+      --link-color: #2e7d32;
+      --shadow-color: rgba(0,0,0,0.1);
+      --border-radius: 0.5rem;
+      --transition-speed: 0.4s;
     }
     .tema-windows {
       --navbar-bg: #0078d4;
@@ -180,6 +191,10 @@
       --modal-bg: #fff;
       --input-bg: #fff;
       --input-border: #b0b0b0;
+      --link-color: #0078d4;
+      --shadow-color: rgba(0,0,0,0.2);
+      --border-radius: 0;
+      --transition-speed: 0.2s;
     }
     .tema-mac {
       --navbar-bg: #2c2c2e;
@@ -195,6 +210,10 @@
       --modal-bg: #fff;
       --input-bg: #fff;
       --input-border: #c0c0c0;
+      --link-color: #007aff;
+      --shadow-color: rgba(0,0,0,0.1);
+      --border-radius: 0.75rem;
+      --transition-speed: 0.35s;
     }
     .tema-videojuego {
       --navbar-bg: #1a1a2e;
@@ -210,6 +229,10 @@
       --modal-bg: #1a1a2e;
       --input-bg: #2a2a4a;
       --input-border: #4a4a6a;
+      --link-color: #e94560;
+      --shadow-color: rgba(233,69,96,0.3);
+      --border-radius: 0.25rem;
+      --transition-speed: 0.5s;
     }
     .tema-verde {
       --navbar-bg: #2e7d32;
@@ -225,6 +248,10 @@
       --modal-bg: #fff;
       --input-bg: #fff;
       --input-border: #81c784;
+      --link-color: #2e7d32;
+      --shadow-color: rgba(46,125,50,0.2);
+      --border-radius: 0.5rem;
+      --transition-speed: 0.3s;
     }
     .tema-amarillo {
       --navbar-bg: #f9a825;
@@ -240,6 +267,10 @@
       --modal-bg: #fff;
       --input-bg: #fff;
       --input-border: #ffd54f;
+      --link-color: #f57f17;
+      --shadow-color: rgba(245,127,23,0.2);
+      --border-radius: 0.3rem;
+      --transition-speed: 0.25s;
     }
     .tema-argentina {
       --navbar-bg: #75aadb;
@@ -255,6 +286,10 @@
       --modal-bg: #fff;
       --input-bg: #fff;
       --input-border: #b0c4de;
+      --link-color: #75aadb;
+      --shadow-color: rgba(117,170,219,0.3);
+      --border-radius: 0.4rem;
+      --transition-speed: 0.3s;
     }
     .tema-azul {
       --navbar-bg: #1565c0;
@@ -270,6 +305,10 @@
       --modal-bg: #fff;
       --input-bg: #fff;
       --input-border: #64b5f6;
+      --link-color: #1565c0;
+      --shadow-color: rgba(21,101,192,0.25);
+      --border-radius: 0.5rem;
+      --transition-speed: 0.3s;
     }
     .tema-oscuro {
       --navbar-bg: #212529;
@@ -285,15 +324,21 @@
       --modal-bg: #2c2c2c;
       --input-bg: #3a3a3a;
       --input-border: #5a5a5a;
+      --link-color: #adb5bd;
+      --shadow-color: rgba(0,0,0,0.5);
+      --border-radius: 0.25rem;
+      --transition-speed: 0.4s;
     }
 
     /* Aplicación de variables */
     body {
       background-color: var(--body-bg, #f8f9fa);
       color: var(--text-color, #212529);
+      transition: background-color var(--transition-speed, 0.3s), color var(--transition-speed, 0.3s);
     }
     .navbar {
       background-color: var(--navbar-bg, #0d6efd) !important;
+      transition: background-color var(--transition-speed, 0.3s);
     }
     .navbar .navbar-brand,
     .navbar .nav-link,
@@ -302,83 +347,53 @@
       color: var(--navbar-color, #fff) !important;
     }
 
-    /* ========== BOTONES DE NAVEGACIÓN ========== */
-    .navbar .nav-link {
-      background-color: rgba(255,255,255,0.12);
-      border-radius: 30px;
-      padding: 0.4rem 1.2rem;
-      margin: 0 0.3rem;
-      transition: background-color 0.3s, color 0.3s, transform 0.2s;
-      font-weight: 500;
-      border: 1px solid transparent;
-    }
-    .navbar .nav-link:hover {
-      background-color: rgba(255,255,255,0.25);
-      transform: scale(1.02);
-    }
-    .navbar .nav-link.active {
-      background-color: rgba(255,255,255,0.30);
-      font-weight: 700;
-      border-color: rgba(255,255,255,0.5);
-    }
-    .tema-android .navbar .nav-link,
-    .tema-amarillo .navbar .nav-link {
-      background-color: rgba(0,0,0,0.10);
-    }
-    .tema-android .navbar .nav-link:hover,
-    .tema-amarillo .navbar .nav-link:hover {
-      background-color: rgba(0,0,0,0.20);
-    }
-    .tema-android .navbar .nav-link.active,
-    .tema-amarillo .navbar .nav-link.active {
-      background-color: rgba(0,0,0,0.25);
-      border-color: rgba(0,0,0,0.3);
-    }
-
-    .btn-bicicleta {
-      background-color: rgba(255,255,255,0.15);
-      border-radius: 30px;
-      padding: 0.4rem 1.2rem;
-      color: #fff !important;
-      border: 1px solid rgba(255,255,255,0.3);
-      transition: all 0.3s;
-      font-weight: 500;
-      margin-right: 0.5rem;
-    }
-    .btn-bicicleta:hover {
-      background-color: rgba(255,255,255,0.3);
-      transform: scale(1.02);
-      color: #fff !important;
-    }
-
+    /* Botones, tarjetas, modales y otros elementos con variables */
     .btn-primary {
       background-color: var(--btn-primary-bg, #0d6efd);
       border-color: var(--btn-primary-border, #0d6efd);
+      transition: all var(--transition-speed, 0.3s);
+      color: var(--navbar-color, #fff);
     }
     .btn-primary:hover {
       filter: brightness(0.9);
+      transform: scale(1.02);
     }
     .btn-success {
       background-color: var(--btn-primary-bg, #0d6efd);
       border-color: var(--btn-primary-border, #0d6efd);
+      transition: all var(--transition-speed, 0.3s);
+      color: var(--navbar-color, #fff);
     }
     .btn-success:hover {
       filter: brightness(0.9);
+      transform: scale(1.02);
     }
     .btn-warning {
       background-color: var(--btn-primary-bg, #0d6efd);
       border-color: var(--btn-primary-border, #0d6efd);
+      transition: all var(--transition-speed, 0.3s);
+      color: var(--navbar-color, #fff);
     }
     .btn-warning:hover {
       filter: brightness(0.9);
+      transform: scale(1.02);
     }
     .card {
       background-color: var(--card-bg, #fff);
       color: var(--text-color, #212529);
+      border: 1px solid var(--input-border, #ced4da);
+      border-radius: var(--border-radius, 0.375rem);
+      box-shadow: 0 2px 8px var(--shadow-color, rgba(0,0,0,0.1));
+      transition: all var(--transition-speed, 0.3s);
+    }
+    .card:hover {
+      box-shadow: 0 4px 16px var(--shadow-color, rgba(0,0,0,0.15));
     }
     .modal-content {
       background-color: var(--modal-bg, #fff);
       color: var(--text-color, #212529);
+      border-radius: var(--border-radius, 0.375rem);
+      border: 1px solid var(--input-border, #ced4da);
     }
     .table {
       color: var(--text-color, #212529);
@@ -398,6 +413,8 @@
       background-color: var(--input-bg, #fff);
       border-color: var(--input-border, #ced4da);
       color: var(--text-color, #212529);
+      border-radius: var(--border-radius, 0.375rem);
+      transition: all var(--transition-speed, 0.3s);
     }
     .form-control:focus, .form-select:focus {
       border-color: var(--btn-primary-bg, #0d6efd);
@@ -407,14 +424,48 @@
       background-color: var(--card-bg, #fff);
       color: var(--text-color, #212529);
       border-color: var(--input-border, #ced4da);
+      border-radius: var(--border-radius, 0.375rem);
     }
     .nav-tabs .nav-link {
       color: var(--text-color, #212529);
+      border-radius: var(--border-radius, 0.375rem) var(--border-radius, 0.375rem) 0 0;
+      transition: all var(--transition-speed, 0.3s);
     }
     .nav-tabs .nav-link.active {
       background-color: var(--card-bg, #fff);
       color: var(--text-color, #212529);
       border-color: var(--input-border, #ced4da);
+    }
+    .nav-tabs .nav-link:hover {
+      background-color: var(--table-stripe, #f2f2f2);
+    }
+    .btn-outline-secondary {
+      color: var(--text-color, #212529);
+      border-color: var(--input-border, #ced4da);
+      transition: all var(--transition-speed, 0.3s);
+    }
+    .btn-outline-secondary:hover {
+      background-color: var(--btn-primary-bg, #0d6efd);
+      color: var(--navbar-color, #fff);
+      border-color: var(--btn-primary-bg, #0d6efd);
+    }
+    a {
+      color: var(--link-color, #0d6efd);
+    }
+    .suggestions-list {
+      background: var(--card-bg, #fff);
+      border-color: var(--input-border, #ced4da);
+      border-radius: 0 0 var(--border-radius, 0.375rem) var(--border-radius, 0.375rem);
+    }
+    .suggestions-list .suggestion-item {
+      color: var(--text-color, #212529);
+      border-bottom: 1px solid var(--table-stripe, #f0f0f0);
+    }
+    .suggestions-list .suggestion-item:hover {
+      background-color: var(--table-stripe, #e9f5e9);
+    }
+    .suggestions-list .suggestion-item .suggestion-price {
+      color: var(--btn-primary-bg, #e65100);
     }
 
     /* Ajustes para el nombre de la empresa */
@@ -435,14 +486,6 @@
     .fondo-personalizado {
       background-size: cover;
       background-position: center;
-    }
-    .btn-outline-secondary {
-      color: var(--text-color, #212529);
-      border-color: var(--input-border, #ced4da);
-    }
-    .btn-outline-secondary:hover {
-      background-color: var(--btn-primary-bg, #0d6efd);
-      color: var(--navbar-color, #fff);
     }
 
     /* Contacto en banner */
@@ -527,6 +570,44 @@
     /* Buscador en productos admin */
     .admin-search {
       margin-bottom: 10px;
+    }
+    .admin-filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .admin-filters .form-select {
+      width: auto;
+      min-width: 150px;
+    }
+
+    /* Estilo para el contenedor de sugerencias de cliente en modal */
+    .cliente-suggestions-container {
+      position: relative;
+    }
+    .cliente-suggestions-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--card-bg, #fff);
+      border: 1px solid var(--input-border, #ced4da);
+      border-radius: 0 0 var(--border-radius, 0.375rem) var(--border-radius, 0.375rem);
+      box-shadow: 0 4px 12px var(--shadow-color, rgba(0,0,0,0.15));
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+    .cliente-suggestions-list .suggestion-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--table-stripe, #f0f0f0);
+      color: var(--text-color, #212529);
+    }
+    .cliente-suggestions-list .suggestion-item:hover {
+      background-color: var(--table-stripe, #e9f5e9);
     }
   </style>
 </head>
@@ -627,6 +708,20 @@
                 <button class="btn btn-success" id="btnAgregarProducto">+ Agregar</button>
                 <button class="btn btn-warning ms-2" id="btnAjustePrecios"><i class="bi bi-percent"></i> Ajuste de precios</button>
               </div>
+            </div>
+            <!-- Filtros y orden -->
+            <div class="admin-filters">
+              <select id="filtroStockAdmin" class="form-select">
+                <option value="todos">Todos los stocks</option>
+                <option value="0">Stock = 0</option>
+                <option value="1">Stock = 1</option>
+              </select>
+              <select id="ordenProductosAdmin" class="form-select">
+                <option value="nombreAsc">Nombre A-Z</option>
+                <option value="nombreDesc">Nombre Z-A</option>
+                <option value="stockDesc">Stock mayor a menor</option>
+                <option value="stockAsc">Stock menor a mayor</option>
+              </select>
             </div>
             <!-- Buscador de productos admin -->
             <div class="admin-search">
@@ -873,10 +968,9 @@
             <div class="row g-2 mt-2">
               <div class="col-md-4">
                 <label>Cliente</label>
-                <div class="d-flex">
-                  <input type="text" id="ordenClienteBuscar" class="form-control me-1" placeholder="Buscar por nombre o WhatsApp" list="clientesList">
-                  <datalist id="clientesList"></datalist>
-                  <button class="btn btn-outline-secondary" id="btnSeleccionarCliente" title="Seleccionar cliente"><i class="bi bi-check2"></i></button>
+                <div class="cliente-suggestions-container">
+                  <input type="text" id="ordenClienteBuscar" class="form-control" placeholder="Buscar por nombre o WhatsApp" autocomplete="off">
+                  <div id="clienteSuggestionsList" class="cliente-suggestions-list"></div>
                 </div>
                 <div class="mt-1">
                   <input type="text" id="ordenClienteNombre" class="form-control form-control-sm" placeholder="Nombre completo">
@@ -995,7 +1089,7 @@
                 <button type="button" class="btn btn-outline-secondary" id="btnGestionarCategorias" title="Gestionar categorías (agregar/editar/eliminar)"><i class="bi bi-gear"></i></button>
               </div>
             </div>
-            <div class="mb-2"><label>Costo *</label><input type="number" step="0.01" id="prodCosto" class="form-control" required></div>
+            <div class="mb-2"><label>Costo *</label><input type="number" step="0.01" id="prodCosto" class="form-control" value="0" required></div>
             <div class="mb-2"><label>Tipo</label>
               <select id="prodTipo" class="form-select">
                 <option value="propio">Propio</option>
@@ -1012,7 +1106,7 @@
               <div class="mb-2"><label>Precio de Reventa (sugerido)</label><input type="text" id="prodPrecioReventa" class="form-control" readonly></div>
             </div>
             <div class="mb-2"><label>Stock *</label><input type="number" id="prodStock" class="form-control" required></div>
-            <div class="mb-2"><label>Stock Mínimo</label><input type="number" id="prodStockMinimo" class="form-control" value="5"></div>
+            <div class="mb-2"><label>Stock Mínimo</label><input type="number" id="prodStockMinimo" class="form-control" value="1"></div>
             <div class="mb-2"><label>Foto (URL o archivo)</label>
               <input type="text" id="prodFotoUrl" class="form-control" placeholder="URL de imagen">
               <input type="file" id="prodFotoFile" class="form-control mt-1" accept="image/*">
@@ -1065,7 +1159,7 @@
     </div>
   </div>
 
-  <!-- MODAL BACKUP OBLIGATORIO (18:00) -->
+  <!-- MODAL BACKUP OBLIGATORIO (18:00 o al login) -->
   <div class="modal fade" id="modalBackupObligatorio" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1073,7 +1167,7 @@
           <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Recordatorio de Backup</h5>
         </div>
         <div class="modal-body">
-          <p>Es la hora del backup diario (18:00). Realice una copia de seguridad de la base de datos para evitar pérdidas de información.</p>
+          <p>Es necesario realizar un backup de la base de datos. No podrás continuar hasta que lo hagas.</p>
           <button class="btn btn-primary w-100" id="btnBackupObligatorio"><i class="bi bi-download"></i> Hacer Backup</button>
         </div>
       </div>
@@ -1084,8 +1178,6 @@
   <script>
     // =================================================================
     // SCRIPT MEJORADO - TIEMPO REAL CON FIREBASE (usando compat)
-    // + NUEVAS FUNCIONALIDADES: ajuste de precios, "consultar precio",
-    //   reportes de taller, resumen combinado, botón único.
     // =================================================================
     (function() {
       "use strict";
@@ -1323,12 +1415,30 @@
         const container = document.getElementById('listaProductosAdmin');
         if (!container) return;
         const search = (document.getElementById('buscarProductoAdmin')?.value || '').toLowerCase();
+        const filtroStock = document.getElementById('filtroStockAdmin')?.value || 'todos';
+        const orden = document.getElementById('ordenProductosAdmin')?.value || 'nombreAsc';
+
         let filtered = productos;
         if (search) {
-          filtered = productos.filter(p => p.nombre.toLowerCase().includes(search));
+          filtered = filtered.filter(p => p.nombre.toLowerCase().includes(search));
         }
+        if (filtroStock === '0') {
+          filtered = filtered.filter(p => p.stock === 0);
+        } else if (filtroStock === '1') {
+          filtered = filtered.filter(p => p.stock === 1);
+        }
+
+        // Ordenar
+        switch (orden) {
+          case 'nombreAsc': filtered.sort((a, b) => a.nombre.localeCompare(b.nombre)); break;
+          case 'nombreDesc': filtered.sort((a, b) => b.nombre.localeCompare(a.nombre)); break;
+          case 'stockDesc': filtered.sort((a, b) => b.stock - a.stock); break;
+          case 'stockAsc': filtered.sort((a, b) => a.stock - b.stock); break;
+          default: break;
+        }
+
         if (filtered.length === 0) {
-          container.innerHTML = '<p>No hay productos</p>';
+          container.innerHTML = '<p>No hay productos que coincidan con los filtros</p>';
           return;
         }
         let html = '<table class="table table-striped table-hover"><thead><tr><th>Foto</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Tipo</th><th>Acciones</th></tr></thead><tbody>';
@@ -1701,7 +1811,7 @@
           document.getElementById('prodPrecioAcordado').value = data.precioFinal || 0;
           document.getElementById('prodPorcentajeReventa').value = data.porcentajeReventa || 0;
           document.getElementById('prodStock').value = data.stock || 0;
-          document.getElementById('prodStockMinimo').value = data.stockMinimo || 5;
+          document.getElementById('prodStockMinimo').value = data.stockMinimo || 1;
           document.getElementById('prodFotoUrl').value = data.foto || '';
           document.getElementById('prodFotoPreview').src = data.foto || '';
           document.getElementById('prodFotoPreview').style.display = data.foto ? 'block' : 'none';
@@ -1711,13 +1821,13 @@
           document.getElementById('prodId').value = '';
           document.getElementById('prodNombre').value = '';
           document.getElementById('prodCategoria').value = '';
-          document.getElementById('prodCosto').value = '';
+          document.getElementById('prodCosto').value = '0';
           document.getElementById('prodTipo').value = 'propio';
           document.getElementById('prodPorcentaje').value = 20;
           document.getElementById('prodPrecioAcordado').value = '';
           document.getElementById('prodPorcentajeReventa').value = 30;
           document.getElementById('prodStock').value = '';
-          document.getElementById('prodStockMinimo').value = 5;
+          document.getElementById('prodStockMinimo').value = '1';
           document.getElementById('prodFotoUrl').value = '';
           document.getElementById('prodFotoPreview').src = '';
           document.getElementById('prodFotoPreview').style.display = 'none';
@@ -1753,9 +1863,9 @@
         e.preventDefault();
         const nombre = document.getElementById('prodNombre').value.trim();
         const categoria = document.getElementById('prodCategoria').value;
-        const costo = parseFloat(document.getElementById('prodCosto').value);
+        const costo = parseFloat(document.getElementById('prodCosto').value) || 0;
         const stock = parseInt(document.getElementById('prodStock').value);
-        if (!nombre || !categoria || isNaN(costo) || isNaN(stock)) {
+        if (!nombre || !categoria || isNaN(stock)) {
           alert('Por favor, complete todos los campos obligatorios (*)');
           return;
         }
@@ -1763,7 +1873,7 @@
         const id = document.getElementById('prodId').value;
         const tipo = document.getElementById('prodTipo').value;
         const foto = document.getElementById('prodFotoUrl').value.trim();
-        const stockMinimo = parseInt(document.getElementById('prodStockMinimo').value) || 5;
+        const stockMinimo = parseInt(document.getElementById('prodStockMinimo').value) || 1;
 
         let precioFinal, porcentaje, porcentajeReventa;
         if (tipo === 'propio') {
@@ -2145,30 +2255,8 @@
       }
 
       function actualizarListaClientesSelect() {
-        const datalist = document.getElementById('clientesList');
-        if (!datalist) return;
-        datalist.innerHTML = '';
-        clientes.forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.nombre;
-          opt.dataset.whatsapp = c.whatsapp;
-          opt.dataset.direccion = c.direccion || '';
-          opt.dataset.id = c.id;
-          datalist.appendChild(opt);
-        });
-        // Evento para autocompletar al seleccionar del datalist
-        const input = document.getElementById('ordenClienteBuscar');
-        if (input) {
-          input.addEventListener('input', function() {
-            const val = this.value;
-            const option = Array.from(datalist.options).find(o => o.value === val);
-            if (option) {
-              document.getElementById('ordenClienteNombre').value = option.value;
-              document.getElementById('ordenClienteWhatsapp').value = option.dataset.whatsapp;
-              document.getElementById('ordenClienteDireccion').value = option.dataset.direccion;
-            }
-          });
-        }
+        // Esta función ya no se usa para el datalist, ahora usamos sugerencias en cliente
+        // Pero la mantenemos por compatibilidad
       }
 
       // -------- ÓRDENES --------
@@ -2357,6 +2445,8 @@
             });
           }
           calcularTotalPresupuesto();
+          // Cargar el nombre en el buscador de cliente
+          document.getElementById('ordenClienteBuscar').value = data.clienteNombre || '';
         } else {
           document.getElementById('modalOrdenTitle').textContent = 'Nueva Orden';
           document.getElementById('ordenId').value = '';
@@ -2378,8 +2468,11 @@
           document.getElementById('ordenPresupuestoMano').value = 0;
           document.getElementById('ordenRepuestosList').innerHTML = '';
           calcularTotalPresupuesto();
+          document.getElementById('ordenClienteBuscar').value = '';
         }
         modal.show();
+        // Enfocar el campo de búsqueda de cliente
+        setTimeout(() => document.getElementById('ordenClienteBuscar').focus(), 300);
       }
 
       function agregarRepuestoItem(id, nombre, cantidad, precio) {
@@ -2530,7 +2623,6 @@
         renderOrdenes();
         cargarSelectRepuestos();
         renderClientes();
-        actualizarListaClientesSelect();
         renderCatalogo();
         renderAdminProductos();
         actualizarReportes();
@@ -2642,28 +2734,75 @@
       };
 
       // ================================================================
-      //  BACKUP OBLIGATORIO (18:00)
+      //  BACKUP OBLIGATORIO (18:00 o al login)
       // ================================================================
       function verificarBackupObligatorio() {
         const now = new Date();
-        const hora = now.getHours();
-        const min = now.getMinutes();
-        // Solo entre las 18:00 y 18:05 para evitar múltiples disparos
-        if (hora === 18 && min >= 0 && min <= 5) {
-          const hoy = now.toISOString().slice(0,10);
-          const ultimo = localStorage.getItem('ultimoBackupDate') || '';
-          // Si ya se hizo backup hoy, no mostrar
-          if (ultimo === hoy) return;
+        const hoy = now.toISOString().slice(0,10);
+        const ultimo = localStorage.getItem('ultimoBackupDate') || '';
+        // Si ya se hizo backup hoy, no mostrar
+        if (ultimo === hoy) return;
 
-          // Mostrar modal obligatorio
-          if (!backupObligatorioModal) {
-            backupObligatorioModal = new bootstrap.Modal(document.getElementById('modalBackupObligatorio'), {
-              backdrop: 'static',
-              keyboard: false
-            });
-          }
-          backupObligatorioModal.show();
+        // Mostrar modal obligatorio
+        if (!backupObligatorioModal) {
+          backupObligatorioModal = new bootstrap.Modal(document.getElementById('modalBackupObligatorio'), {
+            backdrop: 'static',
+            keyboard: false
+          });
         }
+        backupObligatorioModal.show();
+      }
+
+      // ================================================================
+      //  SUGERENCIAS PARA CLIENTE EN MODAL DE ORDEN
+      // ================================================================
+      function initClienteSuggestions() {
+        const input = document.getElementById('ordenClienteBuscar');
+        const list = document.getElementById('clienteSuggestionsList');
+        if (!input || !list) return;
+
+        input.addEventListener('input', function() {
+          const query = this.value.trim().toLowerCase();
+          if (query.length === 0) {
+            list.style.display = 'none';
+            return;
+          }
+          const coincidencias = clientes.filter(c => 
+            c.nombre.toLowerCase().includes(query) || 
+            c.whatsapp.includes(query)
+          ).slice(0, 8);
+          if (coincidencias.length === 0) {
+            list.innerHTML = '<div class="suggestion-item" style="justify-content:center; color:#999;">No hay coincidencias</div>';
+            list.style.display = 'block';
+            return;
+          }
+          list.innerHTML = coincidencias.map(c => `
+            <div class="suggestion-item" data-id="${c.id}">
+              <span class="suggestion-name">${c.nombre}</span>
+              <span class="suggestion-price">${c.whatsapp}</span>
+            </div>
+          `).join('');
+          list.style.display = 'block';
+          list.querySelectorAll('.suggestion-item').forEach(el => {
+            el.addEventListener('click', function() {
+              const id = this.dataset.id;
+              const cliente = clientes.find(c => c.id === id);
+              if (cliente) {
+                document.getElementById('ordenClienteBuscar').value = cliente.nombre;
+                document.getElementById('ordenClienteNombre').value = cliente.nombre;
+                document.getElementById('ordenClienteWhatsapp').value = cliente.whatsapp;
+                document.getElementById('ordenClienteDireccion').value = cliente.direccion || '';
+                list.style.display = 'none';
+              }
+            });
+          });
+        });
+
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('.cliente-suggestions-container')) {
+            list.style.display = 'none';
+          }
+        });
       }
 
       // ================================================================
@@ -2821,22 +2960,12 @@
         document.getElementById('ordenPrecio').addEventListener('change', renderCatalogo);
         document.getElementById('buscarProductoAdmin').addEventListener('input', renderAdminProductos);
         document.getElementById('buscarCliente').addEventListener('input', renderClientes);
+        document.getElementById('filtroStockAdmin').addEventListener('change', renderAdminProductos);
+        document.getElementById('ordenProductosAdmin').addEventListener('change', renderAdminProductos);
 
         // ========== EVENTOS TALLER ==========
         document.getElementById('btnNuevaOrden').addEventListener('click', () => abrirModalOrden(null));
         document.getElementById('formOrden').addEventListener('submit', guardarOrden);
-        document.getElementById('btnSeleccionarCliente').addEventListener('click', function() {
-          const input = document.getElementById('ordenClienteBuscar');
-          const value = input.value.trim();
-          const cliente = clientes.find(c => c.nombre === value);
-          if (cliente) {
-            document.getElementById('ordenClienteNombre').value = cliente.nombre;
-            document.getElementById('ordenClienteWhatsapp').value = cliente.whatsapp;
-            document.getElementById('ordenClienteDireccion').value = cliente.direccion || '';
-          } else {
-            alert('Cliente no encontrado. Puedes escribirlo manualmente.');
-          }
-        });
         document.getElementById('ordenPresupuestoMano').addEventListener('input', calcularTotalPresupuesto);
         document.getElementById('btnAgregarRepuesto').addEventListener('click', function() {
           const sel = document.getElementById('ordenRepuestoSelect');
@@ -2894,10 +3023,8 @@
           exportarBackup();
         });
 
-        // Verificar backup cada minuto
-        setInterval(verificarBackupObligatorio, 60000);
-        // Verificar al cargar
-        verificarBackupObligatorio();
+        // ========== INICIALIZAR SUGERENCIAS CLIENTE ==========
+        initClienteSuggestions();
       }
 
       function mostrarSeccion(seccion) {
@@ -2914,7 +3041,8 @@
           renderClientes();
           renderOrdenes();
           cargarSelectRepuestos();
-          actualizarListaClientesSelect();
+          // Verificar backup obligatorio al login
+          verificarBackupObligatorio();
         } else {
           document.getElementById('msjLogin').textContent = 'Clave incorrecta';
         }
@@ -3140,7 +3268,6 @@
                 renderClientes();
                 renderOrdenes();
                 cargarSelectRepuestos();
-                actualizarListaClientesSelect();
               }
               console.log('🔄 Datos actualizados en tiempo real');
             }
