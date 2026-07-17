@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catálogo</title>
+  <title>JAMA-MISCA</title>
   <!-- Bootstrap 5 + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* --- ESTILOS BASE (sin cambios) --- */
+    /* --- ESTILOS BASE --- */
     body {
       background: #f8f9fa;
       transition: background 0.3s, color 0.3s;
-      padding-top: 56px; /* espacio para navbar fija */
-      overflow-x: hidden; /* Evita scroll horizontal en todo el body */
+      padding-top: 56px;
+      overflow-x: hidden;
     }
     .logo-img {
       max-height: 60px;
@@ -75,7 +75,7 @@
       padding-top: 20px;
     }
 
-    /* Estilos para el autocompletado */
+    /* --- Sugerencias para búsqueda --- */
     .suggestions-container {
       position: relative;
     }
@@ -124,7 +124,7 @@
     }
     .search-bar-fixed {
       position: sticky;
-      top: 56px; /* altura de la navbar */
+      top: 56px;
       z-index: 1020;
       background-color: var(--body-bg, #f8f9fa);
       padding: 10px 0;
@@ -135,10 +135,52 @@
       max-height: calc(100vh - 180px);
       overflow-y: auto;
       padding-bottom: 20px;
-      overflow-x: hidden; /* Evita scroll horizontal en el catálogo */
+      overflow-x: hidden;
     }
 
-    /* --- TEMAS (se aplican dinámicamente) --- */
+    /* --- BOTÓN MI BICICLETA CON ANIMACIÓN --- */
+    .btn-bicicleta {
+      background-color: rgba(255,255,255,0.15);
+      border-radius: 30px;
+      padding: 0.4rem 1.2rem;
+      color: #fff !important;
+      border: 2px solid rgba(255,255,255,0.6);
+      transition: all 0.3s;
+      font-weight: 500;
+      margin-right: 0.5rem;
+      animation: borderPulse 2s infinite alternate;
+      position: relative;
+    }
+    .btn-bicicleta:hover {
+      background-color: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+      color: #fff !important;
+    }
+    @keyframes borderPulse {
+      0% { border-color: rgba(255,255,255,0.4); box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+      50% { border-color: rgba(255,215,0,0.9); box-shadow: 0 0 15px rgba(255,215,0,0.5); }
+      100% { border-color: rgba(255,255,255,0.4); box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+    }
+    .tema-android .btn-bicicleta {
+      border-color: #000;
+      animation-name: borderPulseAndroid;
+    }
+    @keyframes borderPulseAndroid {
+      0% { border-color: rgba(0,0,0,0.3); box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+      50% { border-color: #ff6f00; box-shadow: 0 0 15px #ff6f00; }
+      100% { border-color: rgba(0,0,0,0.3); box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    }
+    .tema-amarillo .btn-bicicleta {
+      border-color: #000;
+      animation-name: borderPulseAmarillo;
+    }
+    @keyframes borderPulseAmarillo {
+      0% { border-color: rgba(0,0,0,0.3); box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+      50% { border-color: #d32f2f; box-shadow: 0 0 15px #d32f2f; }
+      100% { border-color: rgba(0,0,0,0.3); box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    }
+
+    /* --- TEMAS CON CONTRASTE GARANTIZADO --- */
     .tema-default {
       --navbar-bg: #0d6efd;
       --navbar-color: #fff;
@@ -330,7 +372,7 @@
       --transition-speed: 0.4s;
     }
 
-    /* Aplicación de variables */
+    /* Aplicación de variables con contraste */
     body {
       background-color: var(--body-bg, #f8f9fa);
       color: var(--text-color, #212529);
@@ -346,8 +388,6 @@
     .navbar .contacto-info span {
       color: var(--navbar-color, #fff) !important;
     }
-
-    /* Botones, tarjetas, modales y otros elementos con variables */
     .btn-primary {
       background-color: var(--btn-primary-bg, #0d6efd);
       border-color: var(--btn-primary-border, #0d6efd);
@@ -474,15 +514,9 @@
       display: inline-block;
       transform: translate(0px, 0px);
     }
-    .logo-container.vertical-top {
-      align-items: flex-start;
-    }
-    .logo-container.vertical-middle {
-      align-items: center;
-    }
-    .logo-container.vertical-bottom {
-      align-items: flex-end;
-    }
+    .logo-container.vertical-top { align-items: flex-start; }
+    .logo-container.vertical-middle { align-items: center; }
+    .logo-container.vertical-bottom { align-items: flex-end; }
     .fondo-personalizado {
       background-size: cover;
       background-position: center;
@@ -523,31 +557,12 @@
     .estado-lista { background: #d4edda; color: #155724; }
     .estado-retirada { background: #cce5ff; color: #004085; }
 
-    /* Colores de fondo y borde para el historial */
-    .fila-no_visto {
-      background-color: #cce5ff !important;
-      border-left: 4px solid #004085 !important;
-    }
-    .fila-presupuestada {
-      background-color: #fff3cd !important;
-      border-left: 4px solid #856404 !important;
-    }
-    .fila-confirmada {
-      background-color: #ffe5cc !important;
-      border-left: 4px solid #a66300 !important;
-    }
-    .fila-rechazado {
-      background-color: #f8d7da !important;
-      border-left: 4px solid #721c24 !important;
-    }
-    .fila-lista {
-      background-color: #d4edda !important;
-      border-left: 4px solid #155724 !important;
-    }
-    .fila-retirada {
-      background-color: #cce5ff !important;
-      border-left: 4px solid #004085 !important;
-    }
+    .fila-no_visto { background-color: #cce5ff !important; border-left: 4px solid #004085 !important; }
+    .fila-presupuestada { background-color: #fff3cd !important; border-left: 4px solid #856404 !important; }
+    .fila-confirmada { background-color: #ffe5cc !important; border-left: 4px solid #a66300 !important; }
+    .fila-rechazado { background-color: #f8d7da !important; border-left: 4px solid #721c24 !important; }
+    .fila-lista { background-color: #d4edda !important; border-left: 4px solid #155724 !important; }
+    .fila-retirada { background-color: #cce5ff !important; border-left: 4px solid #004085 !important; }
 
     .orden-card {
       transition: transform 0.2s;
@@ -567,7 +582,7 @@
       height: 100% !important;
     }
 
-    /* Buscador en productos admin */
+    /* Filtros admin */
     .admin-search {
       margin-bottom: 10px;
     }
@@ -582,7 +597,7 @@
       min-width: 150px;
     }
 
-    /* Estilo para el contenedor de sugerencias de cliente en modal */
+    /* Sugerencias cliente en modal */
     .cliente-suggestions-container {
       position: relative;
     }
@@ -609,6 +624,18 @@
     .cliente-suggestions-list .suggestion-item:hover {
       background-color: var(--table-stripe, #e9f5e9);
     }
+
+    /* Estilo para el nombre del cliente en la tabla (clickeable) */
+    .cliente-nombre-link {
+      cursor: pointer;
+      color: var(--link-color, #0d6efd);
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .cliente-nombre-link:hover {
+      color: var(--btn-primary-bg, #0d6efd);
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -618,10 +645,10 @@
     <div class="container-fluid">
       <div class="logo-container" id="logoContainer">
         <img id="logoImg" src="" alt="Logo" class="logo-img me-2" style="display:none;">
-        <span class="navbar-brand" id="empresaNombre">Mi Catálogo</span>
+        <span class="navbar-brand" id="empresaNombre">JAMA-MISCA</span>
       </div>
 
-      <!-- Botón Mi Bicicleta -->
+      <!-- Botón Mi Bicicleta (más llamativo) -->
       <a href="#" class="btn-bicicleta d-none d-lg-inline-block" id="btnMiBicicleta" title="Consultar estado de tu bicicleta">
         <i class="bi bi-bicycle"></i> Mi Bicicleta
       </a>
@@ -650,7 +677,6 @@
 
     <!-- SECCIÓN CATÁLOGO -->
     <div id="seccionCatalogo">
-      <!-- Barra de búsqueda fija -->
       <div class="search-bar-fixed">
         <div class="row g-2">
           <div class="col-md-4 position-relative suggestions-container">
@@ -671,13 +697,12 @@
           </div>
         </div>
       </div>
-      <!-- Catálogo con scroll -->
       <div class="catalogo-scroll">
         <div id="productosCatalogo" class="row row-cols-1 row-cols-md-3 g-4"></div>
       </div>
     </div>
 
-    <!-- SECCIÓN ADMIN (requiere login) -->
+    <!-- SECCIÓN ADMIN -->
     <div id="seccionAdmin" class="admin-section">
       <div id="loginAdmin">
         <div class="card w-50 mx-auto">
@@ -709,7 +734,6 @@
                 <button class="btn btn-warning ms-2" id="btnAjustePrecios"><i class="bi bi-percent"></i> Ajuste de precios</button>
               </div>
             </div>
-            <!-- Filtros y orden -->
             <div class="admin-filters">
               <select id="filtroStockAdmin" class="form-select">
                 <option value="todos">Todos los stocks</option>
@@ -723,7 +747,6 @@
                 <option value="stockAsc">Stock menor a mayor</option>
               </select>
             </div>
-            <!-- Buscador de productos admin -->
             <div class="admin-search">
               <input type="text" id="buscarProductoAdmin" class="form-control" placeholder="Buscar producto por nombre...">
             </div>
@@ -751,7 +774,6 @@
               <button class="btn btn-outline-secondary" data-periodo="anual">Anual</button>
             </div>
             <div id="resumenVentas"></div>
-            <!-- Gráficos -->
             <div class="row mt-3">
               <div class="col-md-6">
                 <div class="card p-2">
@@ -792,8 +814,6 @@
               <div class="mb-2"><label>WhatsApp (número con código país)</label><input type="text" id="ajusteWhatsapp" class="form-control"></div>
               <div class="mb-2"><label>Dirección</label><input type="text" id="ajusteDireccion" class="form-control"></div>
               <div class="mb-2"><label>Horarios y Días</label><input type="text" id="ajusteHorarios" class="form-control"></div>
-
-              <!-- Logo -->
               <div class="mb-2"><label>Logo (URL o seleccionar archivo)</label>
                 <input type="text" id="ajusteLogoUrl" class="form-control" placeholder="URL del logo">
                 <input type="file" id="ajusteLogoFile" class="form-control mt-1" accept="image/*">
@@ -808,8 +828,6 @@
                   <option value="derecha">Derecha</option>
                 </select>
               </div>
-
-              <!-- Nombre empresa -->
               <div class="mb-2"><label>Tamaño fuente del nombre (px) <span id="labelTamNombre">24</span>px</label>
                 <input type="range" id="ajusteTamNombre" min="12" max="48" value="24" class="form-range">
               </div>
@@ -839,8 +857,6 @@
                   <option value="bottom">Abajo</option>
                 </select>
               </div>
-
-              <!-- Fondo -->
               <div class="mb-2"><label>Color de fondo (personalizado)</label>
                 <input type="color" id="ajusteColorFondo" class="form-control form-control-color" value="#f8f9fa">
                 <button type="button" class="btn btn-outline-secondary mt-1" id="btnResetFondo">Restaurar fondo por defecto</button>
@@ -848,8 +864,6 @@
               <div class="mb-2"><label>Imagen de fondo (URL)</label>
                 <input type="text" id="ajusteFondoImagen" class="form-control" placeholder="URL de imagen de fondo">
               </div>
-
-              <!-- Temas -->
               <div class="mb-2"><label>Tema de colores</label>
                 <select id="ajusteTema" class="form-select">
                   <option value="default">Default</option>
@@ -864,11 +878,9 @@
                   <option value="oscuro">Oscuro</option>
                 </select>
               </div>
-
               <div class="mb-2"><label>Tamaño de campos (px) <span id="labelTamCampos">16</span>px</label>
                 <input type="range" id="ajusteTamCampos" min="10" max="30" value="16" class="form-range">
               </div>
-
               <button type="submit" class="btn btn-success">Guardar Ajustes</button>
             </form>
           </div>
@@ -925,6 +937,24 @@
           </div>
           <hr>
           <div id="resultadoOrdenCliente"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL HISTORIAL CLIENTE (admin) ========== -->
+  <div class="modal fade" id="modalHistorialCliente" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Historial de ingresos al taller</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="historialClienteContent"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -1052,18 +1082,9 @@
         <div class="modal-body">
           <form id="formCliente">
             <input type="hidden" id="clienteId">
-            <div class="mb-2">
-              <label>Nombre y Apellido</label>
-              <input type="text" id="clienteNombre" class="form-control" required>
-            </div>
-            <div class="mb-2">
-              <label>WhatsApp (sin 0 y sin 15)</label>
-              <input type="text" id="clienteWhatsapp" class="form-control" required>
-            </div>
-            <div class="mb-2">
-              <label>Dirección</label>
-              <input type="text" id="clienteDireccion" class="form-control">
-            </div>
+            <div class="mb-2"><label>Nombre y Apellido</label><input type="text" id="clienteNombre" class="form-control" required></div>
+            <div class="mb-2"><label>WhatsApp (sin 0 y sin 15)</label><input type="text" id="clienteWhatsapp" class="form-control" required></div>
+            <div class="mb-2"><label>Dirección</label><input type="text" id="clienteDireccion" class="form-control"></div>
             <button type="submit" class="btn btn-primary">Guardar</button>
           </form>
         </div>
@@ -1138,7 +1159,7 @@
     </div>
   </div>
 
-  <!-- MODAL PARA PRECIO EN VENTA (cuando precio=0) -->
+  <!-- MODAL PARA PRECIO EN VENTA -->
   <div class="modal fade" id="modalPrecioVenta" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1159,7 +1180,7 @@
     </div>
   </div>
 
-  <!-- MODAL BACKUP OBLIGATORIO (18:00 o al login) -->
+  <!-- MODAL BACKUP OBLIGATORIO -->
   <div class="modal fade" id="modalBackupObligatorio" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1177,7 +1198,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // =================================================================
-    // SCRIPT MEJORADO - TIEMPO REAL CON FIREBASE (usando compat)
+    // SCRIPT COMPLETO - TIEMPO REAL CON FIREBASE
     // =================================================================
     (function() {
       "use strict";
@@ -1221,11 +1242,8 @@
       let docRef = null;
       let unsub = null;
 
-      // Variables para gráficos
       let chartVentasPeriodo = null;
       let chartTopProductos = null;
-
-      // Backup obligatorio
       let backupObligatorioModal = null;
       let ultimoBackupDate = '';
 
@@ -1428,7 +1446,6 @@
           filtered = filtered.filter(p => p.stock === 1);
         }
 
-        // Ordenar
         switch (orden) {
           case 'nombreAsc': filtered.sort((a, b) => a.nombre.localeCompare(b.nombre)); break;
           case 'nombreDesc': filtered.sort((a, b) => b.nombre.localeCompare(a.nombre)); break;
@@ -1499,9 +1516,8 @@
         });
       }
 
-      // ========== ACTUALIZAR REPORTES (incluye taller) ==========
+      // ========== ACTUALIZAR REPORTES ==========
       function actualizarReportes(periodo = 'dia') {
-        // --- Stock ---
         const totalStock = productos.reduce((acc, p) => acc + p.stock, 0);
         document.getElementById('stockTotal').textContent = totalStock;
         const sinStock = productos.filter(p => p.stock <= 0);
@@ -1520,7 +1536,6 @@
           container.innerHTML = html;
         }
 
-        // --- Ventas y Taller ---
         let now = new Date();
         let inicio;
         switch (periodo) {
@@ -1531,12 +1546,10 @@
           default: inicio = new Date(0);
         }
 
-        // Ventas de productos
         const ventasPeriodo = ventas.filter(v => new Date(v.fecha) >= inicio);
         const totalVentas = ventasPeriodo.reduce((acc, v) => acc + v.total, 0);
         const cantidad = ventasPeriodo.reduce((acc, v) => acc + v.cantidad, 0);
 
-        // Órdenes de taller (ingresos: retiradas o confirmadas)
         const ordenesPeriodo = ordenes.filter(o => {
           const fecha = new Date(o.fechaIngreso);
           return fecha >= inicio;
@@ -1558,16 +1571,12 @@
           </div>
         `;
 
-        // Gráficos
         dibujarGraficos(periodo, ventasPeriodo);
-
-        // Reportes de taller
         renderReportesTaller();
       }
 
       // ===== GRÁFICOS =====
       function dibujarGraficos(periodo, ventasPeriodo) {
-        // Gráfico 1: Ventas por día en el periodo (barras)
         const ctx1 = document.getElementById('chartVentasPeriodo').getContext('2d');
         if (chartVentasPeriodo) chartVentasPeriodo.destroy();
 
@@ -1594,16 +1603,11 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false }
-            },
-            scales: {
-              y: { beginAtZero: true }
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
           }
         });
 
-        // Gráfico 2: Top 5 productos más vendidos en el mes actual
         const ctx2 = document.getElementById('chartTopProductos').getContext('2d');
         if (chartTopProductos) chartTopProductos.destroy();
 
@@ -1633,12 +1637,8 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false }
-            },
-            scales: {
-              y: { beginAtZero: true }
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
           }
         });
       }
@@ -1647,7 +1647,6 @@
       function renderReportesTaller() {
         const container = document.getElementById('reportesTaller');
         if (!container) return;
-
         if (ordenes.length === 0) {
           container.innerHTML = '<h5 class="mt-3">Trabajos de Taller</h5><p>No hay órdenes registradas.</p>';
           return;
@@ -1736,7 +1735,7 @@
         }
       }
 
-      // ========== FUNCIONES GLOBALES (expuestas) ==========
+      // ========== FUNCIONES GLOBALES ==========
       window.editarCategoria = async function(oldName) {
         const newName = prompt('Editar categoría:', oldName);
         if (!newName || newName.trim() === oldName) return;
@@ -1922,14 +1921,11 @@
         if (!prod) return alert('Producto no encontrado');
         if (prod.stock < cantidad) return alert(`Stock insuficiente. Disponible: ${prod.stock}`);
 
-        // Verificar si el precio es 0 o null -> pedir precio en modal
         if (prod.precioFinal === 0 || prod.precioFinal === null || prod.precioFinal === undefined) {
-          // Mostrar modal para ingresar precio
           document.getElementById('precioVentaProductoNombre').textContent = prod.nombre;
           document.getElementById('precioVentaInput').value = '';
           const modalPrecio = new bootstrap.Modal(document.getElementById('modalPrecioVenta'));
           modalPrecio.show();
-          // Esperar a que el usuario confirme
           return new Promise((resolve) => {
             const confirmBtn = document.getElementById('btnConfirmarPrecioVenta');
             const handler = async () => {
@@ -1940,12 +1936,10 @@
               }
               modalPrecio.hide();
               confirmBtn.removeEventListener('click', handler);
-              // Registrar venta con el precio ingresado
               await registrarVentaConPrecio(prod, cantidad, precio);
               resolve();
             };
             confirmBtn.addEventListener('click', handler);
-            // Si se cierra el modal sin confirmar, cancelar
             document.getElementById('modalPrecioVenta').addEventListener('hidden.bs.modal', function() {
               confirmBtn.removeEventListener('click', handler);
               resolve();
@@ -2007,10 +2001,8 @@
         a.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
         a.click();
         URL.revokeObjectURL(url);
-        // Actualizar fecha de último backup
         ultimoBackupDate = new Date().toISOString().slice(0,10);
         localStorage.setItem('ultimoBackupDate', ultimoBackupDate);
-        // Si el modal obligatorio está abierto, cerrarlo
         if (backupObligatorioModal) {
           backupObligatorioModal.hide();
         }
@@ -2160,10 +2152,8 @@
       }
 
       // ================================================================
-      //  TALLER, CLIENTES, MI BICICLETA
+      //  CLIENTES - RENDER Y EVENTOS
       // ================================================================
-
-      // -------- CLIENTES --------
       function renderClientes() {
         const container = document.getElementById('listaClientes');
         if (!container) return;
@@ -2183,7 +2173,7 @@
         filtered.forEach(c => {
           html += `
             <tr>
-              <td>${c.nombre}</td>
+              <td><span class="cliente-nombre-link" data-id="${c.id}" data-nombre="${c.nombre}">${c.nombre}</span></td>
               <td>${c.whatsapp}</td>
               <td>${c.direccion || ''}</td>
               <td>
@@ -2196,70 +2186,51 @@
         });
         html += '</tbody></table>';
         container.innerHTML = html;
+
+        // Agregar evento click a los nombres de cliente
+        container.querySelectorAll('.cliente-nombre-link').forEach(el => {
+          el.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nombre = this.dataset.nombre;
+            mostrarHistorialCliente(id, nombre);
+          });
+        });
       }
 
-      window.editarCliente = function(id) {
-        const c = clientes.find(cl => cl.id === id);
-        if (!c) return;
-        document.getElementById('clienteId').value = c.id;
-        document.getElementById('clienteNombre').value = c.nombre;
-        document.getElementById('clienteWhatsapp').value = c.whatsapp;
-        document.getElementById('clienteDireccion').value = c.direccion || '';
-        document.getElementById('modalClienteTitle').textContent = 'Editar Cliente';
-        const modal = new bootstrap.Modal(document.getElementById('modalCliente'));
-        modal.show();
-      };
-
-      window.eliminarCliente = async function(id) {
-        if (!confirm('¿Eliminar este cliente?')) return;
-        clientes = clientes.filter(c => c.id !== id);
-        await guardarTodo();
-        renderClientes();
-      };
-
-      window.enviarWhatsappPresentacion = function(id) {
-        const c = clientes.find(cl => cl.id === id);
-        if (!c) return;
-        const mensaje = ajustes.mensajePresentacion || 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
-        const texto = mensaje.replace(/{empresa}/g, ajustes.nombreEmpresa || 'Mi Catálogo');
-        const wpp = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(texto)}`;
-        window.open(wpp, '_blank');
-      };
-
-      async function guardarCliente(e) {
-        e.preventDefault();
-        const id = document.getElementById('clienteId').value;
-        const nombre = document.getElementById('clienteNombre').value.trim();
-        const whatsapp = document.getElementById('clienteWhatsapp').value.trim();
-        const direccion = document.getElementById('clienteDireccion').value.trim();
-        if (!nombre || !whatsapp) {
-          alert('Nombre y WhatsApp son obligatorios');
-          return;
-        }
-        if (id) {
-          const idx = clientes.findIndex(c => c.id === id);
-          if (idx !== -1) {
-            clientes[idx] = { ...clientes[idx], nombre, whatsapp, direccion };
-          }
+      // ===== MOSTRAR HISTORIAL DEL CLIENTE (admin) =====
+      function mostrarHistorialCliente(clienteId, nombre) {
+        const ordenesCliente = ordenes.filter(o => o.clienteId === clienteId);
+        if (ordenesCliente.length === 0) {
+          document.getElementById('historialClienteContent').innerHTML = `<p>No hay ingresos al taller para <strong>${nombre}</strong>.</p>`;
         } else {
-          const newCliente = {
-            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-            nombre, whatsapp, direccion
-          };
-          clientes.push(newCliente);
+          // Ordenar de más reciente a más antiguo
+          ordenesCliente.sort((a, b) => new Date(b.fechaIngreso) - new Date(a.fechaIngreso));
+          let html = `<h6>Historial de <strong>${nombre}</strong></h6><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Orden</th><th>Estado</th><th>Ingreso</th><th>Salida</th><th>Total</th><th>Acciones</th></tr></thead><tbody>`;
+          ordenesCliente.forEach(o => {
+            const total = calcularTotalOrden(o);
+            const estadoLabel = o.estado.replace('_', ' ').toUpperCase();
+            html += `
+              <tr class="fila-${o.estado}">
+                <td>#${o.id}</td>
+                <td><span class="badge estado-badge estado-${o.estado}">${estadoLabel}</span></td>
+                <td>${o.fechaIngreso || ''}</td>
+                <td>${o.fechaSalida || ''}</td>
+                <td>$${total.toFixed(2)}</td>
+                <td>
+                  <button class="btn btn-sm btn-warning" onclick="editarOrden('${o.id}')"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-success" onclick="enviarWhatsappOrden('${o.id}')"><i class="bi bi-whatsapp"></i></button>
+                </td>
+              </tr>
+            `;
+          });
+          html += '</tbody></table></div>';
+          document.getElementById('historialClienteContent').innerHTML = html;
         }
-        await guardarTodo();
-        bootstrap.Modal.getInstance(document.getElementById('modalCliente')).hide();
-        renderClientes();
-        actualizarListaClientesSelect();
+        const modal = new bootstrap.Modal(document.getElementById('modalHistorialCliente'));
+        modal.show();
       }
 
-      function actualizarListaClientesSelect() {
-        // Esta función ya no se usa para el datalist, ahora usamos sugerencias en cliente
-        // Pero la mantenemos por compatibilidad
-      }
-
-      // -------- ÓRDENES --------
+      // ========== ÓRDENES ==========
       function generarIdOrden() {
         const existing = ordenes.map(o => parseInt(o.id) || 0);
         const max = existing.length ? Math.max(...existing) : 0;
@@ -2445,7 +2416,6 @@
             });
           }
           calcularTotalPresupuesto();
-          // Cargar el nombre en el buscador de cliente
           document.getElementById('ordenClienteBuscar').value = data.clienteNombre || '';
         } else {
           document.getElementById('modalOrdenTitle').textContent = 'Nueva Orden';
@@ -2471,7 +2441,6 @@
           document.getElementById('ordenClienteBuscar').value = '';
         }
         modal.show();
-        // Enfocar el campo de búsqueda de cliente
         setTimeout(() => document.getElementById('ordenClienteBuscar').focus(), 300);
       }
 
@@ -2653,7 +2622,6 @@
           container.innerHTML = '<p class="text-danger">No se encontraron órdenes para este número</p>';
           return;
         }
-        // Ordenar de más reciente a más antiguo por fecha de ingreso
         ordenesCliente.sort((a, b) => new Date(b.fechaIngreso) - new Date(a.fechaIngreso));
         let html = '';
         ordenesCliente.forEach(o => {
@@ -2734,16 +2702,13 @@
       };
 
       // ================================================================
-      //  BACKUP OBLIGATORIO (18:00 o al login)
+      //  BACKUP OBLIGATORIO
       // ================================================================
       function verificarBackupObligatorio() {
         const now = new Date();
         const hoy = now.toISOString().slice(0,10);
         const ultimo = localStorage.getItem('ultimoBackupDate') || '';
-        // Si ya se hizo backup hoy, no mostrar
         if (ultimo === hoy) return;
-
-        // Mostrar modal obligatorio
         if (!backupObligatorioModal) {
           backupObligatorioModal = new bootstrap.Modal(document.getElementById('modalBackupObligatorio'), {
             backdrop: 'static',
@@ -2754,7 +2719,7 @@
       }
 
       // ================================================================
-      //  SUGERENCIAS PARA CLIENTE EN MODAL DE ORDEN
+      //  SUGERENCIAS CLIENTE EN MODAL ORDEN
       // ================================================================
       function initClienteSuggestions() {
         const input = document.getElementById('ordenClienteBuscar');
@@ -2808,7 +2773,6 @@
       // ================================================================
       //  EVENTOS E INICIALIZACIÓN
       // ================================================================
-
       function initEventos() {
         const btnCatalogo = document.getElementById('btnCatalogo');
         const btnAdmin = document.getElementById('btnAdmin');
@@ -3023,7 +2987,7 @@
           exportarBackup();
         });
 
-        // ========== INICIALIZAR SUGERENCIAS CLIENTE ==========
+        // ========== SUGERENCIAS CLIENTE ==========
         initClienteSuggestions();
       }
 
@@ -3041,7 +3005,6 @@
           renderClientes();
           renderOrdenes();
           cargarSelectRepuestos();
-          // Verificar backup obligatorio al login
           verificarBackupObligatorio();
         } else {
           document.getElementById('msjLogin').textContent = 'Clave incorrecta';
@@ -3122,7 +3085,6 @@
         crearModalAjustePrecios();
         const modal = new bootstrap.Modal(document.getElementById('modalAjustePrecios'));
         modal.show();
-
         const btnAplicar = document.getElementById('btnAplicarAjuste');
         btnAplicar.replaceWith(btnAplicar.cloneNode(true));
         document.getElementById('btnAplicarAjuste').addEventListener('click', aplicarAjustePrecios);
@@ -3134,13 +3096,10 @@
           alert('Ingrese un porcentaje válido (distinto de 0)');
           return;
         }
-
         const soloConStock = document.getElementById('ajusteSoloConStock').checked;
         const tipo = document.querySelector('input[name="tipoAjuste"]:checked').value;
         const factor = tipo === 'aumento' ? 1 + porcentaje / 100 : 1 - porcentaje / 100;
-
         if (!confirm(`¿Aplicar ${tipo === 'aumento' ? 'aumento' : 'descuento'} del ${porcentaje}% a los productos ${soloConStock ? 'con stock' : 'todos'}?`)) return;
-
         let contador = 0;
         productos.forEach(p => {
           if (soloConStock && p.stock <= 0) return;
@@ -3149,12 +3108,10 @@
             contador++;
           }
         });
-
         if (contador === 0) {
           alert('No se encontraron productos para ajustar');
           return;
         }
-
         await guardarTodo();
         bootstrap.Modal.getInstance(document.getElementById('modalAjustePrecios')).hide();
         renderAdminProductos();
@@ -3163,10 +3120,65 @@
         alert(`Ajuste aplicado a ${contador} productos.`);
       }
 
-      // ========== INICIALIZACIÓN CON TIEMPO REAL ==========
+      // ========== FUNCIONES DE CLIENTE ==========
+      window.editarCliente = function(id) {
+        const c = clientes.find(cl => cl.id === id);
+        if (!c) return;
+        document.getElementById('clienteId').value = c.id;
+        document.getElementById('clienteNombre').value = c.nombre;
+        document.getElementById('clienteWhatsapp').value = c.whatsapp;
+        document.getElementById('clienteDireccion').value = c.direccion || '';
+        document.getElementById('modalClienteTitle').textContent = 'Editar Cliente';
+        const modal = new bootstrap.Modal(document.getElementById('modalCliente'));
+        modal.show();
+      };
+
+      window.eliminarCliente = async function(id) {
+        if (!confirm('¿Eliminar este cliente?')) return;
+        clientes = clientes.filter(c => c.id !== id);
+        await guardarTodo();
+        renderClientes();
+      };
+
+      window.enviarWhatsappPresentacion = function(id) {
+        const c = clientes.find(cl => cl.id === id);
+        if (!c) return;
+        const mensaje = ajustes.mensajePresentacion || 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
+        const texto = mensaje.replace(/{empresa}/g, ajustes.nombreEmpresa || 'Mi Catálogo');
+        const wpp = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(texto)}`;
+        window.open(wpp, '_blank');
+      };
+
+      async function guardarCliente(e) {
+        e.preventDefault();
+        const id = document.getElementById('clienteId').value;
+        const nombre = document.getElementById('clienteNombre').value.trim();
+        const whatsapp = document.getElementById('clienteWhatsapp').value.trim();
+        const direccion = document.getElementById('clienteDireccion').value.trim();
+        if (!nombre || !whatsapp) {
+          alert('Nombre y WhatsApp son obligatorios');
+          return;
+        }
+        if (id) {
+          const idx = clientes.findIndex(c => c.id === id);
+          if (idx !== -1) {
+            clientes[idx] = { ...clientes[idx], nombre, whatsapp, direccion };
+          }
+        } else {
+          const newCliente = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            nombre, whatsapp, direccion
+          };
+          clientes.push(newCliente);
+        }
+        await guardarTodo();
+        bootstrap.Modal.getInstance(document.getElementById('modalCliente')).hide();
+        renderClientes();
+      }
+
+      // ========== INICIALIZACIÓN ==========
       async function init() {
         try {
-          // Hacer visible el botón "Mi Bicicleta" en móviles
           const btnBici = document.getElementById('btnMiBicicleta');
           if (btnBici) {
             btnBici.classList.remove('d-none', 'd-lg-inline-block');
@@ -3174,7 +3186,6 @@
             btnBici.style.margin = '0.2rem 0.5rem';
           }
 
-          // Cargar Firebase compat
           await new Promise((resolve, reject) => {
             const scriptApp = document.createElement('script');
             scriptApp.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
@@ -3193,7 +3204,6 @@
           db = firebase.firestore();
           docRef = db.collection(COLLECTION).doc(DOC_ID);
 
-          // Inicializar con datos por defecto si no existen
           const docSnap = await docRef.get();
           if (!docSnap.exists) {
             await docRef.set({
@@ -3226,7 +3236,6 @@
             });
           }
 
-          // ===== SUSCRIPCIÓN EN TIEMPO REAL =====
           unsub = docRef.onSnapshot((snapshot) => {
             if (snapshot.exists) {
               const data = snapshot.data();
@@ -3237,7 +3246,6 @@
               ordenes = data.ordenes || [];
               categorias = data.categorias || CATEGORIAS_PREDEFINIDAS.slice();
 
-              // Asegurar propiedades de ajustes
               if (!ajustes.tamNombre) ajustes.tamNombre = 24;
               if (!ajustes.fuenteNombre) ajustes.fuenteNombre = "'Segoe UI', Roboto, sans-serif";
               if (!ajustes.alineacionNombre) ajustes.alineacionNombre = 'center';
@@ -3278,7 +3286,6 @@
           initEventos();
           mostrarSeccion('catalogo');
           document.getElementById('btnCatalogo').classList.add('active');
-
           console.log('✅ Catálogo con tiempo real inicializado');
         } catch (error) {
           console.error('Error en la inicialización:', error);
