@@ -14,7 +14,7 @@
     body {
       background: #f8f9fa;
       transition: background 0.3s, color 0.3s;
-      padding-top: 56px;
+      padding-top: 56px; /* se ajustará dinámicamente */
       overflow-x: hidden;
     }
     .logo-img {
@@ -124,7 +124,7 @@
     }
     .search-bar-fixed {
       position: sticky;
-      top: 56px;
+      /* top se ajustará dinámicamente */
       z-index: 1020;
       background-color: var(--body-bg, #f8f9fa);
       padding: 10px 0;
@@ -132,7 +132,7 @@
       border-bottom: 1px solid rgba(0,0,0,0.1);
     }
     .catalogo-scroll {
-      max-height: calc(100vh - 180px);
+      max-height: calc(100vh - 180px); /* se ajustará dinámicamente */
       overflow-y: auto;
       padding-bottom: 20px;
       overflow-x: hidden;
@@ -642,14 +642,14 @@
       padding-top: 20px;
     }
     #loginAdmin .card {
-      margin-top: 80px; /* suficiente espacio para que no quede debajo de la navbar */
+      margin-top: 80px;
     }
   </style>
 </head>
 <body>
 
   <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg">
+  <nav class="navbar navbar-expand-lg" id="mainNavbar">
     <div class="container-fluid">
       <div class="logo-container" id="logoContainer">
         <img id="logoImg" src="" alt="Logo" class="logo-img me-2" style="display:none;">
@@ -685,7 +685,7 @@
 
     <!-- SECCIÓN CATÁLOGO -->
     <div id="seccionCatalogo">
-      <div class="search-bar-fixed">
+      <div class="search-bar-fixed" id="searchBarFixed">
         <div class="row g-2">
           <div class="col-md-4 position-relative suggestions-container">
             <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto..." autocomplete="off">
@@ -705,7 +705,7 @@
           </div>
         </div>
       </div>
-      <div class="catalogo-scroll">
+      <div class="catalogo-scroll" id="catalogoScroll">
         <div id="productosCatalogo" class="row row-cols-1 row-cols-md-3 g-4"></div>
       </div>
     </div>
@@ -1254,6 +1254,30 @@
       let chartTopProductos = null;
       let backupObligatorioModal = null;
       let ultimoBackupDate = '';
+
+      // ========== FUNCIONES DE AJUSTE DE ESPACIOS (móvil) ==========
+      function ajustarEspacios() {
+        const navbar = document.getElementById('mainNavbar');
+        const searchBar = document.getElementById('searchBarFixed');
+        const catalogoScroll = document.getElementById('catalogoScroll');
+        if (!navbar || !searchBar || !catalogoScroll) return;
+
+        // Obtener altura real de la navbar
+        const navbarHeight = navbar.offsetHeight;
+        // Aplicar padding-top al body
+        document.body.style.paddingTop = navbarHeight + 'px';
+        // Aplicar top a la barra de búsqueda
+        searchBar.style.top = navbarHeight + 'px';
+
+        // Calcular altura disponible para el catálogo
+        const windowHeight = window.innerHeight;
+        const searchBarHeight = searchBar.offsetHeight;
+        // Restar la altura de la navbar, la barra de búsqueda y un margen extra
+        const availableHeight = windowHeight - navbarHeight - searchBarHeight - 40; // 40px de margen
+        if (availableHeight > 100) {
+          catalogoScroll.style.maxHeight = availableHeight + 'px';
+        }
+      }
 
       // ========== FUNCIONES DE APLICACIÓN ==========
       function aplicarAjustes() {
@@ -3037,11 +3061,24 @@
 
         // ========== SUGERENCIAS CLIENTE ==========
         initClienteSuggestions();
+
+        // ========== AJUSTAR ESPACIOS AL CARGAR Y REDIMENSIONAR ==========
+        window.addEventListener('load', ajustarEspacios);
+        window.addEventListener('resize', ajustarEspacios);
+        // También cuando se muestre el catálogo (por si cambia la visibilidad)
+        // Observador de cambios en la navbar
+        if (window.ResizeObserver) {
+          const resizeObserver = new ResizeObserver(() => ajustarEspacios());
+          const navbar = document.getElementById('mainNavbar');
+          if (navbar) resizeObserver.observe(navbar);
+        }
       }
 
       function mostrarSeccion(seccion) {
         document.getElementById('seccionCatalogo').style.display = (seccion === 'catalogo') ? 'block' : 'none';
         document.getElementById('seccionAdmin').style.display = (seccion === 'admin') ? 'block' : 'none';
+        // Reajustar espacios al cambiar de sección (por si la barra cambia de altura)
+        setTimeout(ajustarEspacios, 100);
       }
 
       function loginAdmin() {
@@ -3054,6 +3091,7 @@
           renderOrdenes();
           cargarSelectRepuestos();
           verificarBackupObligatorio();
+          ajustarEspacios();
         } else {
           document.getElementById('msjLogin').textContent = 'Clave incorrecta';
         }
