@@ -2019,7 +2019,7 @@
         }
       }
 
-      // ========== SUBIDA DE IMÁGENES A IMGBB ==========
+      // ========== SUBIDA DE IMÁGENES A IMGBB con compresión agresiva ==========
       async function subirImagenImgBB(base64, fileName = 'producto.jpg') {
         const key = ajustes.imgbbApiKey || IMGBB_API_KEY;
         const formData = new FormData();
@@ -2078,7 +2078,8 @@
       function manejarFoto(fileInput, previewEl, urlInput, callback) {
         const file = fileInput.files[0];
         if (!file) return;
-        comprimirImagen(file, 700, 0.6, async function(dataUrl) {
+        // Compresión a 600px y calidad 0.5 para reducir drásticamente el tamaño
+        comprimirImagen(file, 600, 0.5, async function(dataUrl) {
           previewEl.src = dataUrl;
           previewEl.style.display = 'block';
           const url = await subirImagenImgBB(dataUrl, file.name || 'producto.jpg');
@@ -2088,6 +2089,7 @@
             if (callback) callback(url);
           } else {
             urlInput.value = '';
+            // Mostrar mensaje pero mantener el preview local
             alert('No se pudo subir la imagen a ImgBB. El producto se guardará sin foto.');
             if (callback) callback('');
           }
@@ -3563,7 +3565,7 @@
           }
         });
 
-        // Manejo de foto en paso 4 con ImgBB y compresión 700x0.6
+        // Manejo de foto en paso 4 con compresión a 600px y calidad 0.5
         const fotoInput = document.getElementById('movilProdFotoInput');
         const preview = document.getElementById('movilProdFotoPreview');
         const urlInput = document.getElementById('movilProdFotoUrl');
@@ -3582,7 +3584,7 @@
           fotoInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-              comprimirImagen(file, 700, 0.6, async function(dataUrl) {
+              comprimirImagen(file, 600, 0.5, async function(dataUrl) {
                 preview.src = dataUrl;
                 preview.style.display = 'block';
                 const url = await subirImagenImgBB(dataUrl, file.name || 'producto.jpg');
@@ -4222,7 +4224,7 @@
         document.getElementById('ajusteLogoFile').addEventListener('change', function(e) {
           const file = e.target.files[0];
           if (file) {
-            comprimirImagen(file, 700, 0.6, async function(dataUrl) {
+            comprimirImagen(file, 600, 0.5, async function(dataUrl) {
               const url = await subirImagenImgBB(dataUrl, 'logo.jpg');
               document.getElementById('ajusteLogoUrl').value = url || '';
             });
