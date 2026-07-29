@@ -10,11 +10,11 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* --- ESTILOS BASE --- */
+    /* --- ESTILOS BASE (sin cambios) --- */
     body {
       background: #f8f9fa;
       transition: background 0.3s, color 0.3s;
-      padding-top: 56px; /* se ajustará dinámicamente */
+      padding-top: 56px;
       overflow-x: hidden;
     }
     .logo-img {
@@ -74,8 +74,6 @@
     .tab-content {
       padding-top: 20px;
     }
-
-    /* --- Sugerencias para búsqueda --- */
     .suggestions-container {
       position: relative;
     }
@@ -112,8 +110,6 @@
       color: var(--btn-primary-bg, #e65100);
       font-weight: 700;
     }
-
-    /* --- BARRA FIJA --- */
     .navbar {
       position: fixed;
       top: 0;
@@ -124,7 +120,6 @@
     }
     .search-bar-fixed {
       position: sticky;
-      /* top se ajustará dinámicamente */
       z-index: 1020;
       background-color: var(--body-bg, #f8f9fa);
       padding: 10px 0;
@@ -132,13 +127,11 @@
       border-bottom: 1px solid rgba(0,0,0,0.1);
     }
     .catalogo-scroll {
-      max-height: calc(100vh - 180px); /* se ajustará dinámicamente */
+      max-height: calc(100vh - 180px);
       overflow-y: auto;
       padding-bottom: 20px;
       overflow-x: hidden;
     }
-
-    /* --- BOTÓN MI BICICLETA CON ANIMACIÓN --- */
     .btn-bicicleta {
       background-color: rgba(255,255,255,0.15);
       border-radius: 30px;
@@ -179,8 +172,7 @@
       50% { border-color: #d32f2f; box-shadow: 0 0 15px #d32f2f; }
       100% { border-color: rgba(0,0,0,0.3); box-shadow: 0 0 5px rgba(0,0,0,0.1); }
     }
-
-    /* --- TEMAS CON CONTRASTE GARANTIZADO --- */
+    /* Temas (sin cambios) */
     .tema-default {
       --navbar-bg: #0d6efd;
       --navbar-color: #fff;
@@ -371,8 +363,6 @@
       --border-radius: 0.25rem;
       --transition-speed: 0.4s;
     }
-
-    /* Aplicación de variables con contraste */
     body {
       background-color: var(--body-bg, #f8f9fa);
       color: var(--text-color, #212529);
@@ -507,8 +497,6 @@
     .suggestions-list .suggestion-item .suggestion-price {
       color: var(--btn-primary-bg, #e65100);
     }
-
-    /* Ajustes para el nombre de la empresa */
     #empresaNombre {
       transition: font-size 0.2s, font-family 0.2s, text-align 0.2s;
       display: inline-block;
@@ -521,8 +509,6 @@
       background-size: cover;
       background-position: center;
     }
-
-    /* Contacto en banner */
     .contacto-info {
       font-size: 0.9rem;
       white-space: nowrap;
@@ -543,8 +529,6 @@
         margin-right: 0.5rem !important;
       }
     }
-
-    /* Estados - badges */
     .estado-badge {
       font-size: 0.9rem;
       padding: 0.4rem 0.8rem;
@@ -556,22 +540,18 @@
     .estado-rechazado { background: #f8d7da; color: #721c24; }
     .estado-lista { background: #d4edda; color: #155724; }
     .estado-retirada { background: #cce5ff; color: #004085; }
-
     .fila-no_visto { background-color: #cce5ff !important; border-left: 4px solid #004085 !important; }
     .fila-presupuestada { background-color: #fff3cd !important; border-left: 4px solid #856404 !important; }
     .fila-confirmada { background-color: #ffe5cc !important; border-left: 4px solid #a66300 !important; }
     .fila-rechazado { background-color: #f8d7da !important; border-left: 4px solid #721c24 !important; }
     .fila-lista { background-color: #d4edda !important; border-left: 4px solid #155724 !important; }
     .fila-retirada { background-color: #cce5ff !important; border-left: 4px solid #004085 !important; }
-
     .orden-card {
       transition: transform 0.2s;
     }
     .orden-card:hover {
       transform: scale(1.01);
     }
-
-    /* Gráficos */
     .chart-container {
       position: relative;
       height: 200px;
@@ -581,8 +561,6 @@
       width: 100% !important;
       height: 100% !important;
     }
-
-    /* Filtros admin */
     .admin-search {
       margin-bottom: 10px;
     }
@@ -596,8 +574,6 @@
       width: auto;
       min-width: 150px;
     }
-
-    /* Sugerencias cliente en modal */
     .cliente-suggestions-container {
       position: relative;
     }
@@ -624,8 +600,6 @@
     .cliente-suggestions-list .suggestion-item:hover {
       background-color: var(--table-stripe, #e9f5e9);
     }
-
-    /* Estilo para el nombre del cliente en la tabla (clickeable) */
     .cliente-nombre-link {
       cursor: pointer;
       color: var(--link-color, #0d6efd);
@@ -636,16 +610,13 @@
       color: var(--btn-primary-bg, #0d6efd);
       text-decoration: none;
     }
-
-    /* ===== AJUSTE PARA QUE EL LOGIN ADMIN NO QUEDE OCULTO ===== */
     #seccionAdmin {
       padding-top: 20px;
     }
     #loginAdmin .card {
       margin-top: 80px;
     }
-
-    /* ===== ESTILOS PARA EL MODO MÓVIL ===== */
+    /* --- ESTILOS PARA EL MODO MÓVIL --- */
     .modo-movil-container {
       padding: 16px;
       max-width: 600px;
@@ -768,8 +739,57 @@
     .modo-movil-container .item-card .item-actions button {
       margin-left: 6px;
     }
-
-    /* ===== AJUSTES PARA SELECTOR DE DISPOSITIVO ===== */
+    /* --- ESTILOS PARA FOTOS MÚLTIPLES (modo móvil) --- */
+    .fotos-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .fotos-grid .foto-item {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      border: 2px solid #dee2e6;
+      overflow: hidden;
+      background: #f8f9fa;
+    }
+    .fotos-grid .foto-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .fotos-grid .foto-item .btn-eliminar-foto {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(255,0,0,0.7);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 12px;
+      line-height: 22px;
+      text-align: center;
+      padding: 0;
+      cursor: pointer;
+    }
+    .btn-agregar-foto {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-agregar-foto .btn {
+      flex: 1;
+      min-width: 60px;
+      padding: 8px 0;
+      font-size: 1.2rem;
+      border-radius: 30px;
+    }
+    /* Ajustes selector dispositivo */
     #selectorDispositivo .btn-lg {
       padding: 20px 30px;
       font-size: 1.3rem;
@@ -786,6 +806,20 @@
         font-size: 1.5rem;
       }
     }
+    /* Estilo para el contenedor de categorías con botones */
+    .cat-select-wrapper {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .cat-select-wrapper select {
+      flex: 1;
+    }
+    .cat-select-wrapper .btn {
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 <body>
@@ -797,19 +831,14 @@
         <img id="logoImg" src="" alt="Logo" class="logo-img me-2" style="display:none;">
         <span class="navbar-brand" id="empresaNombre">Mi Catálogo</span>
       </div>
-
-      <!-- Botón Mi Bicicleta (más llamativo) -->
       <a href="#" class="btn-bicicleta d-none d-lg-inline-block" id="btnMiBicicleta" title="Consultar estado de tu bicicleta">
         <i class="bi bi-bicycle"></i> Mi Bicicleta
       </a>
-
-      <!-- Información de contacto -->
       <div class="contacto-info d-flex align-items-center ms-auto me-2">
         <a href="#" target="_blank" id="contactoWhatsappLink" class="me-2"><i class="bi bi-whatsapp"></i> <span id="contactoWhatsapp"></span></a>
         <span id="contactoHorario" class="me-2"></span>
         <span id="contactoDireccion"></span>
       </div>
-
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -1034,7 +1063,6 @@
               <button type="submit" class="btn btn-success">Guardar Ajustes</button>
             </form>
           </div>
-
           <!-- Taller -->
           <div class="tab-pane fade" id="tabTaller">
             <h5 class="mt-2">Gestión de Órdenes de Taller</h5>
@@ -1051,7 +1079,6 @@
               </div>
             </div>
           </div>
-
           <!-- Clientes -->
           <div class="tab-pane fade" id="tabClientes">
             <h5 class="mt-2">Gestión de Clientes</h5>
@@ -1061,14 +1088,12 @@
             </div>
             <div id="listaClientes" class="mt-2"></div>
           </div>
-
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- ========== MODAL MI BICICLETA (cliente) ========== -->
+  <!-- MODALES (sin cambios) -->
   <div class="modal fade" id="modalMiBicicleta" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -1095,7 +1120,6 @@
     </div>
   </div>
 
-  <!-- ========== MODAL HISTORIAL CLIENTE (admin) ========== -->
   <div class="modal fade" id="modalHistorialCliente" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -1113,7 +1137,6 @@
     </div>
   </div>
 
-  <!-- ========== MODAL NUEVA ORDEN (taller) ========== -->
   <div class="modal fade" id="modalOrden" tabindex="-1">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
@@ -1221,7 +1244,6 @@
     </div>
   </div>
 
-  <!-- ========== MODAL NUEVO CLIENTE ========== -->
   <div class="modal fade" id="modalCliente" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1242,7 +1264,6 @@
     </div>
   </div>
 
-  <!-- ========== MODAL PRODUCTO ========== -->
   <div class="modal fade" id="modalProducto" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -1290,7 +1311,6 @@
     </div>
   </div>
 
-  <!-- MODAL GESTIÓN DE CATEGORÍAS -->
   <div class="modal fade" id="modalGestionCategorias" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1309,7 +1329,6 @@
     </div>
   </div>
 
-  <!-- MODAL PARA PRECIO EN VENTA -->
   <div class="modal fade" id="modalPrecioVenta" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1330,7 +1349,6 @@
     </div>
   </div>
 
-  <!-- MODAL BACKUP OBLIGATORIO -->
   <div class="modal fade" id="modalBackupObligatorio" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1349,6 +1367,7 @@
   <script>
     // =================================================================
     // SCRIPT COMPLETO - TIEMPO REAL CON FIREBASE + MODO MÓVIL
+    // (Versión actualizada con fotos múltiples y gestión de categorías)
     // =================================================================
     (function() {
       "use strict";
@@ -1404,7 +1423,7 @@
       let datosPaso = {};
       let entidadEditando = null;
 
-      // ========== FUNCIONES DE AJUSTE DE ESPACIOS (móvil) ==========
+      // ========== FUNCIONES DE AJUSTE DE ESPACIOS ==========
       function ajustarEspacios() {
         const navbar = document.getElementById('mainNavbar');
         const searchBar = document.getElementById('searchBarFixed');
@@ -1949,6 +1968,17 @@
         renderizarCategorias();
         renderCatalogo();
         renderAdminProductos();
+        // Si estamos en modo móvil y en paso 0, refrescar select
+        if (modoMovilActivo && pasoActual === 0) {
+          const sel = document.getElementById('movilProdCategoria');
+          if (sel) {
+            const currentVal = sel.value;
+            sel.innerHTML = '<option value="">Seleccionar</option>';
+            categorias.forEach(c => {
+              sel.innerHTML += `<option value="${c}" ${c === currentVal ? 'selected' : ''}>${c}</option>`;
+            });
+          }
+        }
       };
 
       window.eliminarCategoria = async function(cat) {
@@ -1963,6 +1993,16 @@
         renderizarCategorias();
         renderCatalogo();
         renderAdminProductos();
+        if (modoMovilActivo && pasoActual === 0) {
+          const sel = document.getElementById('movilProdCategoria');
+          if (sel) {
+            const currentVal = sel.value;
+            sel.innerHTML = '<option value="">Seleccionar</option>';
+            categorias.forEach(c => {
+              sel.innerHTML += `<option value="${c}" ${c === currentVal ? 'selected' : ''}>${c}</option>`;
+            });
+          }
+        }
       };
 
       window.editarProducto = function(id) {
@@ -1996,7 +2036,7 @@
         }
       };
 
-      // ========== PRODUCTOS (modal) ==========
+      // ========== PRODUCTOS (modal de escritorio) ==========
       function abrirModalProducto(data) {
         const modal = new bootstrap.Modal(document.getElementById('modalProducto'));
         if (data) {
@@ -3314,10 +3354,15 @@
         datosPaso = prod ? { ...prod } : {
           nombre: '', categoria: '', costo: 0, tipo: 'propio',
           porcentaje: 20, precioFinal: 0, stock: 0, stockMinimo: 1,
-          foto: '', porcentajeReventa: 0
+          fotos: [], // array de URLs
+          porcentajeReventa: 0
         };
+        // Si el producto tiene foto principal, la añadimos al array si no está
+        if (datosPaso.foto && !datosPaso.fotos.includes(datosPaso.foto)) {
+          datosPaso.fotos.push(datosPaso.foto);
+        }
         pasoActual = 0;
-        totalPasos = 4; // 0: nombre/cat, 1: costo/tipo, 2: precios, 3: stock/foto
+        totalPasos = 4;
         mostrarPasoProducto();
       }
 
@@ -3344,10 +3389,14 @@
               </div>
               <div class="input-group-movil">
                 <label>Categoría *</label>
-                <select id="movilProdCategoria" class="form-select">
-                  <option value="">Seleccionar</option>
-                  ${categorias.map(c => `<option value="${c}" ${p.categoria === c ? 'selected' : ''}>${c}</option>`).join('')}
-                </select>
+                <div class="cat-select-wrapper">
+                  <select id="movilProdCategoria" class="form-select">
+                    <option value="">Seleccionar</option>
+                    ${categorias.map(c => `<option value="${c}" ${p.categoria === c ? 'selected' : ''}>${c}</option>`).join('')}
+                  </select>
+                  <button type="button" class="btn btn-outline-secondary" id="btnGestionarCatsMovil" title="Gestionar categorías"><i class="bi bi-plus-circle"></i></button>
+                  <button type="button" class="btn btn-outline-secondary" id="btnRefreshCatsMovil" title="Recargar categorías"><i class="bi bi-arrow-repeat"></i></button>
+                </div>
               </div>
             `;
             break;
@@ -3398,8 +3447,9 @@
             html += `</div>`;
             break;
           case 3:
+            // Paso 4: Stock y Fotos (múltiples)
             html += `
-              <h6>Paso 4: Stock y Foto</h6>
+              <h6>Paso 4: Stock y Fotos</h6>
               <div class="input-group-movil">
                 <label>Stock *</label>
                 <input type="number" id="movilProdStock" class="form-control" value="${p.stock || 0}">
@@ -3409,9 +3459,24 @@
                 <input type="number" id="movilProdStockMinimo" class="form-control" value="${p.stockMinimo || 1}">
               </div>
               <div class="input-group-movil">
-                <label>Foto</label>
-                <input type="file" accept="image/*" capture="environment" id="movilProdFoto" class="form-control">
-                <img id="movilProdFotoPreview" src="${p.foto || ''}" class="foto-preview-movil" style="${p.foto ? '' : 'display:none;'}">
+                <label>Fotos (máximo 4)</label>
+                <div id="fotosContainer" class="fotos-grid">
+                  ${p.fotos.map((f, idx) => `
+                    <div class="foto-item" data-idx="${idx}">
+                      <img src="${f}" alt="foto ${idx+1}">
+                      <button class="btn-eliminar-foto" data-idx="${idx}">✕</button>
+                    </div>
+                  `).join('')}
+                </div>
+                ${p.fotos.length < 4 ? `
+                  <div class="btn-agregar-foto">
+                    <button class="btn btn-outline-primary" id="btnCamaraMovil"><i class="bi bi-camera"></i> Cámara</button>
+                    <button class="btn btn-outline-success" id="btnArchivoMovil"><i class="bi bi-folder"></i> Archivo</button>
+                    <button class="btn btn-outline-info" id="btnUrlMovil"><i class="bi bi-link"></i> URL</button>
+                  </div>
+                ` : `<p class="text-muted">Límite de 4 fotos alcanzado</p>`}
+                <input type="file" id="inputCamaraMovil" accept="image/*" capture="environment" style="display:none;">
+                <input type="file" id="inputArchivoMovil" accept="image/*" style="display:none;">
               </div>
             `;
             break;
@@ -3425,45 +3490,129 @@
         </div>`;
         content.innerHTML = html;
 
-        // Eventos para recalcular precio automáticamente (paso 2)
-        if (pasoActual === 2) {
-          const tipo = document.getElementById('movilProdTipo')?.value || p.tipo;
-          const costoInput = document.getElementById('movilProdCosto');
-          const porcentajeInput = document.getElementById('movilProdPorcentaje');
-          const precioFinalInput = document.getElementById('movilProdPrecioFinal');
-          const acordadoInput = document.getElementById('movilProdPrecioAcordado');
-          const pReventaInput = document.getElementById('movilProdPorcentajeReventa');
-
-          function recalcularPreciosMovil() {
-            const tipo = document.getElementById('movilProdTipo')?.value || 'propio';
-            const costo = parseFloat(document.getElementById('movilProdCosto')?.value) || 0;
-            if (tipo === 'propio') {
-              const porcentaje = parseFloat(document.getElementById('movilProdPorcentaje')?.value) || 0;
-              const pf = costo * (1 + porcentaje / 100);
-              const pfInput = document.getElementById('movilProdPrecioFinal');
-              if (pfInput) pfInput.value = pf.toFixed(2);
-            } else {
-              const acordado = parseFloat(document.getElementById('movilProdPrecioAcordado')?.value) || 0;
-              const pReventa = parseFloat(document.getElementById('movilProdPorcentajeReventa')?.value) || 0;
-              // No hay campo para mostrar en este paso, solo guardamos
-            }
+        // === Eventos para paso 0: categorías ===
+        if (pasoActual === 0) {
+          const btnGestionar = document.getElementById('btnGestionarCatsMovil');
+          if (btnGestionar) {
+            btnGestionar.addEventListener('click', function() {
+              // Guardar estado actual
+              const nombre = document.getElementById('movilProdNombre')?.value || '';
+              const categoria = document.getElementById('movilProdCategoria')?.value || '';
+              datosPaso.nombre = nombre;
+              datosPaso.categoria = categoria;
+              // Abrir modal
+              abrirModalGestionCategorias();
+              // Al cerrar, refrescar el select y restaurar valores
+              const modal = document.getElementById('modalGestionCategorias');
+              modal.addEventListener('hidden.bs.modal', function handler() {
+                modal.removeEventListener('hidden.bs.modal', handler);
+                // Actualizar select con las categorías actuales
+                const sel = document.getElementById('movilProdCategoria');
+                if (sel) {
+                  const currentVal = sel.value;
+                  sel.innerHTML = '<option value="">Seleccionar</option>';
+                  categorias.forEach(c => {
+                    sel.innerHTML += `<option value="${c}" ${c === currentVal ? 'selected' : ''}>${c}</option>`;
+                  });
+                }
+                // Restaurar nombre y categoría si no se perdió
+                const nombreInput = document.getElementById('movilProdNombre');
+                if (nombreInput) nombreInput.value = datosPaso.nombre || '';
+              });
+            });
           }
-
-          // Asignar eventos
-          if (costoInput) costoInput.addEventListener('input', recalcularPreciosMovil);
-          if (porcentajeInput) porcentajeInput.addEventListener('input', recalcularPreciosMovil);
-          if (acordadoInput) acordadoInput.addEventListener('input', recalcularPreciosMovil);
-          if (pReventaInput) pReventaInput.addEventListener('input', recalcularPreciosMovil);
-          // También al cambiar tipo
-          const tipoSelect = document.getElementById('movilProdTipo');
-          if (tipoSelect) tipoSelect.addEventListener('change', function() {
-            // Actualizar la vista del paso 2 (cambiar campos)
-            // Simplemente recargamos el paso
-            guardarDatosPasoProducto();
-            mostrarPasoProducto();
-          });
+          const btnRefresh = document.getElementById('btnRefreshCatsMovil');
+          if (btnRefresh) {
+            btnRefresh.addEventListener('click', function() {
+              const sel = document.getElementById('movilProdCategoria');
+              if (sel) {
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="">Seleccionar</option>';
+                categorias.forEach(c => {
+                  sel.innerHTML += `<option value="${c}" ${c === currentVal ? 'selected' : ''}>${c}</option>`;
+                });
+              }
+            });
+          }
         }
 
+        // === Eventos para paso 3 (fotos) ===
+        if (pasoActual === 3) {
+          const containerFotos = document.getElementById('fotosContainer');
+          // Eliminar foto
+          containerFotos.querySelectorAll('.btn-eliminar-foto').forEach(btn => {
+            btn.addEventListener('click', function() {
+              const idx = parseInt(this.dataset.idx);
+              datosPaso.fotos.splice(idx, 1);
+              // Actualizar vista
+              mostrarPasoProducto();
+            });
+          });
+
+          // Botón Cámara
+          const btnCamara = document.getElementById('btnCamaraMovil');
+          const inputCamara = document.getElementById('inputCamaraMovil');
+          if (btnCamara && inputCamara) {
+            btnCamara.addEventListener('click', function() {
+              inputCamara.click();
+            });
+            inputCamara.addEventListener('change', function(e) {
+              const file = e.target.files[0];
+              if (file) {
+                comprimirImagen(file, 600, 0.6, function(dataUrl) {
+                  if (datosPaso.fotos.length < 4) {
+                    datosPaso.fotos.push(dataUrl);
+                    mostrarPasoProducto();
+                  } else {
+                    alert('Límite de 4 fotos alcanzado');
+                  }
+                });
+              }
+              inputCamara.value = '';
+            });
+          }
+
+          // Botón Archivo
+          const btnArchivo = document.getElementById('btnArchivoMovil');
+          const inputArchivo = document.getElementById('inputArchivoMovil');
+          if (btnArchivo && inputArchivo) {
+            btnArchivo.addEventListener('click', function() {
+              inputArchivo.click();
+            });
+            inputArchivo.addEventListener('change', function(e) {
+              const file = e.target.files[0];
+              if (file) {
+                comprimirImagen(file, 600, 0.6, function(dataUrl) {
+                  if (datosPaso.fotos.length < 4) {
+                    datosPaso.fotos.push(dataUrl);
+                    mostrarPasoProducto();
+                  } else {
+                    alert('Límite de 4 fotos alcanzado');
+                  }
+                });
+              }
+              inputArchivo.value = '';
+            });
+          }
+
+          // Botón URL
+          const btnUrl = document.getElementById('btnUrlMovil');
+          if (btnUrl) {
+            btnUrl.addEventListener('click', function() {
+              const url = prompt('Ingresa la URL de la imagen:');
+              if (url && url.trim() !== '') {
+                if (datosPaso.fotos.length < 4) {
+                  datosPaso.fotos.push(url.trim());
+                  mostrarPasoProducto();
+                } else {
+                  alert('Límite de 4 fotos alcanzado');
+                }
+              }
+            });
+          }
+        }
+
+        // Eventos navegación
         document.getElementById('btnPasoAnterior')?.addEventListener('click', function() {
           if (pasoActual > 0) {
             guardarDatosPasoProducto();
@@ -3482,20 +3631,36 @@
           }
         });
 
-        // Compresión de imagen (más agresiva)
-        const fotoInput = document.getElementById('movilProdFoto');
-        if (fotoInput) {
-          fotoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-              comprimirImagen(file, 600, 0.6, function(dataUrl) {
-                document.getElementById('movilProdFotoPreview').src = dataUrl;
-                document.getElementById('movilProdFotoPreview').style.display = 'block';
-                datosPaso.foto = dataUrl;
-                // Liberar memoria
-                URL.revokeObjectURL(dataUrl);
-              });
+        // Recalcular precios en paso 2
+        if (pasoActual === 2) {
+          const tipo = document.getElementById('movilProdTipo')?.value || p.tipo;
+          const costoInput = document.getElementById('movilProdCosto');
+          const porcentajeInput = document.getElementById('movilProdPorcentaje');
+          const precioFinalInput = document.getElementById('movilProdPrecioFinal');
+          const acordadoInput = document.getElementById('movilProdPrecioAcordado');
+          const pReventaInput = document.getElementById('movilProdPorcentajeReventa');
+
+          function recalcularPreciosMovil() {
+            const tipo = document.getElementById('movilProdTipo')?.value || 'propio';
+            const costo = parseFloat(document.getElementById('movilProdCosto')?.value) || 0;
+            if (tipo === 'propio') {
+              const porcentaje = parseFloat(document.getElementById('movilProdPorcentaje')?.value) || 0;
+              const pf = costo * (1 + porcentaje / 100);
+              const pfInput = document.getElementById('movilProdPrecioFinal');
+              if (pfInput) pfInput.value = pf.toFixed(2);
+            } else {
+              // No hay campo para mostrar en este paso, solo guardamos
             }
+          }
+
+          if (costoInput) costoInput.addEventListener('input', recalcularPreciosMovil);
+          if (porcentajeInput) porcentajeInput.addEventListener('input', recalcularPreciosMovil);
+          if (acordadoInput) acordadoInput.addEventListener('input', recalcularPreciosMovil);
+          if (pReventaInput) pReventaInput.addEventListener('input', recalcularPreciosMovil);
+          const tipoSelect = document.getElementById('movilProdTipo');
+          if (tipoSelect) tipoSelect.addEventListener('change', function() {
+            guardarDatosPasoProducto();
+            mostrarPasoProducto();
           });
         }
       }
@@ -3519,6 +3684,7 @@
         } else if (pasoActual === 3) {
           p.stock = parseInt(document.getElementById('movilProdStock')?.value) || 0;
           p.stockMinimo = parseInt(document.getElementById('movilProdStockMinimo')?.value) || 1;
+          // fotos se guardan en tiempo real al agregar/eliminar
         }
       }
 
@@ -3537,16 +3703,34 @@
           return;
         }
 
+        // Usar la primera foto como principal, el resto en array 'fotos'
+        const fotoPrincipal = p.fotos.length > 0 ? p.fotos[0] : '';
+        const fotosArray = p.fotos.length > 1 ? p.fotos.slice(1) : [];
+
+        const productoData = {
+          nombre: p.nombre,
+          categoria: p.categoria,
+          costo: p.costo,
+          tipo: p.tipo,
+          porcentaje: p.porcentaje || 0,
+          precioFinal: p.precioFinal,
+          stock: p.stock,
+          stockMinimo: p.stockMinimo || 1,
+          foto: fotoPrincipal,
+          fotos: fotosArray,
+          porcentajeReventa: p.porcentajeReventa || 0,
+          fechaCreacion: p.fechaCreacion || new Date().toISOString()
+        };
+
         if (entidadEditando) {
           const idx = productos.findIndex(prod => prod.id === entidadEditando);
           if (idx !== -1) {
-            productos[idx] = { ...productos[idx], ...p };
+            productos[idx] = { ...productos[idx], ...productoData };
           }
         } else {
           const newProd = {
             id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-            ...p,
-            fechaCreacion: new Date().toISOString()
+            ...productoData
           };
           productos.push(newProd);
         }
@@ -4013,7 +4197,7 @@
         });
       }
 
-      // ===== COMPRESIÓN DE IMAGEN (más agresiva) =====
+      // ===== COMPRESIÓN DE IMAGEN =====
       function comprimirImagen(file, maxWidth, calidad, callback) {
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -4030,10 +4214,8 @@
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            // Calidad 0.6 para reducir aún más el tamaño
             const dataUrl = canvas.toDataURL('image/jpeg', calidad || 0.6);
             callback(dataUrl);
-            // Liberar memoria
             canvas.width = 0;
             canvas.height = 0;
           };
@@ -4043,7 +4225,7 @@
       }
 
       // ================================================================
-      //  EVENTOS E INICIALIZACIÓN (modificada para incluir selector)
+      //  EVENTOS E INICIALIZACIÓN
       // ================================================================
       function initEventos() {
         const btnCatalogo = document.getElementById('btnCatalogo');
@@ -4079,7 +4261,6 @@
         document.getElementById('prodPrecioAcordado').addEventListener('input', calcularPrecios);
         document.getElementById('prodPorcentajeReventa').addEventListener('input', calcularPrecios);
 
-        // Compresión para la foto en el modal de producto
         document.getElementById('prodFotoFile').addEventListener('change', function(e) {
           const file = e.target.files[0];
           if (file) {
