@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JAMA MISCA</title>
+  <title>Catálogo</title>
   <!-- Bootstrap 5 + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -644,6 +644,130 @@
     #loginAdmin .card {
       margin-top: 80px;
     }
+
+    /* ===== ESTILOS PARA EL MODO MÓVIL ===== */
+    .modo-movil-container {
+      padding: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .modo-movil-container .btn-block {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 16px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .modo-movil-container .btn-block i {
+      font-size: 1.6rem;
+      margin-right: 12px;
+    }
+    .modo-movil-container .card {
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .modo-movil-container .paso-indicador {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modo-movil-container .paso-indicador .paso {
+      flex: 1;
+      text-align: center;
+      padding: 8px 0;
+      background: #e9ecef;
+      border-radius: 30px;
+      margin: 0 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #6c757d;
+    }
+    .modo-movil-container .paso-indicador .paso.activo {
+      background: var(--btn-primary-bg, #0d6efd);
+      color: #fff;
+    }
+    .modo-movil-container .paso-indicador .paso.completado {
+      background: #28a745;
+      color: #fff;
+    }
+    .modo-movil-container .input-group-movil {
+      margin-bottom: 16px;
+    }
+    .modo-movil-container .input-group-movil label {
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .modo-movil-container .input-group-movil input,
+    .modo-movil-container .input-group-movil select,
+    .modo-movil-container .input-group-movil textarea {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 2px solid #dee2e6;
+      font-size: 1rem;
+      background: #fff;
+    }
+    .modo-movil-container .input-group-movil input:focus,
+    .modo-movil-container .input-group-movil select:focus {
+      border-color: var(--btn-primary-bg, #0d6efd);
+      outline: none;
+    }
+    .modo-movil-container .acciones-paso {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .modo-movil-container .acciones-paso .btn {
+      flex: 1;
+      padding: 14px;
+      font-size: 1.1rem;
+      border-radius: 30px;
+    }
+    .modo-movil-container .foto-preview-movil {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 12px;
+      margin-top: 8px;
+      border: 2px dashed #dee2e6;
+      object-fit: contain;
+      background: #f8f9fa;
+    }
+    .modo-movil-container .btn-camara {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 30px;
+      width: 100%;
+      font-weight: 600;
+    }
+    .modo-movil-container .btn-camara i {
+      margin-right: 8px;
+    }
+    .modo-movil-container .lista-items {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .modo-movil-container .item-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-left: 4px solid var(--btn-primary-bg, #0d6efd);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modo-movil-container .item-card .item-info {
+      flex: 1;
+    }
+    .modo-movil-container .item-card .item-actions button {
+      margin-left: 6px;
+    }
   </style>
 </head>
 <body>
@@ -653,7 +777,7 @@
     <div class="container-fluid">
       <div class="logo-container" id="logoContainer">
         <img id="logoImg" src="" alt="Logo" class="logo-img me-2" style="display:none;">
-        <span class="navbar-brand" id="empresaNombre">JAMA MISCA</span>
+        <span class="navbar-brand" id="empresaNombre">Mi Catálogo</span>
       </div>
 
       <!-- Botón Mi Bicicleta (más llamativo) -->
@@ -1206,7 +1330,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // =================================================================
-    // SCRIPT COMPLETO - TIEMPO REAL CON FIREBASE
+    // SCRIPT COMPLETO - TIEMPO REAL CON FIREBASE + MODO MÓVIL
     // =================================================================
     (function() {
       "use strict";
@@ -1255,6 +1379,13 @@
       let backupObligatorioModal = null;
       let ultimoBackupDate = '';
 
+      // === Variables para el modo móvil ===
+      let modoMovilActivo = false;
+      let pasoActual = 0;
+      let totalPasos = 0;
+      let datosPaso = {}; // almacena datos temporales del asistente
+      let entidadEditando = null; // id de producto/cliente/orden en edición
+
       // ========== FUNCIONES DE AJUSTE DE ESPACIOS (móvil) ==========
       function ajustarEspacios() {
         const navbar = document.getElementById('mainNavbar');
@@ -1262,18 +1393,13 @@
         const catalogoScroll = document.getElementById('catalogoScroll');
         if (!navbar || !searchBar || !catalogoScroll) return;
 
-        // Obtener altura real de la navbar
         const navbarHeight = navbar.offsetHeight;
-        // Aplicar padding-top al body
         document.body.style.paddingTop = navbarHeight + 'px';
-        // Aplicar top a la barra de búsqueda
         searchBar.style.top = navbarHeight + 'px';
 
-        // Calcular altura disponible para el catálogo
         const windowHeight = window.innerHeight;
         const searchBarHeight = searchBar.offsetHeight;
-        // Restar la altura de la navbar, la barra de búsqueda y un margen extra
-        const availableHeight = windowHeight - navbarHeight - searchBarHeight - 40; // 40px de margen
+        const availableHeight = windowHeight - navbarHeight - searchBarHeight - 40;
         if (availableHeight > 100) {
           catalogoScroll.style.maxHeight = availableHeight + 'px';
         }
@@ -1401,7 +1527,6 @@
         }
       }
 
-      // Función de formateo de precios
       function formatearPrecio(precio) {
         if (precio === null || precio === undefined || precio === 0) {
           return '<span class="text-muted">Consultar precio</span>';
@@ -1609,7 +1734,6 @@
         renderReportesTaller();
       }
 
-      // ===== GRÁFICOS =====
       function dibujarGraficos(periodo, ventasPeriodo) {
         const ctx1 = document.getElementById('chartVentasPeriodo').getContext('2d');
         if (chartVentasPeriodo) chartVentasPeriodo.destroy();
@@ -1695,7 +1819,6 @@
         });
       }
 
-      // ===== REPORTES DE TALLER =====
       function renderReportesTaller() {
         const container = document.getElementById('reportesTaller');
         if (!container) return;
@@ -1837,6 +1960,10 @@
           renderCatalogo();
           cargarSelectVentas();
           actualizarReportes();
+          // Si modo móvil, refrescar listas
+          if (modoMovilActivo) {
+            renderListaItemsMovil('productos');
+          }
         }
       };
 
@@ -1846,6 +1973,9 @@
           await guardarTodo();
           renderAdminVentas();
           actualizarReportes();
+          if (modoMovilActivo) {
+            renderListaItemsMovil('ventas');
+          }
         }
       };
 
@@ -1892,7 +2022,6 @@
         const tipo = document.getElementById('prodTipo').value;
         document.getElementById('camposPropio').style.display = tipo === 'propio' ? 'block' : 'none';
         document.getElementById('camposConsignacion').style.display = tipo === 'consignacion' ? 'block' : 'none';
-        // Ajustar readonly de prodPrecioFinal
         const precioFinal = document.getElementById('prodPrecioFinal');
         if (tipo === 'propio') {
           precioFinal.removeAttribute('readonly');
@@ -1938,7 +2067,6 @@
         let precioFinal, porcentaje, porcentajeReventa;
         if (tipo === 'propio') {
           porcentaje = parseFloat(document.getElementById('prodPorcentaje').value) || 0;
-          // Tomamos el valor del campo precioFinal (puede ser el calculado o editado manualmente)
           precioFinal = parseFloat(document.getElementById('prodPrecioFinal').value) || 0;
           porcentajeReventa = 0;
         } else {
@@ -1948,7 +2076,7 @@
             return;
           }
           porcentajeReventa = parseFloat(document.getElementById('prodPorcentajeReventa').value) || 0;
-          precioFinal = acordado; // En consignación, el precio final es el acordado
+          precioFinal = acordado;
           porcentaje = 0;
         }
 
@@ -1972,6 +2100,9 @@
         renderCatalogo();
         cargarSelectVentas();
         actualizarReportes();
+        if (modoMovilActivo) {
+          renderListaItemsMovil('productos');
+        }
       }
 
       // ========== VENTAS ==========
@@ -2031,9 +2162,11 @@
         renderCatalogo();
         renderAdminProductos();
         alert('Venta registrada');
+        if (modoMovilActivo) {
+          renderListaItemsMovil('ventas');
+        }
       }
 
-      // ========== WHATSAPP SIN STOCK ==========
       function enviarWhatsappSinStock() {
         const sinStock = productos.filter(p => p.stock <= 0);
         if (sinStock.length === 0) {
@@ -2049,7 +2182,6 @@
         else window.open(wpp, '_blank');
       }
 
-      // ========== BACKUP ==========
       function exportarBackup() {
         const data = {
           productos, ventas, ajustes, clientes, ordenes,
@@ -2101,6 +2233,11 @@
                 renderClientes();
                 renderOrdenes();
                 alert('Backup importado correctamente');
+                if (modoMovilActivo) {
+                  renderListaItemsMovil('productos');
+                  renderListaItemsMovil('clientes');
+                  renderListaItemsMovil('ordenes');
+                }
               }
             } else {
               alert('Archivo no válido');
@@ -2249,7 +2386,6 @@
         html += '</tbody></table>';
         container.innerHTML = html;
 
-        // Agregar evento click a los nombres de cliente
         container.querySelectorAll('.cliente-nombre-link').forEach(el => {
           el.addEventListener('click', function() {
             const id = this.dataset.id;
@@ -2259,13 +2395,11 @@
         });
       }
 
-      // ===== MOSTRAR HISTORIAL DEL CLIENTE (admin) =====
       function mostrarHistorialCliente(clienteId, nombre) {
         const ordenesCliente = ordenes.filter(o => o.clienteId === clienteId);
         if (ordenesCliente.length === 0) {
           document.getElementById('historialClienteContent').innerHTML = `<p>No hay ingresos al taller para <strong>${nombre}</strong>.</p>`;
         } else {
-          // Ordenar de más reciente a más antiguo
           ordenesCliente.sort((a, b) => new Date(b.fechaIngreso) - new Date(a.fechaIngreso));
           let html = `<h6>Historial de <strong>${nombre}</strong></h6><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Orden</th><th>Estado</th><th>Ingreso</th><th>Salida</th><th>Total</th><th>Acciones</th></tr></thead><tbody>`;
           ordenesCliente.forEach(o => {
@@ -2386,6 +2520,9 @@
         renderCatalogo();
         renderAdminProductos();
         actualizarReportes();
+        if (modoMovilActivo) {
+          renderListaItemsMovil('ordenes');
+        }
       };
 
       window.enviarWhatsappOrden = function(id) {
@@ -2660,9 +2797,12 @@
         renderCatalogo();
         renderAdminProductos();
         actualizarReportes();
+        if (modoMovilActivo) {
+          renderListaItemsMovil('ordenes');
+          renderListaItemsMovil('clientes');
+        }
       }
 
-      // -------- SELECT DE REPUESTOS --------
       function cargarSelectRepuestos() {
         const sel = document.getElementById('ordenRepuestoSelect');
         if (!sel) return;
@@ -2674,7 +2814,7 @@
         });
       }
 
-      // -------- MI BICICLETA --------
+      // ========== MI BICICLETA ==========
       function buscarOrdenPorWhatsapp() {
         const numero = document.getElementById('clienteWhatsappBuscar').value.trim();
         const container = document.getElementById('resultadoOrdenCliente');
@@ -2836,7 +2976,1045 @@
       }
 
       // ================================================================
-      //  EVENTOS E INICIALIZACIÓN
+      //  MODO MÓVIL: NUEVA INTERFAZ PARA ADMIN
+      // ================================================================
+
+      // Crear el contenedor para el modo móvil
+      function crearContenedorMovil() {
+        let container = document.getElementById('modoMovilContainer');
+        if (container) return container;
+        container = document.createElement('div');
+        container.id = 'modoMovilContainer';
+        container.className = 'modo-movil-container';
+        container.style.display = 'none';
+        // Insertar después de #panelAdmin
+        const panelAdmin = document.getElementById('panelAdmin');
+        panelAdmin.parentNode.insertBefore(container, panelAdmin);
+        return container;
+      }
+
+      // Mostrar selector de dispositivo (PC / Celular)
+      function mostrarSelectorDispositivo() {
+        const loginDiv = document.getElementById('loginAdmin');
+        const panelDiv = document.getElementById('panelAdmin');
+        loginDiv.style.display = 'none';
+        panelDiv.style.display = 'none';
+
+        let selector = document.getElementById('selectorDispositivo');
+        if (!selector) {
+          selector = document.createElement('div');
+          selector.id = 'selectorDispositivo';
+          selector.className = 'card w-75 mx-auto mt-5 p-4 text-center';
+          selector.innerHTML = `
+            <h4>¿Cómo querés administrar?</h4>
+            <div class="d-flex justify-content-around mt-4">
+              <button class="btn btn-primary btn-lg" id="btnModoPC" style="padding:20px 40px; font-size:1.5rem;">
+                <i class="bi bi-laptop"></i> PC
+              </button>
+              <button class="btn btn-success btn-lg" id="btnModoMovil" style="padding:20px 40px; font-size:1.5rem;">
+                <i class="bi bi-phone"></i> Celular
+              </button>
+            </div>
+          `;
+          const seccionAdmin = document.getElementById('seccionAdmin');
+          seccionAdmin.prepend(selector);
+        }
+        selector.style.display = 'block';
+
+        document.getElementById('btnModoPC').addEventListener('click', function() {
+          selector.style.display = 'none';
+          modoMovilActivo = false;
+          loginDiv.style.display = 'block';
+        });
+
+        document.getElementById('btnModoMovil').addEventListener('click', function() {
+          selector.style.display = 'none';
+          modoMovilActivo = true;
+          // Mostrar login simplificado o directamente pedir clave
+          mostrarLoginMovil();
+        });
+      }
+
+      function mostrarLoginMovil() {
+        const loginDiv = document.getElementById('loginAdmin');
+        loginDiv.style.display = 'none';
+        const panelDiv = document.getElementById('panelAdmin');
+        panelDiv.style.display = 'none';
+
+        let loginMovil = document.getElementById('loginMovil');
+        if (!loginMovil) {
+          loginMovil = document.createElement('div');
+          loginMovil.id = 'loginMovil';
+          loginMovil.className = 'card w-75 mx-auto mt-5 p-4';
+          loginMovil.innerHTML = `
+            <h5>Acceso Administrador</h5>
+            <input type="password" id="claveAdminMovil" class="form-control mb-2" placeholder="Clave de administrador">
+            <button class="btn btn-primary btn-block" id="btnLoginAdminMovil">Ingresar</button>
+            <div id="msjLoginMovil" class="mt-2 text-danger"></div>
+          `;
+          const seccionAdmin = document.getElementById('seccionAdmin');
+          seccionAdmin.prepend(loginMovil);
+        }
+        loginMovil.style.display = 'block';
+
+        document.getElementById('btnLoginAdminMovil').addEventListener('click', function() {
+          const clave = document.getElementById('claveAdminMovil').value;
+          if (clave === DEFAULT_PASSWORD) {
+            document.getElementById('msjLoginMovil').textContent = '';
+            loginMovil.style.display = 'none';
+            iniciarModoMovil();
+          } else {
+            document.getElementById('msjLoginMovil').textContent = 'Clave incorrecta';
+          }
+        });
+      }
+
+      function iniciarModoMovil() {
+        const container = crearContenedorMovil();
+        container.style.display = 'block';
+        // Ocultar cualquier otro contenido
+        document.getElementById('loginAdmin').style.display = 'none';
+        document.getElementById('panelAdmin').style.display = 'none';
+        // Inyectar el dashboard móvil
+        renderDashboardMovil();
+        // Ajustar espacios
+        ajustarEspacios();
+        // Cargar datos
+        renderListaItemsMovil('productos');
+        renderListaItemsMovil('clientes');
+        renderListaItemsMovil('ordenes');
+        renderListaItemsMovil('ventas');
+      }
+
+      function renderDashboardMovil() {
+        const container = document.getElementById('modoMovilContainer');
+        container.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">📱 Panel Móvil</h4>
+            <button class="btn btn-outline-secondary btn-sm" id="btnSalirModoMovil">Salir</button>
+          </div>
+          <div class="row g-3">
+            <div class="col-6">
+              <button class="btn btn-primary btn-block" data-modulo="productos">
+                <i class="bi bi-box"></i> Productos
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="btn btn-success btn-block" data-modulo="clientes">
+                <i class="bi bi-people"></i> Clientes
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="btn btn-warning btn-block" data-modulo="ordenes">
+                <i class="bi bi-tools"></i> Taller
+              </button>
+            </div>
+            <div class="col-6">
+              <button class="btn btn-info btn-block" data-modulo="ventas">
+                <i class="bi bi-cash"></i> Ventas
+              </button>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-secondary btn-block" data-modulo="ajustes">
+                <i class="bi bi-gear"></i> Ajustes
+              </button>
+            </div>
+          </div>
+          <hr>
+          <div id="modoMovilContenido">
+            <p class="text-muted">Selecciona una opción para comenzar.</p>
+          </div>
+        `;
+
+        // Eventos de botones
+        container.querySelectorAll('[data-modulo]').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const modulo = this.dataset.modulo;
+            mostrarModuloMovil(modulo);
+          });
+        });
+
+        document.getElementById('btnSalirModoMovil').addEventListener('click', function() {
+          modoMovilActivo = false;
+          container.style.display = 'none';
+          // Mostrar login normal
+          document.getElementById('loginAdmin').style.display = 'block';
+          document.getElementById('panelAdmin').style.display = 'none';
+          document.getElementById('selectorDispositivo')?.remove();
+          document.getElementById('loginMovil')?.remove();
+        });
+      }
+
+      function mostrarModuloMovil(modulo) {
+        const content = document.getElementById('modoMovilContenido');
+        if (!content) return;
+        content.innerHTML = '';
+
+        switch (modulo) {
+          case 'productos':
+            renderModuloProductos(content);
+            break;
+          case 'clientes':
+            renderModuloClientes(content);
+            break;
+          case 'ordenes':
+            renderModuloOrdenes(content);
+            break;
+          case 'ventas':
+            renderModuloVentas(content);
+            break;
+          case 'ajustes':
+            renderModuloAjustes(content);
+            break;
+          default:
+            content.innerHTML = '<p>Módulo no implementado.</p>';
+        }
+      }
+
+      // --- MÓDULO PRODUCTOS ---
+      function renderModuloProductos(container) {
+        container.innerHTML = `
+          <div class="d-flex justify-content-between mb-2">
+            <h5>📦 Productos</h5>
+            <button class="btn btn-success btn-sm" id="btnNuevoProductoMovil">+ Nuevo</button>
+          </div>
+          <div id="listaItemsMovil" class="lista-items"></div>
+        `;
+        renderListaItemsMovil('productos');
+        document.getElementById('btnNuevoProductoMovil').addEventListener('click', function() {
+          iniciarAsistenteProducto(null);
+        });
+      }
+
+      function renderListaItemsMovil(tipo) {
+        const container = document.getElementById('listaItemsMovil');
+        if (!container) return;
+        let items = [];
+        let titulo = '';
+        switch (tipo) {
+          case 'productos':
+            items = productos;
+            titulo = 'Productos';
+            break;
+          case 'clientes':
+            items = clientes;
+            titulo = 'Clientes';
+            break;
+          case 'ordenes':
+            items = ordenes;
+            titulo = 'Órdenes';
+            break;
+          case 'ventas':
+            items = ventas;
+            titulo = 'Ventas';
+            break;
+          default: return;
+        }
+        if (items.length === 0) {
+          container.innerHTML = `<p class="text-muted">No hay ${titulo.toLowerCase()} registrados.</p>`;
+          return;
+        }
+        let html = '';
+        items.forEach(item => {
+          let info = '';
+          let id = item.id;
+          if (tipo === 'productos') {
+            info = `${item.nombre} - ${formatearPrecio(item.precioFinal)} (Stock: ${item.stock})`;
+          } else if (tipo === 'clientes') {
+            info = `${item.nombre} (${item.whatsapp})`;
+          } else if (tipo === 'ordenes') {
+            info = `#${item.id} - ${item.clienteNombre} (${item.estado})`;
+          } else if (tipo === 'ventas') {
+            info = `${item.nombreProducto} x${item.cantidad} = ${formatearPrecio(item.total)}`;
+          }
+          html += `
+            <div class="item-card" data-id="${id}">
+              <div class="item-info">${info}</div>
+              <div class="item-actions">
+                <button class="btn btn-sm btn-warning editar-item" data-id="${id}"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-danger eliminar-item" data-id="${id}"><i class="bi bi-trash"></i></button>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+
+        // Eventos editar/eliminar
+        container.querySelectorAll('.editar-item').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            if (tipo === 'productos') {
+              const prod = productos.find(p => p.id === id);
+              if (prod) iniciarAsistenteProducto(prod);
+            } else if (tipo === 'clientes') {
+              const cli = clientes.find(c => c.id === id);
+              if (cli) iniciarAsistenteCliente(cli);
+            } else if (tipo === 'ordenes') {
+              const ord = ordenes.find(o => o.id === id);
+              if (ord) iniciarAsistenteOrden(ord);
+            } else if (tipo === 'ventas') {
+              alert('Las ventas no se editan. Si es necesario, elimínela y regístrela de nuevo.');
+            }
+          });
+        });
+
+        container.querySelectorAll('.eliminar-item').forEach(btn => {
+          btn.addEventListener('click', async function() {
+            const id = this.dataset.id;
+            if (!confirm('¿Eliminar este elemento?')) return;
+            if (tipo === 'productos') {
+              productos = productos.filter(p => p.id !== id);
+              await guardarTodo();
+              renderListaItemsMovil('productos');
+              renderCatalogo();
+              renderAdminProductos();
+              cargarSelectVentas();
+            } else if (tipo === 'clientes') {
+              clientes = clientes.filter(c => c.id !== id);
+              await guardarTodo();
+              renderListaItemsMovil('clientes');
+              renderClientes();
+            } else if (tipo === 'ordenes') {
+              const orden = ordenes.find(o => o.id === id);
+              if (orden && orden.repuestos) {
+                orden.repuestos.forEach(r => {
+                  const prod = productos.find(p => p.id === r.id);
+                  if (prod) prod.stock += r.cantidad;
+                });
+              }
+              ordenes = ordenes.filter(o => o.id !== id);
+              await guardarTodo();
+              renderListaItemsMovil('ordenes');
+              renderOrdenes();
+              cargarSelectRepuestos();
+              renderCatalogo();
+              renderAdminProductos();
+            } else if (tipo === 'ventas') {
+              ventas = ventas.filter(v => v.id !== id);
+              await guardarTodo();
+              renderListaItemsMovil('ventas');
+              renderAdminVentas();
+            }
+            actualizarReportes();
+          });
+        });
+      }
+
+      // --- ASISTENTE PRODUCTO (pasos) ---
+      function iniciarAsistenteProducto(prod) {
+        entidadEditando = prod ? prod.id : null;
+        datosPaso = prod ? { ...prod } : {
+          nombre: '', categoria: '', costo: 0, tipo: 'propio',
+          porcentaje: 20, precioFinal: 0, stock: 0, stockMinimo: 1,
+          foto: '', porcentajeReventa: 0
+        };
+        pasoActual = 0;
+        totalPasos = 4; // 0: nombre/cat, 1: costo/tipo, 2: precios, 3: stock/foto
+        mostrarPasoProducto();
+      }
+
+      function mostrarPasoProducto() {
+        const content = document.getElementById('modoMovilContenido');
+        if (!content) return;
+        const p = datosPaso;
+        let html = `<div class="paso-indicador">`;
+        for (let i = 0; i < totalPasos; i++) {
+          let clase = 'paso';
+          if (i === pasoActual) clase += ' activo';
+          else if (i < pasoActual) clase += ' completado';
+          html += `<div class="${clase}">${i+1}</div>`;
+        }
+        html += `</div><div class="card">`;
+
+        switch (pasoActual) {
+          case 0:
+            html += `
+              <h6>Paso 1: Nombre y Categoría</h6>
+              <div class="input-group-movil">
+                <label>Nombre *</label>
+                <input type="text" id="movilProdNombre" class="form-control" value="${p.nombre || ''}">
+              </div>
+              <div class="input-group-movil">
+                <label>Categoría *</label>
+                <select id="movilProdCategoria" class="form-select">
+                  <option value="">Seleccionar</option>
+                  ${categorias.map(c => `<option value="${c}" ${p.categoria === c ? 'selected' : ''}>${c}</option>`).join('')}
+                </select>
+              </div>
+            `;
+            break;
+          case 1:
+            html += `
+              <h6>Paso 2: Costo y Tipo</h6>
+              <div class="input-group-movil">
+                <label>Costo *</label>
+                <input type="number" step="0.01" id="movilProdCosto" class="form-control" value="${p.costo || 0}">
+              </div>
+              <div class="input-group-movil">
+                <label>Tipo</label>
+                <select id="movilProdTipo" class="form-select">
+                  <option value="propio" ${p.tipo === 'propio' ? 'selected' : ''}>Propio</option>
+                  <option value="consignacion" ${p.tipo === 'consignacion' ? 'selected' : ''}>Consignación</option>
+                </select>
+              </div>
+            `;
+            break;
+          case 2:
+            html += `
+              <h6>Paso 3: Precios</h6>
+              <div id="movilPrecios">
+            `;
+            if (p.tipo === 'propio') {
+              html += `
+                <div class="input-group-movil">
+                  <label>% Aumento</label>
+                  <input type="number" step="0.1" id="movilProdPorcentaje" class="form-control" value="${p.porcentaje || 20}">
+                </div>
+                <div class="input-group-movil">
+                  <label>Precio Final (sugerido)</label>
+                  <input type="number" step="0.01" id="movilProdPrecioFinal" class="form-control" value="${p.precioFinal || 0}">
+                </div>
+              `;
+            } else {
+              html += `
+                <div class="input-group-movil">
+                  <label>Precio Acordado *</label>
+                  <input type="number" step="0.01" id="movilProdPrecioAcordado" class="form-control" value="${p.precioFinal || 0}">
+                </div>
+                <div class="input-group-movil">
+                  <label>% Reventa</label>
+                  <input type="number" step="0.1" id="movilProdPorcentajeReventa" class="form-control" value="${p.porcentajeReventa || 30}">
+                </div>
+              `;
+            }
+            html += `</div>`;
+            break;
+          case 3:
+            html += `
+              <h6>Paso 4: Stock y Foto</h6>
+              <div class="input-group-movil">
+                <label>Stock *</label>
+                <input type="number" id="movilProdStock" class="form-control" value="${p.stock || 0}">
+              </div>
+              <div class="input-group-movil">
+                <label>Stock Mínimo</label>
+                <input type="number" id="movilProdStockMinimo" class="form-control" value="${p.stockMinimo || 1}">
+              </div>
+              <div class="input-group-movil">
+                <label>Foto</label>
+                <input type="file" accept="image/*" capture="environment" id="movilProdFoto" class="form-control">
+                <img id="movilProdFotoPreview" src="${p.foto || ''}" class="foto-preview-movil" style="${p.foto ? '' : 'display:none;'}">
+              </div>
+            `;
+            break;
+        }
+
+        html += `
+          <div class="acciones-paso">
+            <button class="btn btn-secondary" id="btnPasoAnterior" ${pasoActual === 0 ? 'disabled' : ''}>Atrás</button>
+            <button class="btn btn-primary" id="btnPaaSiguiente">${pasoActual === totalPasos-1 ? 'Guardar' : 'Siguiente'}</button>
+          </div>
+        </div>`;
+        content.innerHTML = html;
+
+        // Eventos de los pasos
+        document.getElementById('btnPasoAnterior')?.addEventListener('click', function() {
+          if (pasoActual > 0) {
+            guardarDatosPasoProducto();
+            pasoActual--;
+            mostrarPasoProducto();
+          }
+        });
+
+        document.getElementById('btnPaaSiguiente')?.addEventListener('click', function() {
+          guardarDatosPasoProducto();
+          if (pasoActual === totalPasos - 1) {
+            // Guardar producto
+            guardarProductoMovil();
+          } else {
+            pasoActual++;
+            mostrarPasoProducto();
+          }
+        });
+
+        // Compresión de imagen al seleccionar archivo
+        const fotoInput = document.getElementById('movilProdFoto');
+        if (fotoInput) {
+          fotoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+              comprimirImagen(file, 800, 0.7, function(dataUrl) {
+                document.getElementById('movilProdFotoPreview').src = dataUrl;
+                document.getElementById('movilProdFotoPreview').style.display = 'block';
+                datosPaso.foto = dataUrl;
+              });
+            }
+          });
+        }
+
+        // Actualizar precios en tiempo real (si estamos en paso 2)
+        if (pasoActual === 2) {
+          const tipo = document.getElementById('movilProdTipo')?.value || p.tipo;
+          if (tipo === 'propio') {
+            const costo = parseFloat(document.getElementById('movilProdCosto')?.value) || 0;
+            const porcentaje = parseFloat(document.getElementById('movilProdPorcentaje')?.value) || 0;
+            const pf = costo * (1 + porcentaje / 100);
+            const pfInput = document.getElementById('movilProdPrecioFinal');
+            if (pfInput && !isNaN(pf)) pfInput.value = pf.toFixed(2);
+          } else {
+            const acordado = parseFloat(document.getElementById('movilProdPrecioAcordado')?.value) || 0;
+            const pReventa = parseFloat(document.getElementById('movilProdPorcentajeReventa')?.value) || 0;
+            const reventa = acordado * (1 + pReventa / 100);
+            // No hay campo para mostrar en este paso, pero podríamos mostrar un mensaje
+          }
+        }
+      }
+
+      function guardarDatosPasoProducto() {
+        const p = datosPaso;
+        if (pasoActual === 0) {
+          p.nombre = document.getElementById('movilProdNombre')?.value.trim() || '';
+          p.categoria = document.getElementById('movilProdCategoria')?.value || '';
+        } else if (pasoActual === 1) {
+          p.costo = parseFloat(document.getElementById('movilProdCosto')?.value) || 0;
+          p.tipo = document.getElementById('movilProdTipo')?.value || 'propio';
+        } else if (pasoActual === 2) {
+          if (p.tipo === 'propio') {
+            p.porcentaje = parseFloat(document.getElementById('movilProdPorcentaje')?.value) || 0;
+            p.precioFinal = parseFloat(document.getElementById('movilProdPrecioFinal')?.value) || 0;
+          } else {
+            p.precioFinal = parseFloat(document.getElementById('movilProdPrecioAcordado')?.value) || 0;
+            p.porcentajeReventa = parseFloat(document.getElementById('movilProdPorcentajeReventa')?.value) || 0;
+          }
+        } else if (pasoActual === 3) {
+          p.stock = parseInt(document.getElementById('movilProdStock')?.value) || 0;
+          p.stockMinimo = parseInt(document.getElementById('movilProdStockMinimo')?.value) || 1;
+          // foto ya se guarda al cambiar el input
+        }
+      }
+
+      async function guardarProductoMovil() {
+        const p = datosPaso;
+        if (!p.nombre || !p.categoria) {
+          alert('Nombre y categoría son obligatorios');
+          return;
+        }
+        if (p.tipo === 'consignacion' && p.precioFinal <= 0) {
+          alert('Para consignación, el precio acordado debe ser mayor a 0');
+          return;
+        }
+        if (isNaN(p.stock)) {
+          alert('Stock debe ser un número');
+          return;
+        }
+
+        if (entidadEditando) {
+          const idx = productos.findIndex(prod => prod.id === entidadEditando);
+          if (idx !== -1) {
+            productos[idx] = { ...productos[idx], ...p };
+          }
+        } else {
+          const newProd = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            ...p,
+            fechaCreacion: new Date().toISOString()
+          };
+          productos.push(newProd);
+        }
+        await guardarTodo();
+        alert('Producto guardado');
+        // Volver al listado
+        renderListaItemsMovil('productos');
+        renderCatalogo();
+        renderAdminProductos();
+        cargarSelectVentas();
+        actualizarReportes();
+        // Mostrar módulo productos nuevamente
+        const content = document.getElementById('modoMovilContenido');
+        if (content) renderModuloProductos(content);
+      }
+
+      // --- ASISTENTE CLIENTE ---
+      function iniciarAsistenteCliente(cli) {
+        entidadEditando = cli ? cli.id : null;
+        datosPaso = cli ? { ...cli } : { nombre: '', whatsapp: '', direccion: '' };
+        pasoActual = 0;
+        totalPasos = 2;
+        mostrarPasoCliente();
+      }
+
+      function mostrarPasoCliente() {
+        const content = document.getElementById('modoMovilContenido');
+        if (!content) return;
+        const p = datosPaso;
+        let html = `<div class="paso-indicador">`;
+        for (let i = 0; i < totalPasos; i++) {
+          let clase = 'paso';
+          if (i === pasoActual) clase += ' activo';
+          else if (i < pasoActual) clase += ' completado';
+          html += `<div class="${clase}">${i+1}</div>`;
+        }
+        html += `</div><div class="card">`;
+
+        if (pasoActual === 0) {
+          html += `
+            <h6>Paso 1: Nombre y WhatsApp</h6>
+            <div class="input-group-movil">
+              <label>Nombre y Apellido *</label>
+              <input type="text" id="movilCliNombre" class="form-control" value="${p.nombre || ''}">
+            </div>
+            <div class="input-group-movil">
+              <label>WhatsApp (sin 0 y sin 15) *</label>
+              <input type="text" id="movilCliWhatsapp" class="form-control" value="${p.whatsapp || ''}">
+            </div>
+          `;
+        } else {
+          html += `
+            <h6>Paso 2: Dirección</h6>
+            <div class="input-group-movil">
+              <label>Dirección</label>
+              <input type="text" id="movilCliDireccion" class="form-control" value="${p.direccion || ''}">
+            </div>
+          `;
+        }
+
+        html += `
+          <div class="acciones-paso">
+            <button class="btn btn-secondary" id="btnPasoAnterior" ${pasoActual === 0 ? 'disabled' : ''}>Atrás</button>
+            <button class="btn btn-primary" id="btnPaaSiguiente">${pasoActual === totalPasos-1 ? 'Guardar' : 'Siguiente'}</button>
+          </div>
+        </div>`;
+        content.innerHTML = html;
+
+        document.getElementById('btnPasoAnterior')?.addEventListener('click', function() {
+          if (pasoActual > 0) {
+            guardarDatosPasoCliente();
+            pasoActual--;
+            mostrarPasoCliente();
+          }
+        });
+
+        document.getElementById('btnPaaSiguiente')?.addEventListener('click', function() {
+          guardarDatosPasoCliente();
+          if (pasoActual === totalPasos - 1) {
+            guardarClienteMovil();
+          } else {
+            pasoActual++;
+            mostrarPasoCliente();
+          }
+        });
+      }
+
+      function guardarDatosPasoCliente() {
+        const p = datosPaso;
+        if (pasoActual === 0) {
+          p.nombre = document.getElementById('movilCliNombre')?.value.trim() || '';
+          p.whatsapp = document.getElementById('movilCliWhatsapp')?.value.trim() || '';
+        } else if (pasoActual === 1) {
+          p.direccion = document.getElementById('movilCliDireccion')?.value.trim() || '';
+        }
+      }
+
+      async function guardarClienteMovil() {
+        const p = datosPaso;
+        if (!p.nombre || !p.whatsapp) {
+          alert('Nombre y WhatsApp son obligatorios');
+          return;
+        }
+        if (entidadEditando) {
+          const idx = clientes.findIndex(c => c.id === entidadEditando);
+          if (idx !== -1) {
+            clientes[idx] = { ...clientes[idx], ...p };
+          }
+        } else {
+          const newCli = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            ...p
+          };
+          clientes.push(newCli);
+        }
+        await guardarTodo();
+        alert('Cliente guardado');
+        renderListaItemsMovil('clientes');
+        renderClientes();
+        const content = document.getElementById('modoMovilContenido');
+        if (content) renderModuloClientes(content);
+      }
+
+      // --- MÓDULO CLIENTES ---
+      function renderModuloClientes(container) {
+        container.innerHTML = `
+          <div class="d-flex justify-content-between mb-2">
+            <h5>👥 Clientes</h5>
+            <button class="btn btn-success btn-sm" id="btnNuevoClienteMovil">+ Nuevo</button>
+          </div>
+          <div id="listaItemsMovil" class="lista-items"></div>
+        `;
+        renderListaItemsMovil('clientes');
+        document.getElementById('btnNuevoClienteMovil').addEventListener('click', function() {
+          iniciarAsistenteCliente(null);
+        });
+      }
+
+      // --- MÓDULO ORDENES ---
+      function renderModuloOrdenes(container) {
+        container.innerHTML = `
+          <div class="d-flex justify-content-between mb-2">
+            <h5>🔧 Taller (Órdenes)</h5>
+            <button class="btn btn-success btn-sm" id="btnNuevaOrdenMovil">+ Nueva</button>
+          </div>
+          <div id="listaItemsMovil" class="lista-items"></div>
+        `;
+        renderListaItemsMovil('ordenes');
+        document.getElementById('btnNuevaOrdenMovil').addEventListener('click', function() {
+          iniciarAsistenteOrden(null);
+        });
+      }
+
+      // --- ASISTENTE ORDEN (simplificado) ---
+      function iniciarAsistenteOrden(ord) {
+        entidadEditando = ord ? ord.id : null;
+        datosPaso = ord ? { ...ord } : {
+          comprobante: '', clienteNombre: '', clienteWhatsapp: '', clienteDireccion: '',
+          modelo: '', accesorios: '', fechaIngreso: new Date().toISOString().slice(0,10),
+          fechaSalida: '', garantiaDias: 0, fallaInicial: '', diagnostico: '',
+          trabajoRealizado: '', presupuestoMano: 0, repuestos: [], estado: 'no_visto'
+        };
+        pasoActual = 0;
+        totalPasos = 4;
+        mostrarPasoOrden();
+      }
+
+      function mostrarPasoOrden() {
+        const content = document.getElementById('modoMovilContenido');
+        if (!content) return;
+        const p = datosPaso;
+        let html = `<div class="paso-indicador">`;
+        for (let i = 0; i < totalPasos; i++) {
+          let clase = 'paso';
+          if (i === pasoActual) clase += ' activo';
+          else if (i < pasoActual) clase += ' completado';
+          html += `<div class="${clase}">${i+1}</div>`;
+        }
+        html += `</div><div class="card">`;
+
+        switch (pasoActual) {
+          case 0:
+            html += `
+              <h6>Paso 1: Cliente y Modelo</h6>
+              <div class="input-group-movil">
+                <label>Cliente Nombre *</label>
+                <input type="text" id="movilOrdClienteNombre" class="form-control" value="${p.clienteNombre || ''}">
+              </div>
+              <div class="input-group-movil">
+                <label>WhatsApp *</label>
+                <input type="text" id="movilOrdClienteWhatsapp" class="form-control" value="${p.clienteWhatsapp || ''}">
+              </div>
+              <div class="input-group-movil">
+                <label>Modelo</label>
+                <input type="text" id="movilOrdModelo" class="form-control" value="${p.modelo || ''}">
+              </div>
+            `;
+            break;
+          case 1:
+            html += `
+              <h6>Paso 2: Fechas y Estado</h6>
+              <div class="input-group-movil">
+                <label>Fecha Ingreso</label>
+                <input type="date" id="movilOrdFechaIngreso" class="form-control" value="${p.fechaIngreso || ''}">
+              </div>
+              <div class="input-group-movil">
+                <label>Fecha Salida</label>
+                <input type="date" id="movilOrdFechaSalida" class="form-control" value="${p.fechaSalida || ''}">
+              </div>
+              <div class="input-group-movil">
+                <label>Estado</label>
+                <select id="movilOrdEstado" class="form-select">
+                  ${['no_visto','presupuestada','confirmada','rechazado','lista','retirada'].map(e =>
+                    `<option value="${e}" ${p.estado === e ? 'selected' : ''}>${e.replace('_',' ').toUpperCase()}</option>`
+                  ).join('')}
+                </select>
+              </div>
+            `;
+            break;
+          case 2:
+            html += `
+              <h6>Paso 3: Diagnóstico y Presupuesto</h6>
+              <div class="input-group-movil">
+                <label>Falla Inicial</label>
+                <input type="text" id="movilOrdFalla" class="form-control" value="${p.fallaInicial || ''}">
+              </div>
+              <div class="input-group-movil">
+                <label>Diagnóstico</label>
+                <input type="text" id="movilOrdDiagnostico" class="form-control" value="${p.diagnostico || ''}">
+              </div>
+              <div class="input-group-movil">
+                <label>Presupuesto Mano de Obra ($)</label>
+                <input type="number" step="0.01" id="movilOrdMano" class="form-control" value="${p.presupuestoMano || 0}">
+              </div>
+            `;
+            break;
+          case 3:
+            html += `
+              <h6>Paso 4: Trabajo Realizado y Garantía</h6>
+              <div class="input-group-movil">
+                <label>Trabajo Realizado</label>
+                <input type="text" id="movilOrdTrabajo" class="form-control" value="${p.trabajoRealizado || ''}">
+              </div>
+              <div class="input-group-movil">
+                <label>Garantía (días)</label>
+                <input type="number" id="movilOrdGarantia" class="form-control" value="${p.garantiaDias || 0}">
+              </div>
+              <div class="input-group-movil">
+                <label>Comprobante</label>
+                <input type="text" id="movilOrdComprobante" class="form-control" value="${p.comprobante || ''}">
+              </div>
+            `;
+            break;
+        }
+
+        html += `
+          <div class="acciones-paso">
+            <button class="btn btn-secondary" id="btnPasoAnterior" ${pasoActual === 0 ? 'disabled' : ''}>Atrás</button>
+            <button class="btn btn-primary" id="btnPaaSiguiente">${pasoActual === totalPasos-1 ? 'Guardar' : 'Siguiente'}</button>
+          </div>
+        </div>`;
+        content.innerHTML = html;
+
+        document.getElementById('btnPasoAnterior')?.addEventListener('click', function() {
+          if (pasoActual > 0) {
+            guardarDatosPasoOrden();
+            pasoActual--;
+            mostrarPasoOrden();
+          }
+        });
+
+        document.getElementById('btnPaaSiguiente')?.addEventListener('click', function() {
+          guardarDatosPasoOrden();
+          if (pasoActual === totalPasos - 1) {
+            guardarOrdenMovil();
+          } else {
+            pasoActual++;
+            mostrarPasoOrden();
+          }
+        });
+      }
+
+      function guardarDatosPasoOrden() {
+        const p = datosPaso;
+        if (pasoActual === 0) {
+          p.clienteNombre = document.getElementById('movilOrdClienteNombre')?.value.trim() || '';
+          p.clienteWhatsapp = document.getElementById('movilOrdClienteWhatsapp')?.value.trim() || '';
+          p.modelo = document.getElementById('movilOrdModelo')?.value.trim() || '';
+        } else if (pasoActual === 1) {
+          p.fechaIngreso = document.getElementById('movilOrdFechaIngreso')?.value || '';
+          p.fechaSalida = document.getElementById('movilOrdFechaSalida')?.value || '';
+          p.estado = document.getElementById('movilOrdEstado')?.value || 'no_visto';
+        } else if (pasoActual === 2) {
+          p.fallaInicial = document.getElementById('movilOrdFalla')?.value.trim() || '';
+          p.diagnostico = document.getElementById('movilOrdDiagnostico')?.value.trim() || '';
+          p.presupuestoMano = parseFloat(document.getElementById('movilOrdMano')?.value) || 0;
+        } else if (pasoActual === 3) {
+          p.trabajoRealizado = document.getElementById('movilOrdTrabajo')?.value.trim() || '';
+          p.garantiaDias = parseInt(document.getElementById('movilOrdGarantia')?.value) || 0;
+          p.comprobante = document.getElementById('movilOrdComprobante')?.value.trim() || '';
+        }
+      }
+
+      async function guardarOrdenMovil() {
+        const p = datosPaso;
+        if (!p.clienteNombre || !p.clienteWhatsapp) {
+          alert('Nombre y WhatsApp del cliente son obligatorios');
+          return;
+        }
+
+        // Buscar o crear cliente
+        let clienteId = null;
+        let clienteExistente = clientes.find(c => c.whatsapp === p.clienteWhatsapp);
+        if (!clienteExistente) {
+          const newCliente = {
+            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+            nombre: p.clienteNombre,
+            whatsapp: p.clienteWhatsapp,
+            direccion: p.clienteDireccion || ''
+          };
+          clientes.push(newCliente);
+          clienteId = newCliente.id;
+        } else {
+          clienteId = clienteExistente.id;
+          clienteExistente.nombre = p.clienteNombre;
+          if (p.clienteDireccion) clienteExistente.direccion = p.clienteDireccion;
+        }
+
+        const ordenData = {
+          id: entidadEditando || generarIdOrden(),
+          comprobante: p.comprobante || '',
+          clienteId,
+          clienteNombre: p.clienteNombre,
+          clienteWhatsapp: p.clienteWhatsapp,
+          clienteDireccion: p.clienteDireccion || '',
+          modelo: p.modelo || '',
+          accesorios: p.accesorios || '',
+          fechaIngreso: p.fechaIngreso || '',
+          fechaSalida: p.fechaSalida || '',
+          garantiaDias: p.garantiaDias || 0,
+          fallaInicial: p.fallaInicial || '',
+          diagnostico: p.diagnostico || '',
+          trabajoRealizado: p.trabajoRealizado || '',
+          presupuestoMano: p.presupuestoMano || 0,
+          repuestos: p.repuestos || [],
+          estado: p.estado || 'no_visto'
+        };
+
+        if (entidadEditando) {
+          const idx = ordenes.findIndex(o => o.id === entidadEditando);
+          if (idx !== -1) ordenes[idx] = ordenData;
+        } else {
+          ordenes.push(ordenData);
+        }
+        await guardarTodo();
+        alert('Orden guardada');
+        renderListaItemsMovil('ordenes');
+        renderOrdenes();
+        renderClientes();
+        cargarSelectRepuestos();
+        actualizarReportes();
+        const content = document.getElementById('modoMovilContenido');
+        if (content) renderModuloOrdenes(content);
+      }
+
+      // --- MÓDULO VENTAS ---
+      function renderModuloVentas(container) {
+        container.innerHTML = `
+          <h5>💰 Ventas</h5>
+          <div class="card p-2 mb-2">
+            <div class="input-group-movil">
+              <label>Producto</label>
+              <select id="movilVentaProducto" class="form-select">
+                <option value="">Seleccionar</option>
+                ${productos.filter(p => p.stock > 0).map(p =>
+                  `<option value="${p.id}">${p.nombre} (Stock: ${p.stock})</option>`
+                ).join('')}
+              </select>
+            </div>
+            <div class="input-group-movil">
+              <label>Cantidad</label>
+              <input type="number" id="movilVentaCantidad" class="form-control" value="1" min="1">
+            </div>
+            <button class="btn btn-primary btn-block" id="btnRegistrarVentaMovil">Registrar Venta</button>
+          </div>
+          <h6>Historial</h6>
+          <div id="listaItemsMovil" class="lista-items"></div>
+        `;
+        renderListaItemsMovil('ventas');
+
+        document.getElementById('btnRegistrarVentaMovil').addEventListener('click', async function() {
+          const prodId = document.getElementById('movilVentaProducto').value;
+          const cantidad = parseInt(document.getElementById('movilVentaCantidad').value);
+          if (!prodId || !cantidad || cantidad < 1) {
+            alert('Seleccione producto y cantidad válida');
+            return;
+          }
+          const prod = productos.find(p => p.id === prodId);
+          if (!prod) return alert('Producto no encontrado');
+          if (prod.stock < cantidad) return alert(`Stock insuficiente. Disponible: ${prod.stock}`);
+
+          let precio = prod.precioFinal;
+          if (!precio || precio <= 0) {
+            const p = prompt('Ingrese el precio unitario para este producto:');
+            if (!p) return;
+            precio = parseFloat(p);
+            if (isNaN(precio) || precio <= 0) {
+              alert('Precio inválido');
+              return;
+            }
+          }
+
+          await registrarVentaConPrecio(prod, cantidad, precio);
+          // Actualizar lista de ventas y select
+          renderListaItemsMovil('ventas');
+          const sel = document.getElementById('movilVentaProducto');
+          if (sel) {
+            sel.innerHTML = `<option value="">Seleccionar</option>
+              ${productos.filter(p => p.stock > 0).map(p =>
+                `<option value="${p.id}">${p.nombre} (Stock: ${p.stock})</option>`
+              ).join('')}`;
+          }
+        });
+      }
+
+      // --- MÓDULO AJUSTES (simple) ---
+      function renderModuloAjustes(container) {
+        container.innerHTML = `
+          <h5>⚙️ Ajustes</h5>
+          <div class="card p-2">
+            <div class="input-group-movil">
+              <label>Nombre Empresa</label>
+              <input type="text" id="movilAjusteNombre" class="form-control" value="${ajustes.nombreEmpresa || ''}">
+            </div>
+            <div class="input-group-movil">
+              <label>WhatsApp</label>
+              <input type="text" id="movilAjusteWhatsapp" class="form-control" value="${ajustes.whatsapp || ''}">
+            </div>
+            <div class="input-group-movil">
+              <label>Dirección</label>
+              <input type="text" id="movilAjusteDireccion" class="form-control" value="${ajustes.direccion || ''}">
+            </div>
+            <div class="input-group-movil">
+              <label>Horarios</label>
+              <input type="text" id="movilAjusteHorarios" class="form-control" value="${ajustes.horarios || ''}">
+            </div>
+            <div class="input-group-movil">
+              <label>Tema</label>
+              <select id="movilAjusteTema" class="form-select">
+                ${['default','android','windows','mac','videojuego','verde','amarillo','argentina','azul','oscuro'].map(t =>
+                  `<option value="${t}" ${ajustes.tema === t ? 'selected' : ''}>${t}</option>`
+                ).join('')}
+              </select>
+            </div>
+            <button class="btn btn-primary btn-block" id="btnGuardarAjustesMovil">Guardar</button>
+          </div>
+        `;
+
+        document.getElementById('btnGuardarAjustesMovil').addEventListener('click', async function() {
+          ajustes.nombreEmpresa = document.getElementById('movilAjusteNombre').value.trim() || 'Mi Catálogo';
+          ajustes.whatsapp = document.getElementById('movilAjusteWhatsapp').value.trim();
+          ajustes.direccion = document.getElementById('movilAjusteDireccion').value.trim();
+          ajustes.horarios = document.getElementById('movilAjusteHorarios').value.trim();
+          ajustes.tema = document.getElementById('movilAjusteTema').value;
+          await guardarTodo();
+          aplicarAjustes();
+          alert('Ajustes guardados');
+        });
+      }
+
+      // ===== COMPRESIÓN DE IMAGEN =====
+      function comprimirImagen(file, maxWidth, calidad, callback) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            if (width > maxWidth) {
+              height = height * (maxWidth / width);
+              width = maxWidth;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL('image/jpeg', calidad);
+            callback(dataUrl);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // ================================================================
+      //  EVENTOS E INICIALIZACIÓN (modificada para incluir selector)
       // ================================================================
       function initEventos() {
         const btnCatalogo = document.getElementById('btnCatalogo');
@@ -2857,13 +4035,11 @@
           e.preventDefault();
           setActiveButton(this);
           mostrarSeccion('admin');
-          // Hacer scroll para mostrar el login (ahora con margen superior)
-          setTimeout(() => {
-            const loginEl = document.getElementById('loginAdmin');
-            if (loginEl) {
-              loginEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-          }, 300);
+          // Mostrar selector de dispositivo si no está logueado y no está en modo móvil
+          if (!modoMovilActivo && document.getElementById('panelAdmin').style.display === 'none') {
+            mostrarSelectorDispositivo();
+          }
+          setTimeout(ajustarEspacios, 300);
         });
 
         document.getElementById('btnLoginAdmin').addEventListener('click', loginAdmin);
@@ -2878,13 +4054,11 @@
         document.getElementById('prodFotoFile').addEventListener('change', function(e) {
           const file = e.target.files[0];
           if (file) {
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-              document.getElementById('prodFotoUrl').value = ev.target.result;
-              document.getElementById('prodFotoPreview').src = ev.target.result;
+            comprimirImagen(file, 800, 0.7, function(dataUrl) {
+              document.getElementById('prodFotoUrl').value = dataUrl;
+              document.getElementById('prodFotoPreview').src = dataUrl;
               document.getElementById('prodFotoPreview').style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+            });
           }
         });
         document.getElementById('prodFotoUrl').addEventListener('input', function() {
@@ -2929,11 +4103,9 @@
         document.getElementById('ajusteLogoFile').addEventListener('change', function(e) {
           const file = e.target.files[0];
           if (file) {
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-              document.getElementById('ajusteLogoUrl').value = ev.target.result;
-            };
-            reader.readAsDataURL(file);
+            comprimirImagen(file, 800, 0.7, function(dataUrl) {
+              document.getElementById('ajusteLogoUrl').value = dataUrl;
+            });
           }
         });
 
@@ -2946,7 +4118,6 @@
           aplicarAjustes();
         });
 
-        // Búsqueda catálogo
         const inputBuscar = document.getElementById('buscarProducto');
         if (inputBuscar) {
           inputBuscar.addEventListener('input', function() {
@@ -2999,7 +4170,6 @@
         document.getElementById('filtroStockAdmin').addEventListener('change', renderAdminProductos);
         document.getElementById('ordenProductosAdmin').addEventListener('change', renderAdminProductos);
 
-        // ========== EVENTOS TALLER ==========
         document.getElementById('btnNuevaOrden').addEventListener('click', () => abrirModalOrden(null));
         document.getElementById('formOrden').addEventListener('submit', guardarOrden);
         document.getElementById('ordenPresupuestoMano').addEventListener('input', calcularTotalPresupuesto);
@@ -3026,7 +4196,6 @@
           }
         });
 
-        // ========== EVENTOS CLIENTES ==========
         document.getElementById('btnNuevoCliente').addEventListener('click', function() {
           document.getElementById('clienteId').value = '';
           document.getElementById('clienteNombre').value = '';
@@ -3038,7 +4207,6 @@
         });
         document.getElementById('formCliente').addEventListener('submit', guardarCliente);
 
-        // ========== EVENTOS MI BICICLETA ==========
         document.getElementById('btnMiBicicleta').addEventListener('click', function(e) {
           e.preventDefault();
           document.getElementById('clienteWhatsappBuscar').value = '';
@@ -3051,22 +4219,15 @@
           if (e.key === 'Enter') buscarOrdenPorWhatsapp();
         });
 
-        // ========== BOTÓN AJUSTE PRECIOS ==========
         document.getElementById('btnAjustePrecios').addEventListener('click', abrirModalAjustePrecios);
-
-        // ========== BACKUP OBLIGATORIO ==========
         document.getElementById('btnBackupObligatorio').addEventListener('click', function() {
           exportarBackup();
         });
 
-        // ========== SUGERENCIAS CLIENTE ==========
         initClienteSuggestions();
 
-        // ========== AJUSTAR ESPACIOS AL CARGAR Y REDIMENSIONAR ==========
         window.addEventListener('load', ajustarEspacios);
         window.addEventListener('resize', ajustarEspacios);
-        // También cuando se muestre el catálogo (por si cambia la visibilidad)
-        // Observador de cambios en la navbar
         if (window.ResizeObserver) {
           const resizeObserver = new ResizeObserver(() => ajustarEspacios());
           const navbar = document.getElementById('mainNavbar');
@@ -3077,7 +4238,12 @@
       function mostrarSeccion(seccion) {
         document.getElementById('seccionCatalogo').style.display = (seccion === 'catalogo') ? 'block' : 'none';
         document.getElementById('seccionAdmin').style.display = (seccion === 'admin') ? 'block' : 'none';
-        // Reajustar espacios al cambiar de sección (por si la barra cambia de altura)
+        // Si se muestra admin y no está logueado ni modo móvil, mostrar selector
+        if (seccion === 'admin') {
+          if (!modoMovilActivo && document.getElementById('panelAdmin').style.display === 'none') {
+            mostrarSelectorDispositivo();
+          }
+        }
         setTimeout(ajustarEspacios, 100);
       }
 
@@ -3204,6 +4370,9 @@
         renderCatalogo();
         cargarSelectVentas();
         alert(`Ajuste aplicado a ${contador} productos.`);
+        if (modoMovilActivo) {
+          renderListaItemsMovil('productos');
+        }
       }
 
       // ========== FUNCIONES DE CLIENTE ==========
@@ -3224,6 +4393,7 @@
         clientes = clientes.filter(c => c.id !== id);
         await guardarTodo();
         renderClientes();
+        if (modoMovilActivo) renderListaItemsMovil('clientes');
       };
 
       window.enviarWhatsappPresentacion = function(id) {
@@ -3260,9 +4430,12 @@
         await guardarTodo();
         bootstrap.Modal.getInstance(document.getElementById('modalCliente')).hide();
         renderClientes();
+        if (modoMovilActivo) renderListaItemsMovil('clientes');
       }
 
-      // ========== INICIALIZACIÓN ==========
+      // ================================================================
+      //  INICIALIZACIÓN
+      // ================================================================
       async function init() {
         try {
           const btnBici = document.getElementById('btnMiBicicleta');
@@ -3363,6 +4536,21 @@
                 renderOrdenes();
                 cargarSelectRepuestos();
               }
+              if (modoMovilActivo) {
+                // Refrescar listas si están visibles
+                const content = document.getElementById('modoMovilContenido');
+                if (content) {
+                  // Determinar qué módulo está activo (por el contenido)
+                  const h5 = content.querySelector('h5');
+                  if (h5) {
+                    const texto = h5.textContent;
+                    if (texto.includes('Productos')) renderListaItemsMovil('productos');
+                    else if (texto.includes('Clientes')) renderListaItemsMovil('clientes');
+                    else if (texto.includes('Taller')) renderListaItemsMovil('ordenes');
+                    else if (texto.includes('Ventas')) renderListaItemsMovil('ventas');
+                  }
+                }
+              }
               console.log('🔄 Datos actualizados en tiempo real');
             }
           }, (error) => {
@@ -3372,7 +4560,7 @@
           initEventos();
           mostrarSeccion('catalogo');
           document.getElementById('btnCatalogo').classList.add('active');
-          console.log('✅ Catálogo con tiempo real inicializado');
+          console.log('✅ Catálogo con tiempo real y modo móvil inicializado');
         } catch (error) {
           console.error('Error en la inicialización:', error);
           try {
