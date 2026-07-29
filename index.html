@@ -10,11 +10,12 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* --- ESTILOS BASE --- */
+    /* ... estilos iguales a los anteriores ... */
+    /* (se mantienen todos los estilos sin cambios) */
     body {
       background: #f8f9fa;
       transition: background 0.3s, color 0.3s;
-      padding-top: 56px; /* se ajustará dinámicamente */
+      padding-top: 56px;
       overflow-x: hidden;
     }
     .logo-img {
@@ -74,8 +75,6 @@
     .tab-content {
       padding-top: 20px;
     }
-
-    /* --- Sugerencias para búsqueda --- */
     .suggestions-container {
       position: relative;
     }
@@ -112,8 +111,6 @@
       color: var(--btn-primary-bg, #e65100);
       font-weight: 700;
     }
-
-    /* --- BARRA FIJA --- */
     .navbar {
       position: fixed;
       top: 0;
@@ -124,7 +121,6 @@
     }
     .search-bar-fixed {
       position: sticky;
-      /* top se ajustará dinámicamente */
       z-index: 1020;
       background-color: var(--body-bg, #f8f9fa);
       padding: 10px 0;
@@ -132,13 +128,11 @@
       border-bottom: 1px solid rgba(0,0,0,0.1);
     }
     .catalogo-scroll {
-      max-height: calc(100vh - 180px); /* se ajustará dinámicamente */
+      max-height: calc(100vh - 180px);
       overflow-y: auto;
       padding-bottom: 20px;
       overflow-x: hidden;
     }
-
-    /* --- BOTÓN MI BICICLETA CON ANIMACIÓN --- */
     .btn-bicicleta {
       background-color: rgba(255,255,255,0.15);
       border-radius: 30px;
@@ -179,8 +173,6 @@
       50% { border-color: #d32f2f; box-shadow: 0 0 15px #d32f2f; }
       100% { border-color: rgba(0,0,0,0.3); box-shadow: 0 0 5px rgba(0,0,0,0.1); }
     }
-
-    /* --- TEMAS CON CONTRASTE GARANTIZADO --- */
     .tema-default {
       --navbar-bg: #0d6efd;
       --navbar-color: #fff;
@@ -371,8 +363,6 @@
       --border-radius: 0.25rem;
       --transition-speed: 0.4s;
     }
-
-    /* Aplicación de variables con contraste */
     body {
       background-color: var(--body-bg, #f8f9fa);
       color: var(--text-color, #212529);
@@ -507,8 +497,6 @@
     .suggestions-list .suggestion-item .suggestion-price {
       color: var(--btn-primary-bg, #e65100);
     }
-
-    /* Ajustes para el nombre de la empresa */
     #empresaNombre {
       transition: font-size 0.2s, font-family 0.2s, text-align 0.2s;
       display: inline-block;
@@ -521,8 +509,6 @@
       background-size: cover;
       background-position: center;
     }
-
-    /* Contacto en banner */
     .contacto-info {
       font-size: 0.9rem;
       white-space: nowrap;
@@ -543,8 +529,6 @@
         margin-right: 0.5rem !important;
       }
     }
-
-    /* Estados - badges */
     .estado-badge {
       font-size: 0.9rem;
       padding: 0.4rem 0.8rem;
@@ -556,22 +540,18 @@
     .estado-rechazado { background: #f8d7da; color: #721c24; }
     .estado-lista { background: #d4edda; color: #155724; }
     .estado-retirada { background: #cce5ff; color: #004085; }
-
     .fila-no_visto { background-color: #cce5ff !important; border-left: 4px solid #004085 !important; }
     .fila-presupuestada { background-color: #fff3cd !important; border-left: 4px solid #856404 !important; }
     .fila-confirmada { background-color: #ffe5cc !important; border-left: 4px solid #a66300 !important; }
     .fila-rechazado { background-color: #f8d7da !important; border-left: 4px solid #721c24 !important; }
     .fila-lista { background-color: #d4edda !important; border-left: 4px solid #155724 !important; }
     .fila-retirada { background-color: #cce5ff !important; border-left: 4px solid #004085 !important; }
-
     .orden-card {
       transition: transform 0.2s;
     }
     .orden-card:hover {
       transform: scale(1.01);
     }
-
-    /* Gráficos */
     .chart-container {
       position: relative;
       height: 200px;
@@ -581,8 +561,6 @@
       width: 100% !important;
       height: 100% !important;
     }
-
-    /* Filtros admin */
     .admin-search {
       margin-bottom: 10px;
     }
@@ -596,8 +574,6 @@
       width: auto;
       min-width: 150px;
     }
-
-    /* Sugerencias cliente en modal */
     .cliente-suggestions-container {
       position: relative;
     }
@@ -624,8 +600,6 @@
     .cliente-suggestions-list .suggestion-item:hover {
       background-color: var(--table-stripe, #e9f5e9);
     }
-
-    /* Estilo para el nombre del cliente en la tabla (clickeable) */
     .cliente-nombre-link {
       cursor: pointer;
       color: var(--link-color, #0d6efd);
@@ -636,16 +610,12 @@
       color: var(--btn-primary-bg, #0d6efd);
       text-decoration: none;
     }
-
-    /* ===== AJUSTE PARA QUE EL LOGIN ADMIN NO QUEDE OCULTO ===== */
     #seccionAdmin {
       padding-top: 20px;
     }
     #loginAdmin .card {
       margin-top: 80px;
     }
-
-    /* ===== ESTILOS PARA EL MODO MÓVIL ===== */
     .modo-movil-container {
       padding: 16px;
       max-width: 600px;
@@ -768,8 +738,6 @@
     .modo-movil-container .item-card .item-actions button {
       margin-left: 6px;
     }
-
-    /* ===== AJUSTES SELECTOR DISPOSITIVO ===== */
     #selectorDispositivo .btn {
       min-width: 120px;
     }
@@ -782,7 +750,6 @@
         width: 100%;
       }
     }
-    /* Botón + para categorías */
     .btn-categoria-plus {
       font-size: 1.2rem;
       padding: 0.375rem 0.75rem;
@@ -1075,7 +1042,9 @@
 
   </div>
 
-  <!-- ========== MODAL MI BICICLETA (cliente) ========== -->
+  <!-- ========== MODALES ========== -->
+  <!-- Modal Mi Bicicleta, Historial Cliente, Orden, Cliente, Producto, Categorías, Precio Venta, Backup Obligatorio -->
+  <!-- (Se mantienen igual que antes, no se modifican) -->
   <div class="modal fade" id="modalMiBicicleta" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -1102,7 +1071,6 @@
     </div>
   </div>
 
-  <!-- ========== MODAL HISTORIAL CLIENTE (admin) ========== -->
   <div class="modal fade" id="modalHistorialCliente" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -1120,7 +1088,6 @@
     </div>
   </div>
 
-  <!-- ========== MODAL NUEVA ORDEN (taller) ========== -->
   <div class="modal fade" id="modalOrden" tabindex="-1">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
@@ -1228,7 +1195,6 @@
     </div>
   </div>
 
-  <!-- ========== MODAL NUEVO CLIENTE ========== -->
   <div class="modal fade" id="modalCliente" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1249,7 +1215,6 @@
     </div>
   </div>
 
-  <!-- ========== MODAL PRODUCTO ========== -->
   <div class="modal fade" id="modalProducto" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -1297,7 +1262,6 @@
     </div>
   </div>
 
-  <!-- MODAL GESTIÓN DE CATEGORÍAS -->
   <div class="modal fade" id="modalGestionCategorias" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1316,7 +1280,6 @@
     </div>
   </div>
 
-  <!-- MODAL PARA PRECIO EN VENTA -->
   <div class="modal fade" id="modalPrecioVenta" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1337,7 +1300,6 @@
     </div>
   </div>
 
-  <!-- MODAL BACKUP OBLIGATORIO -->
   <div class="modal fade" id="modalBackupObligatorio" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -1410,9 +1372,6 @@
       let totalPasos = 0;
       let datosPaso = {};
       let entidadEditando = null;
-
-      // Clave de API para ImgBB
-      const IMGBB_API_KEY = 'aff9f5e37317dd628697deabb0771e20';
 
       // ========== FUNCIONES DE AJUSTE DE ESPACIOS ==========
       function ajustarEspacios() {
@@ -1537,6 +1496,17 @@
           selProd.value = current;
         }
 
+        // Actualizar también el select del asistente móvil si existe
+        const selMovil = document.getElementById('movilProdCategoria');
+        if (selMovil) {
+          const current = selMovil.value;
+          selMovil.innerHTML = '<option value="">Seleccionar</option>';
+          cats.forEach(c => {
+            selMovil.innerHTML += `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`;
+          });
+          selMovil.value = current;
+        }
+
         const list = document.getElementById('listaCategoriasAdmin');
         if (list) {
           list.innerHTML = '';
@@ -1586,13 +1556,8 @@
         }
         let html = '';
         list.forEach(p => {
-          let foto = '';
-          if (p.foto && p.foto.trim() !== '') {
-            foto = `<img src="${p.foto}" class="card-img-top" style="height:200px;object-fit:contain;" alt="${p.nombre}" onerror="this.onerror=null; this.style.display='none'; this.parentNode.innerHTML='<div class=\\"card-img-top bg-light d-flex align-items-center justify-content-center\\" style=\\"height:200px;\\"><i class=\\"bi bi-image\\" style=\\"font-size:3rem;\\"></i></div>';">`;
-          } else {
-            foto = `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;"><i class="bi bi-image" style="font-size:3rem;"></i></div>`;
-          }
-          
+          const foto = p.foto ? `<img src="${p.foto}" class="card-img-top" style="height:200px;object-fit:contain;" alt="${p.nombre}">` :
+            `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;"><i class="bi bi-image" style="font-size:3rem;"></i></div>`;
           const precioFormateado = formatearPrecio(p.precioFinal);
           const stock = p.stock > 0 ? `Stock: ${p.stock}` : '<span class="text-danger">Sin stock</span>';
           const mensajeWhatsApp = 
@@ -1943,7 +1908,7 @@
         }
       }
 
-      // ========== FUNCIONES GLOBALES (sin confirm) ==========
+      // ========== FUNCIONES GLOBALES ==========
       window.editarCategoria = async function(oldName) {
         const newName = prompt('Editar categoría:', oldName);
         if (!newName || newName.trim() === oldName) return;
@@ -1962,12 +1927,24 @@
         });
         await guardarTodo();
         renderizarCategorias();
-        actualizarSelectCategoriaMovil();
         renderCatalogo();
         renderAdminProductos();
+        // Actualizar también el asistente móvil si está activo
+        if (modoMovilActivo) {
+          const sel = document.getElementById('movilProdCategoria');
+          if (sel) {
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Seleccionar</option>';
+            categorias.forEach(c => {
+              sel.innerHTML += `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`;
+            });
+            sel.value = current;
+          }
+        }
       };
 
       window.eliminarCategoria = async function(cat) {
+        if (!confirm(`¿Eliminar la categoría "${cat}"? Los productos con esta categoría quedarán sin categoría.`)) return;
         let cats = obtenerCategorias();
         cats = cats.filter(c => c !== cat);
         await guardarCategorias(cats);
@@ -1976,9 +1953,19 @@
         });
         await guardarTodo();
         renderizarCategorias();
-        actualizarSelectCategoriaMovil();
         renderCatalogo();
         renderAdminProductos();
+        if (modoMovilActivo) {
+          const sel = document.getElementById('movilProdCategoria');
+          if (sel) {
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Seleccionar</option>';
+            categorias.forEach(c => {
+              sel.innerHTML += `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`;
+            });
+            sel.value = current;
+          }
+        }
       };
 
       window.editarProducto = function(id) {
@@ -2008,42 +1995,23 @@
         }
       };
 
-      function actualizarSelectCategoriaMovil() {
-        const sel = document.getElementById('movilProdCategoria');
-        if (sel) {
-          const current = sel.value;
-          sel.innerHTML = '<option value="">Seleccionar</option>';
-          categorias.forEach(c => {
-            sel.innerHTML += `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`;
-          });
-        }
-      }
-
       // ========== SUBIDA DE IMÁGENES A IMGBB ==========
-      async function subirImagenImgBB(base64, fileName = 'producto.jpg') {
+      const IMGBB_API_KEY = '6a481a17fec7d8d7325ad75241d1408b';
+      const IMGBB_UPLOAD_URL = 'https://api.imgbb.com/1/upload';
+
+      async function subirImagenImgBB(base64) {
         const key = ajustes.imgbbApiKey || IMGBB_API_KEY;
         const formData = new FormData();
-        // Eliminar el prefijo "data:image/jpeg;base64," para enviar solo el dato base64
-        const base64Data = base64.includes('base64,') ? base64.split('base64,')[1] : base64;
-        formData.append('image', base64Data);
+        formData.append('image', base64);
         formData.append('key', key);
-        // Opcional: agregar nombre de archivo
-        formData.append('name', fileName);
         try {
-          const response = await fetch('https://api.imgbb.com/1/upload', {
+          const response = await fetch(IMGBB_UPLOAD_URL, {
             method: 'POST',
             body: formData
           });
           const data = await response.json();
-          if (data.success && data.data) {
-            // Intentar obtener la URL de varias propiedades
-            const url = data.data.url || data.data.display_url || data.data.image?.url || data.data.medium?.url || null;
-            if (url) {
-              return url;
-            } else {
-              console.error('ImgBB no devolvió URL:', data);
-              return null;
-            }
+          if (data.success) {
+            return data.data.url;
           } else {
             console.error('ImgBB error:', data);
             return null;
@@ -2084,16 +2052,15 @@
         comprimirImagen(file, 800, 0.7, async function(dataUrl) {
           previewEl.src = dataUrl;
           previewEl.style.display = 'block';
-          const url = await subirImagenImgBB(dataUrl, file.name || 'producto.jpg');
+          const url = await subirImagenImgBB(dataUrl);
           if (url) {
             urlInput.value = url;
             previewEl.src = url;
             if (callback) callback(url);
           } else {
-            // Si falla, no guardamos nada en el campo, solo mostramos preview
-            urlInput.value = '';
-            alert('No se pudo subir la imagen a ImgBB. El producto se guardará sin foto.');
-            if (callback) callback('');
+            urlInput.value = dataUrl;
+            if (callback) callback(dataUrl);
+            alert('No se pudo subir la imagen a ImgBB, se guardará en la base de datos (puede ocupar espacio).');
           }
         });
       }
@@ -3410,9 +3377,19 @@
       function abrirGestorCategoriasMovil() {
         const modal = new bootstrap.Modal(document.getElementById('modalGestionCategorias'));
         modal.show();
+        // Actualizar lista cuando se cierre
         const handleHidden = () => {
           renderizarCategorias();
-          actualizarSelectCategoriaMovil();
+          // Refrescar el select en el paso actual si está visible
+          const sel = document.getElementById('movilProdCategoria');
+          if (sel) {
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Seleccionar</option>';
+            categorias.forEach(c => {
+              sel.innerHTML += `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`;
+            });
+            sel.value = current;
+          }
           modal.removeEventListener('hidden.bs.modal', handleHidden);
         };
         modal.addEventListener('hidden.bs.modal', handleHidden);
@@ -3544,11 +3521,13 @@
         </div>`;
         content.innerHTML = html;
 
+        // Evento para gestionar categorías (paso 1)
         const btnGestion = document.getElementById('btnGestionarCategoriasMovil');
         if (btnGestion) {
           btnGestion.addEventListener('click', abrirGestorCategoriasMovil);
         }
 
+        // Eventos de pasos
         document.getElementById('btnPasoAnterior')?.addEventListener('click', function() {
           if (pasoActual > 0) {
             guardarDatosPasoProducto();
@@ -3567,7 +3546,7 @@
           }
         });
 
-        // Manejo de foto en paso 4 con ImgBB
+        // Manejo de foto en paso 4
         const fotoInput = document.getElementById('movilProdFotoInput');
         const preview = document.getElementById('movilProdFotoPreview');
         const urlInput = document.getElementById('movilProdFotoUrl');
@@ -3589,22 +3568,22 @@
               comprimirImagen(file, 800, 0.7, async function(dataUrl) {
                 preview.src = dataUrl;
                 preview.style.display = 'block';
-                const url = await subirImagenImgBB(dataUrl, file.name || 'producto.jpg');
+                const url = await subirImagenImgBB(dataUrl);
                 if (url) {
                   urlInput.value = url;
                   preview.src = url;
                   datosPaso.foto = url;
                 } else {
-                  urlInput.value = '';
-                  datosPaso.foto = '';
-                  alert('No se pudo subir la imagen a ImgBB. El producto se guardará sin foto.');
+                  urlInput.value = dataUrl;
+                  datosPaso.foto = dataUrl;
+                  alert('No se pudo subir la imagen a ImgBB, se guardará en la base de datos.');
                 }
               });
             }
           });
         }
 
-        // Actualizar precio sugerido en paso 3 (caso propio)
+        // Actualizar precio sugerido en paso 2 (caso propio)
         if (pasoActual === 2) {
           const tipo = document.getElementById('movilProdTipo')?.value || p.tipo;
           if (tipo === 'propio') {
@@ -3647,8 +3626,8 @@
         } else if (pasoActual === 3) {
           p.stock = parseInt(document.getElementById('movilProdStock')?.value) || 0;
           p.stockMinimo = parseInt(document.getElementById('movilProdStockMinimo')?.value) || 1;
-          // Siempre guardar la URL de la foto, aunque esté vacía, para evitar que quede undefined y sobrescriba
-          p.foto = document.getElementById('movilProdFotoUrl')?.value.trim() || '';
+          const url = document.getElementById('movilProdFotoUrl')?.value.trim() || '';
+          if (url) p.foto = url;
         }
       }
 
@@ -4144,7 +4123,7 @@
       }
 
       // ================================================================
-      //  EVENTOS E INICIALIZACIÓN
+      //  EVENTOS E INICIALIZACIÓN (modificada para incluir selector y mejoras)
       // ================================================================
       function initEventos() {
         const btnCatalogo = document.getElementById('btnCatalogo');
@@ -4180,6 +4159,7 @@
         document.getElementById('prodPrecioAcordado').addEventListener('input', calcularPrecios);
         document.getElementById('prodPorcentajeReventa').addEventListener('input', calcularPrecios);
 
+        // Manejo de foto en modal producto con subida a ImgBB
         document.getElementById('prodFotoFile').addEventListener('change', function(e) {
           const preview = document.getElementById('prodFotoPreview');
           const urlInput = document.getElementById('prodFotoUrl');
@@ -4228,8 +4208,8 @@
           const file = e.target.files[0];
           if (file) {
             comprimirImagen(file, 800, 0.7, async function(dataUrl) {
-              const url = await subirImagenImgBB(dataUrl, 'logo.jpg');
-              document.getElementById('ajusteLogoUrl').value = url || '';
+              const url = await subirImagenImgBB(dataUrl);
+              document.getElementById('ajusteLogoUrl').value = url || dataUrl;
             });
           }
         });
@@ -4391,12 +4371,6 @@
         renderizarCategorias();
         const modal = new bootstrap.Modal(document.getElementById('modalGestionCategorias'));
         modal.show();
-        const handleHidden = () => {
-          renderizarCategorias();
-          actualizarSelectCategoriaMovil();
-          modal.removeEventListener('hidden.bs.modal', handleHidden);
-        };
-        modal.addEventListener('hidden.bs.modal', handleHidden);
       }
 
       async function agregarCategoriaDesdeModal() {
@@ -4408,9 +4382,18 @@
         cats.push(nombre);
         await guardarCategorias(cats);
         renderizarCategorias();
-        actualizarSelectCategoriaMovil();
         input.value = '';
         renderCatalogo();
+        // Actualizar también el select del asistente móvil si está abierto
+        const selMovil = document.getElementById('movilProdCategoria');
+        if (selMovil) {
+          const current = selMovil.value;
+          selMovil.innerHTML = '<option value="">Seleccionar</option>';
+          categorias.forEach(c => {
+            selMovil.innerHTML += `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`;
+          });
+          selMovil.value = current;
+        }
       }
 
       // ========== MODAL AJUSTE PRECIOS ==========
@@ -4506,7 +4489,7 @@
         }
       }
 
-      // ========== FUNCIONES DE CLIENTE (sin confirm) ==========
+      // ========== FUNCIONES DE CLIENTE ==========
       window.editarCliente = function(id) {
         const c = clientes.find(cl => cl.id === id);
         if (!c) return;
@@ -4618,7 +4601,7 @@
                 nombreOffsetX: 0,
                 nombreOffsetY: 0,
                 mensajePresentacion: 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?',
-                imgbbApiKey: 'aff9f5e37317dd628697deabb0771e20'
+                imgbbApiKey: '6a481a17fec7d8d7325ad75241d1408b'
               },
               clientes: [],
               ordenes: [],
@@ -4649,7 +4632,7 @@
               if (!ajustes.mensajePresentacion) {
                 ajustes.mensajePresentacion = 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
               }
-              if (!ajustes.imgbbApiKey) ajustes.imgbbApiKey = 'aff9f5e37317dd628697deabb0771e20';
+              if (!ajustes.imgbbApiKey) ajustes.imgbbApiKey = '6a481a17fec7d8d7325ad75241d1408b';
 
               localStorage.setItem('firebase_fallback', JSON.stringify({
                 productos, ventas, ajustes, clientes, ordenes, categorias
