@@ -1586,8 +1586,14 @@
         }
         let html = '';
         list.forEach(p => {
-          const foto = p.foto ? `<img src="${p.foto}" class="card-img-top" style="height:200px;object-fit:contain;" alt="${p.nombre}">` :
-            `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;"><i class="bi bi-image" style="font-size:3rem;"></i></div>`;
+          let foto = '';
+          if (p.foto) {
+            // Crear imagen con manejador de error para mostrar el placeholder si falla la carga
+            foto = `<img src="${p.foto}" class="card-img-top" style="height:200px;object-fit:contain;" alt="${p.nombre}" onerror="this.onerror=null; this.style.display='none'; this.parentNode.innerHTML='<div class=\\"card-img-top bg-light d-flex align-items-center justify-content-center\\" style=\\"height:200px;\\"><i class=\\"bi bi-image\\" style=\\"font-size:3rem;\\"></i></div>';">`;
+          } else {
+            foto = `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;"><i class="bi bi-image" style="font-size:3rem;"></i></div>`;
+          }
+          
           const precioFormateado = formatearPrecio(p.precioFinal);
           const stock = p.stock > 0 ? `Stock: ${p.stock}` : '<span class="text-danger">Sin stock</span>';
           const mensajeWhatsApp = 
@@ -3634,8 +3640,8 @@
         } else if (pasoActual === 3) {
           p.stock = parseInt(document.getElementById('movilProdStock')?.value) || 0;
           p.stockMinimo = parseInt(document.getElementById('movilProdStockMinimo')?.value) || 1;
-          const url = document.getElementById('movilProdFotoUrl')?.value.trim() || '';
-          if (url) p.foto = url;
+          // Siempre guardar la URL de la foto, aunque esté vacía, para evitar que quede undefined y sobrescriba
+          p.foto = document.getElementById('movilProdFotoUrl')?.value.trim() || '';
         }
       }
 
