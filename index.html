@@ -1587,8 +1587,7 @@
         let html = '';
         list.forEach(p => {
           let foto = '';
-          if (p.foto) {
-            // Crear imagen con manejador de error para mostrar el placeholder si falla la carga
+          if (p.foto && p.foto.trim() !== '') {
             foto = `<img src="${p.foto}" class="card-img-top" style="height:200px;object-fit:contain;" alt="${p.nombre}" onerror="this.onerror=null; this.style.display='none'; this.parentNode.innerHTML='<div class=\\"card-img-top bg-light d-flex align-items-center justify-content-center\\" style=\\"height:200px;\\"><i class=\\"bi bi-image\\" style=\\"font-size:3rem;\\"></i></div>';">`;
           } else {
             foto = `<div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;"><i class="bi bi-image" style="font-size:3rem;"></i></div>`;
@@ -2036,8 +2035,15 @@
             body: formData
           });
           const data = await response.json();
-          if (data.success && data.data && data.data.url) {
-            return data.data.url;
+          if (data.success && data.data) {
+            // Intentar obtener la URL de varias propiedades
+            const url = data.data.url || data.data.display_url || data.data.image?.url || data.data.medium?.url || null;
+            if (url) {
+              return url;
+            } else {
+              console.error('ImgBB no devolvió URL:', data);
+              return null;
+            }
           } else {
             console.error('ImgBB error:', data);
             return null;
@@ -2084,9 +2090,10 @@
             previewEl.src = url;
             if (callback) callback(url);
           } else {
-            urlInput.value = dataUrl;
-            if (callback) callback(dataUrl);
-            alert('No se pudo subir la imagen a ImgBB, se guardará en la base de datos (puede ocupar espacio).');
+            // Si falla, no guardamos nada en el campo, solo mostramos preview
+            urlInput.value = '';
+            alert('No se pudo subir la imagen a ImgBB. El producto se guardará sin foto.');
+            if (callback) callback('');
           }
         });
       }
@@ -3588,9 +3595,9 @@
                   preview.src = url;
                   datosPaso.foto = url;
                 } else {
-                  urlInput.value = dataUrl;
-                  datosPaso.foto = dataUrl;
-                  alert('No se pudo subir la imagen a ImgBB, se guardará en la base de datos.');
+                  urlInput.value = '';
+                  datosPaso.foto = '';
+                  alert('No se pudo subir la imagen a ImgBB. El producto se guardará sin foto.');
                 }
               });
             }
@@ -4222,7 +4229,7 @@
           if (file) {
             comprimirImagen(file, 800, 0.7, async function(dataUrl) {
               const url = await subirImagenImgBB(dataUrl, 'logo.jpg');
-              document.getElementById('ajusteLogoUrl').value = url || dataUrl;
+              document.getElementById('ajusteLogoUrl').value = url || '';
             });
           }
         });
