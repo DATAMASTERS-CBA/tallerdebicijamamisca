@@ -1411,6 +1411,9 @@
       let datosPaso = {};
       let entidadEditando = null;
 
+      // Nueva clave de ImageKit
+      const IMAGEKIT_PUBLIC_KEY = 'public_T2gNCSoik/TcSjsa4meAJOunu7E=';
+
       // ========== FUNCIONES DE AJUSTE DE ESPACIOS ==========
       function ajustarEspacios() {
         const navbar = document.getElementById('mainNavbar');
@@ -1935,7 +1938,7 @@
         }
       }
 
-      // ========== FUNCIONES GLOBALES ==========
+      // ========== FUNCIONES GLOBALES (sin confirm) ==========
       window.editarCategoria = async function(oldName) {
         const newName = prompt('Editar categoría:', oldName);
         if (!newName || newName.trim() === oldName) return;
@@ -1954,12 +1957,13 @@
         });
         await guardarTodo();
         renderizarCategorias();
+        // Actualizar select en móvil si está visible
+        actualizarSelectCategoriaMovil();
         renderCatalogo();
         renderAdminProductos();
       };
 
       window.eliminarCategoria = async function(cat) {
-        if (!confirm(`¿Eliminar la categoría "${cat}"? Los productos con esta categoría quedarán sin categoría.`)) return;
         let cats = obtenerCategorias();
         cats = cats.filter(c => c !== cat);
         await guardarCategorias(cats);
@@ -1968,6 +1972,7 @@
         });
         await guardarTodo();
         renderizarCategorias();
+        actualizarSelectCategoriaMovil();
         renderCatalogo();
         renderAdminProductos();
       };
@@ -1978,34 +1983,40 @@
       };
 
       window.eliminarProducto = async function(id) {
-        if (confirm('¿Eliminar producto?')) {
-          productos = productos.filter(p => p.id !== id);
-          await guardarTodo();
-          renderAdminProductos();
-          renderCatalogo();
-          cargarSelectVentas();
-          actualizarReportes();
-          if (modoMovilActivo) {
-            renderListaItemsMovil('productos');
-          }
+        productos = productos.filter(p => p.id !== id);
+        await guardarTodo();
+        renderAdminProductos();
+        renderCatalogo();
+        cargarSelectVentas();
+        actualizarReportes();
+        if (modoMovilActivo) {
+          renderListaItemsMovil('productos');
         }
       };
 
       window.eliminarVenta = async function(id) {
-        if (confirm('¿Eliminar esta venta? (No se restaurará el stock)')) {
-          ventas = ventas.filter(v => v.id !== id);
-          await guardarTodo();
-          renderAdminVentas();
-          actualizarReportes();
-          if (modoMovilActivo) {
-            renderListaItemsMovil('ventas');
-          }
+        ventas = ventas.filter(v => v.id !== id);
+        await guardarTodo();
+        renderAdminVentas();
+        actualizarReportes();
+        if (modoMovilActivo) {
+          renderListaItemsMovil('ventas');
         }
       };
 
-      // ========== SUBIDA DE IMÁGENES A IMAGEKIT ==========
-      const IMAGEKIT_PUBLIC_KEY = 'public_0rN8ro6eRcTYSwOvgdifojXhcjM='; // se puede sobrescribir con ajustes
+      // Función para actualizar select de categoría en asistente móvil
+      function actualizarSelectCategoriaMovil() {
+        const sel = document.getElementById('movilProdCategoria');
+        if (sel) {
+          const current = sel.value;
+          sel.innerHTML = '<option value="">Seleccionar</option>';
+          categorias.forEach(c => {
+            sel.innerHTML += `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`;
+          });
+        }
+      }
 
+      // ========== SUBIDA DE IMÁGENES A IMAGEKIT ==========
       async function subirImagenImageKit(base64, fileName = 'producto.jpg') {
         const key = ajustes.imagekitPublicKey || IMAGEKIT_PUBLIC_KEY;
         const formData = new FormData();
@@ -2013,8 +2024,6 @@
         formData.append('fileName', fileName);
         formData.append('publicKey', key);
         formData.append('useUniqueFileName', 'true');
-        // Opcional: carpeta
-        // formData.append('folder', '/productos');
         try {
           const response = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
             method: 'POST',
@@ -2057,22 +2066,18 @@
         reader.readAsDataURL(file);
       }
 
-      // ========== MANEJO DE FOTOS (con subida a ImageKit) ==========
       function manejarFoto(fileInput, previewEl, urlInput, callback) {
         const file = fileInput.files[0];
         if (!file) return;
         comprimirImagen(file, 800, 0.7, async function(dataUrl) {
-          // Mostrar preview
           previewEl.src = dataUrl;
           previewEl.style.display = 'block';
-          // Intentar subir a ImageKit
           const url = await subirImagenImageKit(dataUrl, file.name || 'producto.jpg');
           if (url) {
             urlInput.value = url;
             previewEl.src = url;
             if (callback) callback(url);
           } else {
-            // Si falla, usar dataUrl como respaldo
             urlInput.value = dataUrl;
             if (callback) callback(dataUrl);
             alert('No se pudo subir la imagen a ImageKit, se guardará en la base de datos (puede ocupar espacio).');
@@ -2604,7 +2609,6 @@
       };
 
       window.eliminarOrden = async function(id) {
-        if (!confirm('¿Eliminar esta orden?')) return;
         const orden = ordenes.find(o => o.id === id);
         if (orden && orden.repuestos) {
           orden.repuestos.forEach(r => {
@@ -3351,7 +3355,6 @@
         container.querySelectorAll('.eliminar-item').forEach(btn => {
           btn.addEventListener('click', async function() {
             const id = this.dataset.id;
-            if (!confirm('¿Eliminar este elemento?')) return;
             if (tipo === 'productos') {
               productos = productos.filter(p => p.id !== id);
               await guardarTodo();
@@ -3394,18 +3397,10 @@
       function abrirGestorCategoriasMovil() {
         const modal = new bootstrap.Modal(document.getElementById('modalGestionCategorias'));
         modal.show();
-        // Actualizar lista cuando se cierre
+        // Actualizar lista y select al cerrar
         const handleHidden = () => {
           renderizarCategorias();
-          // Refrescar el select en el paso actual si está visible
-          const sel = document.getElementById('movilProdCategoria');
-          if (sel) {
-            const current = sel.value;
-            sel.innerHTML = '<option value="">Seleccionar</option>';
-            categorias.forEach(c => {
-              sel.innerHTML += `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`;
-            });
-          }
+          actualizarSelectCategoriaMovil();
           modal.removeEventListener('hidden.bs.modal', handleHidden);
         };
         modal.addEventListener('hidden.bs.modal', handleHidden);
@@ -3584,7 +3579,6 @@
               comprimirImagen(file, 800, 0.7, async function(dataUrl) {
                 preview.src = dataUrl;
                 preview.style.display = 'block';
-                // Subir a ImageKit
                 const url = await subirImagenImageKit(dataUrl, file.name || 'producto.jpg');
                 if (url) {
                   urlInput.value = url;
@@ -3600,7 +3594,7 @@
           });
         }
 
-        // Actualizar precio sugerido en paso 2 (caso propio)
+        // Actualizar precio sugerido en paso 3 (caso propio)
         if (pasoActual === 2) {
           const tipo = document.getElementById('movilProdTipo')?.value || p.tipo;
           if (tipo === 'propio') {
@@ -3612,7 +3606,6 @@
               const porcentaje = parseFloat(porcentajeEl?.value) || 0;
               const pf = costo * (1 + porcentaje / 100);
               if (precioFinalEl && !isNaN(pf)) {
-                // Solo actualizar si el campo no tiene el foco (para no molestar al usuario que edita manualmente)
                 if (document.activeElement !== precioFinalEl) {
                   precioFinalEl.value = pf.toFixed(2);
                 }
@@ -3620,8 +3613,6 @@
             }
             if (costoEl) costoEl.addEventListener('input', recalcularPropio);
             if (porcentajeEl) porcentajeEl.addEventListener('input', recalcularPropio);
-            // Si el usuario edita manualmente, no recalcular automáticamente al perder foco
-            // pero si cambia costo o porcentaje, se recalcula (a menos que el campo tenga foco)
           }
         }
       }
@@ -4143,7 +4134,7 @@
       }
 
       // ================================================================
-      //  EVENTOS E INICIALIZACIÓN (modificada para incluir selector y mejoras)
+      //  EVENTOS E INICIALIZACIÓN
       // ================================================================
       function initEventos() {
         const btnCatalogo = document.getElementById('btnCatalogo');
@@ -4179,7 +4170,6 @@
         document.getElementById('prodPrecioAcordado').addEventListener('input', calcularPrecios);
         document.getElementById('prodPorcentajeReventa').addEventListener('input', calcularPrecios);
 
-        // Manejo de foto en modal producto con subida a ImageKit
         document.getElementById('prodFotoFile').addEventListener('change', function(e) {
           const preview = document.getElementById('prodFotoPreview');
           const urlInput = document.getElementById('prodFotoUrl');
@@ -4391,6 +4381,13 @@
         renderizarCategorias();
         const modal = new bootstrap.Modal(document.getElementById('modalGestionCategorias'));
         modal.show();
+        // Al cerrar, actualizar selects
+        const handleHidden = () => {
+          renderizarCategorias();
+          actualizarSelectCategoriaMovil();
+          modal.removeEventListener('hidden.bs.modal', handleHidden);
+        };
+        modal.addEventListener('hidden.bs.modal', handleHidden);
       }
 
       async function agregarCategoriaDesdeModal() {
@@ -4402,6 +4399,7 @@
         cats.push(nombre);
         await guardarCategorias(cats);
         renderizarCategorias();
+        actualizarSelectCategoriaMovil();
         input.value = '';
         renderCatalogo();
       }
@@ -4499,7 +4497,7 @@
         }
       }
 
-      // ========== FUNCIONES DE CLIENTE ==========
+      // ========== FUNCIONES DE CLIENTE (sin confirm) ==========
       window.editarCliente = function(id) {
         const c = clientes.find(cl => cl.id === id);
         if (!c) return;
@@ -4513,7 +4511,6 @@
       };
 
       window.eliminarCliente = async function(id) {
-        if (!confirm('¿Eliminar este cliente?')) return;
         clientes = clientes.filter(c => c.id !== id);
         await guardarTodo();
         renderClientes();
@@ -4612,7 +4609,7 @@
                 nombreOffsetX: 0,
                 nombreOffsetY: 0,
                 mensajePresentacion: 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?',
-                imagekitPublicKey: 'public_0rN8ro6eRcTYSwOvgdifojXhcjM='
+                imagekitPublicKey: 'public_T2gNCSoik/TcSjsa4meAJOunu7E='
               },
               clientes: [],
               ordenes: [],
@@ -4643,7 +4640,7 @@
               if (!ajustes.mensajePresentacion) {
                 ajustes.mensajePresentacion = 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
               }
-              if (!ajustes.imagekitPublicKey) ajustes.imagekitPublicKey = 'public_0rN8ro6eRcTYSwOvgdifojXhcjM=';
+              if (!ajustes.imagekitPublicKey) ajustes.imagekitPublicKey = 'public_T2gNCSoik/TcSjsa4meAJOunu7E=';
 
               localStorage.setItem('firebase_fallback', JSON.stringify({
                 productos, ventas, ajustes, clientes, ordenes, categorias
