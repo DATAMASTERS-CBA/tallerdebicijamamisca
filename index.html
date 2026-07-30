@@ -1367,7 +1367,7 @@
   <script>
     // =================================================================
     // SCRIPT COMPLETO - TIEMPO REAL CON FIREBASE + MODO MÓVIL
-    // (Versión actualizada con correcciones y mejoras)
+    // (Versión actualizada con WhatsApp en listas móviles y clic en órdenes)
     // =================================================================
     (function() {
       "use strict";
@@ -3238,6 +3238,9 @@
         });
       }
 
+      // ================================================================
+      //  RENDER LISTA ITEMS MÓVIL (MODIFICADO: agregados botones WhatsApp)
+      // ================================================================
       function renderListaItemsMovil(tipo) {
         const container = document.getElementById('listaItemsMovil');
         if (!container) return;
@@ -3279,53 +3282,83 @@
           } else if (tipo === 'ventas') {
             info = `${item.nombreProducto} x${item.cantidad} = ${formatearPrecio(item.total)}`;
           }
+          // Construir los botones según el tipo
+          let botones = '';
+          if (tipo === 'productos') {
+            botones = `
+              <button class="btn btn-sm btn-warning editar-item" data-id="${id}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-danger eliminar-item" data-id="${id}"><i class="bi bi-trash"></i></button>
+            `;
+          } else if (tipo === 'clientes') {
+            botones = `
+              <button class="btn btn-sm btn-warning editar-item" data-id="${id}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-success whatsapp-item" data-id="${id}"><i class="bi bi-whatsapp"></i></button>
+              <button class="btn btn-sm btn-danger eliminar-item" data-id="${id}"><i class="bi bi-trash"></i></button>
+            `;
+          } else if (tipo === 'ordenes') {
+            botones = `
+              <button class="btn btn-sm btn-warning editar-item" data-id="${id}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-success whatsapp-item" data-id="${id}"><i class="bi bi-whatsapp"></i></button>
+              <button class="btn btn-sm btn-danger eliminar-item" data-id="${id}"><i class="bi bi-trash"></i></button>
+            `;
+          } else if (tipo === 'ventas') {
+            botones = `
+              <button class="btn btn-sm btn-danger eliminar-item" data-id="${id}"><i class="bi bi-trash"></i></button>
+            `;
+          }
           html += `
-            <div class="item-card" data-id="${id}">
+            <div class="item-card" data-id="${id}" data-tipo="${tipo}">
               <div class="item-info">${info}</div>
               <div class="item-actions">
-                <button class="btn btn-sm btn-warning editar-item" data-id="${id}"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-danger eliminar-item" data-id="${id}"><i class="bi bi-trash"></i></button>
+                ${botones}
               </div>
             </div>
           `;
         });
         container.innerHTML = html;
 
+        // === Eventos para los botones ===
+        // Editar
         container.querySelectorAll('.editar-item').forEach(btn => {
-          btn.addEventListener('click', function() {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Evitar que se dispare el clic en la tarjeta
             const id = this.dataset.id;
-            if (tipo === 'productos') {
+            const tipoPadre = this.closest('.item-card').dataset.tipo;
+            if (tipoPadre === 'productos') {
               const prod = productos.find(p => p.id === id);
               if (prod) iniciarAsistenteProducto(prod);
-            } else if (tipo === 'clientes') {
+            } else if (tipoPadre === 'clientes') {
               const cli = clientes.find(c => c.id === id);
               if (cli) iniciarAsistenteCliente(cli);
-            } else if (tipo === 'ordenes') {
+            } else if (tipoPadre === 'ordenes') {
               const ord = ordenes.find(o => o.id === id);
-              if (ord) iniciarAsistenteOrden(ord);
-            } else if (tipo === 'ventas') {
+              if (ord) editarOrden(id); // Usa la función global
+            } else if (tipoPadre === 'ventas') {
               alert('Las ventas no se editan. Si es necesario, elimínela y regístrela de nuevo.');
             }
           });
         });
 
+        // Eliminar
         container.querySelectorAll('.eliminar-item').forEach(btn => {
-          btn.addEventListener('click', async function() {
+          btn.addEventListener('click', async function(e) {
+            e.stopPropagation();
             const id = this.dataset.id;
+            const tipoPadre = this.closest('.item-card').dataset.tipo;
             if (!confirm('¿Eliminar este elemento?')) return;
-            if (tipo === 'productos') {
+            if (tipoPadre === 'productos') {
               productos = productos.filter(p => p.id !== id);
               await guardarTodo();
               renderListaItemsMovil('productos');
               renderCatalogo();
               renderAdminProductos();
               cargarSelectVentas();
-            } else if (tipo === 'clientes') {
+            } else if (tipoPadre === 'clientes') {
               clientes = clientes.filter(c => c.id !== id);
               await guardarTodo();
               renderListaItemsMovil('clientes');
               renderClientes();
-            } else if (tipo === 'ordenes') {
+            } else if (tipoPadre === 'ordenes') {
               const orden = ordenes.find(o => o.id === id);
               if (orden && orden.repuestos) {
                 orden.repuestos.forEach(r => {
@@ -3340,13 +3373,38 @@
               cargarSelectRepuestos();
               renderCatalogo();
               renderAdminProductos();
-            } else if (tipo === 'ventas') {
+            } else if (tipoPadre === 'ventas') {
               ventas = ventas.filter(v => v.id !== id);
               await guardarTodo();
               renderListaItemsMovil('ventas');
               renderAdminVentas();
             }
             actualizarReportes();
+          });
+        });
+
+        // === WhatsApp (para órdenes y clientes) ===
+        container.querySelectorAll('.whatsapp-item').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const id = this.dataset.id;
+            const tipoPadre = this.closest('.item-card').dataset.tipo;
+            if (tipoPadre === 'clientes') {
+              enviarWhatsappPresentacion(id);
+            } else if (tipoPadre === 'ordenes') {
+              enviarWhatsappOrden(id);
+            }
+          });
+        });
+
+        // === Clic en la tarjeta de orden para abrir modal de edición (historial) ===
+        container.querySelectorAll('.item-card[data-tipo="ordenes"]').forEach(card => {
+          card.addEventListener('click', function(e) {
+            // Si el clic fue en un botón, ya se manejó arriba (stopPropagation)
+            // Solo abrir si no se hizo clic en un botón
+            if (e.target.closest('.item-actions')) return;
+            const id = this.dataset.id;
+            editarOrden(id);
           });
         });
       }
@@ -3356,7 +3414,7 @@
         entidadEditando = prod ? prod.id : null;
         datosPaso = prod ? { ...prod } : {
           nombre: '', categoria: '', costo: 0, tipo: 'propio',
-          porcentaje: 20, precioFinal: 0, stock: 1, // <-- stock por defecto 1
+          porcentaje: 20, precioFinal: 0, stock: 1,
           stockMinimo: 1,
           fotos: [],
           porcentajeReventa: 0
@@ -3536,7 +3594,6 @@
         // === Eventos para paso 3 (fotos) ===
         if (pasoActual === 3) {
           const containerFotos = document.getElementById('fotosContainer');
-          // Eliminar foto
           containerFotos.querySelectorAll('.btn-eliminar-foto').forEach(btn => {
             btn.addEventListener('click', function() {
               const idx = parseInt(this.dataset.idx);
@@ -3545,7 +3602,6 @@
             });
           });
 
-          // Función para guardar stock antes de agregar foto
           function guardarStockAntesDeFoto() {
             const stockInput = document.getElementById('movilProdStock');
             const stockMinInput = document.getElementById('movilProdStockMinimo');
@@ -3553,7 +3609,6 @@
             if (stockMinInput) datosPaso.stockMinimo = parseInt(stockMinInput.value) || 1;
           }
 
-          // Botón Cámara
           const btnCamara = document.getElementById('btnCamaraMovil');
           const inputCamara = document.getElementById('inputCamaraMovil');
           if (btnCamara && inputCamara) {
@@ -3577,7 +3632,6 @@
             });
           }
 
-          // Botón Archivo
           const btnArchivo = document.getElementById('btnArchivoMovil');
           const inputArchivo = document.getElementById('inputArchivoMovil');
           if (btnArchivo && inputArchivo) {
@@ -3601,7 +3655,6 @@
             });
           }
 
-          // Botón URL
           const btnUrl = document.getElementById('btnUrlMovil');
           if (btnUrl) {
             btnUrl.addEventListener('click', function() {
@@ -3619,7 +3672,6 @@
           }
         }
 
-        // Eventos navegación
         document.getElementById('btnPasoAnterior')?.addEventListener('click', function() {
           if (pasoActual > 0) {
             guardarDatosPasoProducto();
@@ -3639,7 +3691,6 @@
           }
         });
 
-        // Recalcular precios en paso 2
         if (pasoActual === 2) {
           const tipo = document.getElementById('movilProdTipo')?.value || p.tipo;
           const costoInput = document.getElementById('movilProdCosto');
@@ -3650,7 +3701,6 @@
 
           function recalcularPreciosMovil() {
             const tipo = document.getElementById('movilProdTipo')?.value || 'propio';
-            // Usar el costo guardado en datosPaso (ya actualizado en paso 1)
             const costo = datosPaso.costo || 0;
             if (tipo === 'propio') {
               const porcentaje = parseFloat(document.getElementById('movilProdPorcentaje')?.value) || 0;
@@ -3658,7 +3708,6 @@
               const pfInput = document.getElementById('movilProdPrecioFinal');
               if (pfInput) pfInput.value = pf.toFixed(2);
             } else {
-              // Para consignación, el precio final es el acordado
               const acordado = parseFloat(document.getElementById('movilProdPrecioAcordado')?.value) || 0;
               const pfInput = document.getElementById('movilProdPrecioFinal');
               if (pfInput) pfInput.value = acordado.toFixed(2);
@@ -3668,7 +3717,6 @@
           if (porcentajeInput) porcentajeInput.addEventListener('input', recalcularPreciosMovil);
           if (acordadoInput) acordadoInput.addEventListener('input', recalcularPreciosMovil);
           if (pReventaInput) pReventaInput.addEventListener('input', function() {
-            // Solo para consignación, actualizar precio de reventa
             const acordado = parseFloat(document.getElementById('movilProdPrecioAcordado')?.value) || 0;
             const pRev = parseFloat(this.value) || 0;
             const reventa = acordado * (1 + pRev / 100);
@@ -3680,7 +3728,6 @@
             guardarDatosPasoProducto();
             mostrarPasoProducto();
           });
-          // Llamar una vez para inicializar
           setTimeout(recalcularPreciosMovil, 50);
         }
       }
@@ -4310,7 +4357,6 @@
             </div>
           `;
           document.body.appendChild(modalDiv);
-          // Eventos del modal
           modalDiv.querySelector('#btnAplicarFiltroHistorial').addEventListener('click', function() {
             renderHistorialOrdenes();
           });
@@ -4620,7 +4666,6 @@
           if (navbar) resizeObserver.observe(navbar);
         }
 
-        // Agregar botón historial en escritorio
         agregarBotonHistorialEscritorio();
       }
 
