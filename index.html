@@ -1367,7 +1367,7 @@
   <script>
     // =================================================================
     // SCRIPT COMPLETO - TIEMPO REAL CON FIREBASE + MODO MÓVIL
-    // (Versión actualizada con WhatsApp en listas móviles y clic en órdenes)
+    // (Versión actualizada con mensajes WhatsApp mejor formateados)
     // =================================================================
     (function() {
       "use strict";
@@ -1422,7 +1422,7 @@
       let totalPasos = 0;
       let datosPaso = {};
       let entidadEditando = null;
-      let isSaving = false; // Flag para evitar guardados múltiples
+      let isSaving = false;
 
       // ========== FUNCIONES DE AJUSTE DE ESPACIOS ==========
       function ajustarEspacios() {
@@ -2582,6 +2582,7 @@
         }
       };
 
+      // --- FUNCIÓN MEJORADA PARA ENVIAR WHATSAPP DE ORDEN ---
       window.enviarWhatsappOrden = function(id) {
         const orden = ordenes.find(o => o.id === id);
         if (!orden) {
@@ -2594,37 +2595,49 @@
           alert('El cliente no tiene número de WhatsApp');
           return;
         }
+
+        const empresa = ajustes.nombreEmpresa || 'Taller';
         const estadoLabel = orden.estado.replace('_', ' ').toUpperCase();
-        let msg = `🚲 *${ajustes.nombreEmpresa || 'Taller'}* - Estado de tu orden%0A%0A`;
-        msg += `📋 *Orden N°:* ${orden.id}%0A`;
-        if (orden.comprobante) msg += `🧾 *Comprobante:* ${orden.comprobante}%0A`;
-        msg += `👤 *Cliente:* ${orden.clienteNombre}%0A`;
-        msg += `🚲 *Modelo:* ${orden.modelo || 'No especificado'}%0A`;
-        msg += `📌 *Estado:* ${estadoLabel}%0A`;
-        msg += `📅 *Ingreso:* ${orden.fechaIngreso || ''}%0A`;
-        if (orden.fechaSalida) msg += `📅 *Salida prevista:* ${orden.fechaSalida}%0A`;
-        if (orden.fallaInicial) msg += `🔧 *Falla inicial:* ${orden.fallaInicial}%0A`;
-        if (orden.diagnostico) msg += `🩺 *Diagnóstico:* ${orden.diagnostico}%0A`;
-        if (orden.trabajoRealizado) msg += `✅ *Trabajo realizado:* ${orden.trabajoRealizado}%0A`;
+
+        // Construir mensaje sin emojis, con formato claro
+        let msg = `================================\n`;
+        msg += `${empresa} - Estado de tu orden\n`;
+        msg += `================================\n\n`;
+        msg += `Orden N°: ${orden.id}\n`;
+        if (orden.comprobante) msg += `Comprobante: ${orden.comprobante}\n`;
+        msg += `Cliente: ${orden.clienteNombre}\n`;
+        msg += `Modelo: ${orden.modelo || 'No especificado'}\n`;
+        msg += `Estado: ${estadoLabel}\n`;
+        msg += `Ingreso: ${orden.fechaIngreso || ''}\n`;
+        if (orden.fechaSalida) msg += `Salida prevista: ${orden.fechaSalida}\n`;
+        if (orden.fallaInicial) msg += `\nFalla inicial: ${orden.fallaInicial}\n`;
+        if (orden.diagnostico) msg += `Diagnóstico: ${orden.diagnostico}\n`;
+        if (orden.trabajoRealizado) msg += `Trabajo realizado: ${orden.trabajoRealizado}\n`;
+
         const total = calcularTotalOrden(orden);
-        msg += `💰 *Presupuesto total:* $${total.toFixed(2)}%0A`;
+        msg += `\nPresupuesto total: $${total.toFixed(2)}\n`;
+
         if (orden.repuestos && orden.repuestos.length) {
-          msg += `🔩 *Repuestos colocados:*%0A`;
+          msg += `\nRepuestos colocados:\n`;
           orden.repuestos.forEach(r => {
-            msg += `  - ${r.nombre} (x${r.cantidad}) $${r.precio.toFixed(2)}%0A`;
+            msg += `  - ${r.nombre} (x${r.cantidad}) $${r.precio.toFixed(2)}\n`;
           });
         }
+
         if (orden.estado === 'retirada' && orden.fechaSalida && orden.garantiaDias) {
           const diasRestantes = calcularGarantiaRestante(orden);
           if (diasRestantes > 0) {
-            msg += `🛡️ *Garantía restante:* ${diasRestantes} días%0A`;
+            msg += `\nGarantía restante: ${diasRestantes} días\n`;
           } else {
-            msg += `🛡️ *Garantía expirada*%0A`;
+            msg += `\nGarantía expirada\n`;
           }
         } else {
-          msg += `🛡️ *Garantía:* ${orden.garantiaDias || 0} días (en revisión)%0A`;
+          msg += `\nGarantía: ${orden.garantiaDias || 0} días (en revisión)\n`;
         }
-        msg += `%0A_Consulta por este medio para más información._`;
+
+        msg += `\n--------------------------------\n`;
+        msg += `Consulta por este medio para más información.`;
+
         const url = `https://wa.me/${wpp}?text=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
       };
@@ -2930,37 +2943,44 @@
         }
 
         const estadoLabel = orden.estado.replace('_', ' ').toUpperCase();
-        let msg = `🚲 *NUEVA CONSULTA DE CLIENTE*%0A`;
-        msg += `📋 *Orden N°:* ${orden.id}%0A`;
-        if (orden.comprobante) msg += `🧾 *Comprobante:* ${orden.comprobante}%0A`;
-        msg += `👤 *Cliente:* ${orden.clienteNombre}%0A`;
-        msg += `📱 *WhatsApp del cliente:* ${orden.clienteWhatsapp}%0A`;
-        msg += `🚲 *Modelo:* ${orden.modelo || 'No especificado'}%0A`;
-        msg += `📌 *Estado actual:* ${estadoLabel}%0A`;
-        msg += `📅 *Ingreso:* ${orden.fechaIngreso || ''}%0A`;
-        if (orden.fechaSalida) msg += `📅 *Salida prevista:* ${orden.fechaSalida}%0A`;
-        if (orden.fallaInicial) msg += `🔧 *Falla inicial:* ${orden.fallaInicial}%0A`;
-        if (orden.diagnostico) msg += `🩺 *Diagnóstico:* ${orden.diagnostico}%0A`;
-        if (orden.trabajoRealizado) msg += `✅ *Trabajo realizado:* ${orden.trabajoRealizado}%0A`;
+        let msg = `================================\n`;
+        msg += `NUEVA CONSULTA DE CLIENTE\n`;
+        msg += `================================\n\n`;
+        msg += `Orden N°: ${orden.id}\n`;
+        if (orden.comprobante) msg += `Comprobante: ${orden.comprobante}\n`;
+        msg += `Cliente: ${orden.clienteNombre}\n`;
+        msg += `WhatsApp del cliente: ${orden.clienteWhatsapp}\n`;
+        msg += `Modelo: ${orden.modelo || 'No especificado'}\n`;
+        msg += `Estado actual: ${estadoLabel}\n`;
+        msg += `Ingreso: ${orden.fechaIngreso || ''}\n`;
+        if (orden.fechaSalida) msg += `Salida prevista: ${orden.fechaSalida}\n`;
+        if (orden.fallaInicial) msg += `\nFalla inicial: ${orden.fallaInicial}\n`;
+        if (orden.diagnostico) msg += `Diagnóstico: ${orden.diagnostico}\n`;
+        if (orden.trabajoRealizado) msg += `Trabajo realizado: ${orden.trabajoRealizado}\n`;
+
         const total = calcularTotalOrden(orden);
-        msg += `💰 *Presupuesto total:* $${total.toFixed(2)}%0A`;
+        msg += `\nPresupuesto total: $${total.toFixed(2)}\n`;
+
         if (orden.repuestos && orden.repuestos.length) {
-          msg += `🔩 *Repuestos colocados:*%0A`;
+          msg += `\nRepuestos colocados:\n`;
           orden.repuestos.forEach(r => {
-            msg += `  - ${r.nombre} (x${r.cantidad}) $${r.precio.toFixed(2)}%0A`;
+            msg += `  - ${r.nombre} (x${r.cantidad}) $${r.precio.toFixed(2)}\n`;
           });
         }
+
         if (orden.estado === 'retirada' && orden.fechaSalida && orden.garantiaDias) {
           const diasRestantes = calcularGarantiaRestante(orden);
           if (diasRestantes > 0) {
-            msg += `🛡️ *Garantía restante:* ${diasRestantes} días%0A`;
+            msg += `\nGarantía restante: ${diasRestantes} días\n`;
           } else {
-            msg += `🛡️ *Garantía expirada*%0A`;
+            msg += `\nGarantía expirada\n`;
           }
         } else {
-          msg += `🛡️ *Garantía:* ${orden.garantiaDias || 0} días (en revisión)%0A`;
+          msg += `\nGarantía: ${orden.garantiaDias || 0} días (en revisión)\n`;
         }
-        msg += `%0A_El cliente ${orden.clienteNombre} está consultando el estado de su orden. Por favor, comuníquese con él al ${orden.clienteWhatsapp} para brindarle atención._`;
+
+        msg += `\n--------------------------------\n`;
+        msg += `El cliente ${orden.clienteNombre} está consultando el estado de su orden. Por favor, comuníquese con él al ${orden.clienteWhatsapp} para brindarle atención.`;
 
         const url = `https://wa.me/${empresaWpp}?text=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
@@ -3400,8 +3420,6 @@
         // === Clic en la tarjeta de orden para abrir modal de edición (historial) ===
         container.querySelectorAll('.item-card[data-tipo="ordenes"]').forEach(card => {
           card.addEventListener('click', function(e) {
-            // Si el clic fue en un botón, ya se manejó arriba (stopPropagation)
-            // Solo abrir si no se hizo clic en un botón
             if (e.target.closest('.item-actions')) return;
             const id = this.dataset.id;
             editarOrden(id);
@@ -4809,7 +4827,7 @@
         }
       }
 
-      // ========== FUNCIONES DE CLIENTE ==========
+      // ========== FUNCIONES DE CLIENTE (con mensaje de presentación mejorado) ==========
       window.editarCliente = function(id) {
         const c = clientes.find(cl => cl.id === id);
         if (!c) return;
@@ -4833,9 +4851,16 @@
       window.enviarWhatsappPresentacion = function(id) {
         const c = clientes.find(cl => cl.id === id);
         if (!c) return;
-        const mensaje = ajustes.mensajePresentacion || 'Hola, somos {empresa}. Queremos presentarte nuestros servicios. ¿En qué podemos ayudarte?';
-        const texto = mensaje.replace(/{empresa}/g, ajustes.nombreEmpresa || 'Mi Catálogo');
-        const wpp = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(texto)}`;
+        const empresa = ajustes.nombreEmpresa || 'Mi Catálogo';
+        let msg = `================================\n`;
+        msg += `${empresa}\n`;
+        msg += `================================\n\n`;
+        msg += `Hola, somos ${empresa}. Queremos presentarte nuestros servicios.\n`;
+        msg += `¿En qué podemos ayudarte?\n\n`;
+        msg += `--------------------------------\n`;
+        msg += `Contáctanos por este medio para más información.`;
+
+        const wpp = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(msg)}`;
         window.open(wpp, '_blank');
       };
 
