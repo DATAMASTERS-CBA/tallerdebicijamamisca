@@ -1364,10 +1364,14 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- ================================================================ -->
+  <!-- SCRIPT PRINCIPAL (sin modificar) -->
+  <!-- ================================================================ -->
   <script>
     // =================================================================
     // SCRIPT COMPLETO - TIEMPO REAL CON FIREBASE + MODO MÓVIL
-    // (Versión actualizada con mensajes WhatsApp mejor formateados)
+    // (Versión actualizada: filtro de órdenes activas en móvil + gestión de repuestos)
     // =================================================================
     (function() {
       "use strict";
@@ -2599,7 +2603,6 @@
         const empresa = ajustes.nombreEmpresa || 'Taller';
         const estadoLabel = orden.estado.replace('_', ' ').toUpperCase();
 
-        // Construir mensaje sin emojis, con formato claro
         let msg = `================================\n`;
         msg += `${empresa} - Estado de tu orden\n`;
         msg += `================================\n\n`;
@@ -2712,6 +2715,8 @@
           calcularTotalPresupuesto();
           document.getElementById('ordenClienteBuscar').value = '';
         }
+        // === IMPORTANTE: cargar el select de repuestos al abrir el modal ===
+        cargarSelectRepuestos();
         modal.show();
         setTimeout(() => document.getElementById('ordenClienteBuscar').focus(), 300);
       }
@@ -2741,7 +2746,7 @@
           }
           div.remove();
           calcularTotalPresupuesto();
-          cargarSelectRepuestos();
+          cargarSelectRepuestos(); // Actualizar el select después de eliminar
         });
       }
 
@@ -3259,7 +3264,7 @@
       }
 
       // ================================================================
-      //  RENDER LISTA ITEMS MÓVIL (MODIFICADO: agregados botones WhatsApp)
+      //  RENDER LISTA ITEMS MÓVIL (con filtro de órdenes activas)
       // ================================================================
       function renderListaItemsMovil(tipo) {
         const container = document.getElementById('listaItemsMovil');
@@ -3276,8 +3281,9 @@
             titulo = 'Clientes';
             break;
           case 'ordenes':
-            items = ordenes;
-            titulo = 'Órdenes';
+            // === FILTRO: solo mostrar órdenes activas (no retiradas ni rechazadas) ===
+            items = ordenes.filter(o => o.estado !== 'retirada' && o.estado !== 'rechazado');
+            titulo = 'Órdenes activas';
             break;
           case 'ventas':
             items = ventas;
@@ -3341,7 +3347,7 @@
         // Editar
         container.querySelectorAll('.editar-item').forEach(btn => {
           btn.addEventListener('click', function(e) {
-            e.stopPropagation(); // Evitar que se dispare el clic en la tarjeta
+            e.stopPropagation();
             const id = this.dataset.id;
             const tipoPadre = this.closest('.item-card').dataset.tipo;
             if (tipoPadre === 'productos') {
@@ -3352,7 +3358,7 @@
               if (cli) iniciarAsistenteCliente(cli);
             } else if (tipoPadre === 'ordenes') {
               const ord = ordenes.find(o => o.id === id);
-              if (ord) editarOrden(id); // Usa la función global
+              if (ord) editarOrden(id);
             } else if (tipoPadre === 'ventas') {
               alert('Las ventas no se editan. Si es necesario, elimínela y regístrela de nuevo.');
             }
@@ -4634,7 +4640,7 @@
           prod.stock -= cant;
           agregarRepuestoItem(prod.id, prod.nombre, cant, prod.costo);
           calcularTotalPresupuesto();
-          cargarSelectRepuestos();
+          cargarSelectRepuestos(); // Actualizar el select después de agregar
           guardarTodo();
         });
         document.getElementById('btnEnviarWhatsappOrden').addEventListener('click', function() {
@@ -5056,5 +5062,327 @@
 
     })();
   </script>
+
+  <!-- ================================================================ -->
+  <!-- SCRIPT ADICIONAL: BOTÓN REPORTES EN VENTAS MÓVIL (con periodos)   -->
+  <!-- ================================================================ -->
+  <script>
+    (function() {
+      'use strict';
+
+      // Variables para los gráficos móviles
+      let chartVentasPeriodoMovil = null;
+      let chartTopProductosMovil = null;
+      let modalReportesInstance = null;
+      let periodoActual = 'dia'; // 'dia', 'semana', 'mes', 'anual'
+
+      // Función para crear el modal de reportes dinámicamente (solo una vez)
+      function crearModalReportes() {
+        if (document.getElementById('modalReportesMovil')) return;
+
+        const modalHTML = `
+          <div class="modal fade" id="modalReportesMovil" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">📊 Reportes</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <!-- Botones de periodo -->
+                  <div class="btn-group mb-3 w-100" role="group" aria-label="Periodos">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-periodo="dia">Día</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-periodo="semana">Semana</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-periodo="mes">Mes</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-periodo="anual">Año</button>
+                  </div>
+                  <div id="resumenVentasMovil"></div>
+                  <div class="row mt-3">
+                    <div class="col-md-6">
+                      <div class="card p-2">
+                        <h6>Ventas por día (periodo)</h6>
+                        <div class="chart-container"><canvas id="chartVentasPeriodoMovil"></canvas></div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card p-2">
+                        <h6>Top 5 productos más vendidos (mes actual)</h6>
+                        <div class="chart-container"><canvas id="chartTopProductosMovil"></canvas></div>
+                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                  <h5>Stock</h5>
+                  <p><strong>Stock total:</strong> <span id="stockTotalMovil">0</span></p>
+                  <p><strong>Sin stock (agotados):</strong> <span id="sinStockCountMovil">0</span></p>
+                  <div id="alertasStockMinimoMovil" class="mt-2"></div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Asignar eventos a los botones de periodo
+        document.querySelectorAll('#modalReportesMovil [data-periodo]').forEach(btn => {
+          btn.addEventListener('click', function() {
+            // Quitar clase 'active' de todos
+            document.querySelectorAll('#modalReportesMovil [data-periodo]').forEach(b => b.classList.remove('btn-primary', 'active'));
+            this.classList.add('btn-primary', 'active');
+            periodoActual = this.dataset.periodo;
+            actualizarReportesMovil(periodoActual);
+          });
+        });
+
+        // Evento para destruir gráficos al cerrar el modal
+        document.getElementById('modalReportesMovil').addEventListener('hidden.bs.modal', function() {
+          if (chartVentasPeriodoMovil) {
+            chartVentasPeriodoMovil.destroy();
+            chartVentasPeriodoMovil = null;
+          }
+          if (chartTopProductosMovil) {
+            chartTopProductosMovil.destroy();
+            chartTopProductosMovil = null;
+          }
+        });
+      }
+
+      // Función para actualizar los reportes móviles según el periodo
+      function actualizarReportesMovil(periodo) {
+        periodo = periodo || periodoActual || 'dia';
+        try {
+          const fallback = localStorage.getItem('firebase_fallback');
+          if (!fallback) return;
+          const data = JSON.parse(fallback);
+          const prod = data.productos || [];
+          const vent = data.ventas || [];
+          const ord = data.ordenes || [];
+          const ajust = data.ajustes || {};
+
+          // Formatear precio local
+          function fmt(precio) {
+            if (!precio || precio === 0) return '<span class="text-muted">Consultar precio</span>';
+            const formato = precio.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            return `$ ${formato}`;
+          }
+
+          // Calcular fecha de inicio según periodo
+          const now = new Date();
+          let inicio;
+          switch (periodo) {
+            case 'dia':
+              inicio = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+              break;
+            case 'semana':
+              const diaSemana = now.getDay();
+              inicio = new Date(now);
+              inicio.setDate(now.getDate() - diaSemana);
+              inicio.setHours(0, 0, 0, 0);
+              break;
+            case 'mes':
+              inicio = new Date(now.getFullYear(), now.getMonth(), 1);
+              break;
+            case 'anual':
+              inicio = new Date(now.getFullYear(), 0, 1);
+              break;
+            default:
+              inicio = new Date(0);
+          }
+
+          // Stock
+          const totalStock = prod.reduce((acc, p) => acc + (p.stock || 0), 0);
+          const sinStock = prod.filter(p => (p.stock || 0) <= 0).length;
+          const alertas = prod.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= (p.stockMinimo || 1));
+
+          document.getElementById('stockTotalMovil').textContent = totalStock;
+          document.getElementById('sinStockCountMovil').textContent = sinStock;
+
+          const alertContainer = document.getElementById('alertasStockMinimoMovil');
+          if (alertas.length === 0) {
+            alertContainer.innerHTML = '<p class="text-success">Todos los productos tienen stock suficiente</p>';
+          } else {
+            let html = '<div class="alert alert-warning"><strong>Productos con stock mínimo:</strong><ul>';
+            alertas.forEach(p => {
+              html += `<li>${p.nombre} (Stock: ${p.stock || 0}, Mínimo: ${p.stockMinimo || 1})</li>`;
+            });
+            html += '</ul></div>';
+            alertContainer.innerHTML = html;
+          }
+
+          // Ventas y taller en el periodo
+          const ventasPeriodo = vent.filter(v => new Date(v.fecha) >= inicio);
+          const totalVentas = ventasPeriodo.reduce((acc, v) => acc + (v.total || 0), 0);
+          const cantidad = ventasPeriodo.reduce((acc, v) => acc + (v.cantidad || 0), 0);
+
+          const ordenesPeriodo = ord.filter(o => new Date(o.fechaIngreso) >= inicio);
+          const ordenesConIngreso = ordenesPeriodo.filter(o => o.estado === 'retirada' || o.estado === 'confirmada');
+          let ingresosTaller = 0;
+          ordenesConIngreso.forEach(o => {
+            let total = parseFloat(o.presupuestoMano) || 0;
+            if (o.repuestos) {
+              o.repuestos.forEach(r => { total += (r.precio || 0) * (r.cantidad || 0); });
+            }
+            ingresosTaller += total;
+          });
+          const totalGeneral = totalVentas + ingresosTaller;
+
+          const labelPeriodo = { dia: 'Hoy', semana: 'Semana', mes: 'Mes', anual: 'Año' }[periodo] || periodo;
+          const resumenDiv = document.getElementById('resumenVentasMovil');
+          resumenDiv.innerHTML = `
+            <div class="card p-2">
+              <h6>Resumen de Ventas + Trabajos de Taller (${labelPeriodo})</h6>
+              <p><strong>Total recaudado (ventas + taller):</strong> ${fmt(totalGeneral)}</p>
+              <hr>
+              <p><strong>Ventas de productos:</strong> ${fmt(totalVentas)} (${ventasPeriodo.length} transacciones, ${cantidad} unidades)</p>
+              <p><strong>Ingresos de taller:</strong> ${fmt(ingresosTaller)} (${ordenesConIngreso.length} órdenes finalizadas)</p>
+            </div>
+          `;
+
+          // Gráficos
+          dibujarGraficosMovil(ventasPeriodo);
+        } catch (e) {
+          console.error('Error al actualizar reportes móviles:', e);
+        }
+      }
+
+      function dibujarGraficosMovil(ventasPeriodo) {
+        // Gráfico 1: Ventas por día
+        const ctx1 = document.getElementById('chartVentasPeriodoMovil');
+        if (!ctx1) return;
+        const ctx1c = ctx1.getContext('2d');
+        if (chartVentasPeriodoMovil) {
+          chartVentasPeriodoMovil.destroy();
+          chartVentasPeriodoMovil = null;
+        }
+
+        const ventasPorDia = {};
+        ventasPeriodo.forEach(v => {
+          const fecha = new Date(v.fecha).toISOString().slice(0,10);
+          ventasPorDia[fecha] = (ventasPorDia[fecha] || 0) + (v.total || 0);
+        });
+        const labels = Object.keys(ventasPorDia).sort();
+        const data = labels.map(d => ventasPorDia[d]);
+
+        if (labels.length > 0) {
+          chartVentasPeriodoMovil = new Chart(ctx1c, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Ventas ($)',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true } }
+            }
+          });
+        }
+
+        // Gráfico 2: Top 5 productos (mes actual)
+        const ctx2 = document.getElementById('chartTopProductosMovil');
+        if (!ctx2) return;
+        const ctx2c = ctx2.getContext('2d');
+        if (chartTopProductosMovil) {
+          chartTopProductosMovil.destroy();
+          chartTopProductosMovil = null;
+        }
+
+        const now = new Date();
+        const mesInicio = new Date(now.getFullYear(), now.getMonth(), 1);
+        const ventasMes = ventasPeriodo.filter(v => new Date(v.fecha) >= mesInicio);
+        const productosVendidos = {};
+        ventasMes.forEach(v => {
+          productosVendidos[v.nombreProducto] = (productosVendidos[v.nombreProducto] || 0) + (v.cantidad || 0);
+        });
+        const sorted = Object.entries(productosVendidos).sort((a,b) => b[1] - a[1]).slice(0,5);
+        const labels2 = sorted.map(item => item[0]);
+        const data2 = sorted.map(item => item[1]);
+
+        if (labels2.length > 0) {
+          chartTopProductosMovil = new Chart(ctx2c, {
+            type: 'bar',
+            data: {
+              labels: labels2,
+              datasets: [{
+                label: 'Unidades vendidas',
+                data: data2,
+                backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true } }
+            }
+          });
+        }
+      }
+
+      // Observar cambios en modoMovilContenido para agregar botón de reportes
+      const observer = new MutationObserver(function(mutations) {
+        const content = document.getElementById('modoMovilContenido');
+        if (!content) return;
+        const h5 = content.querySelector('h5');
+        if (h5 && h5.textContent.includes('💰 Ventas')) {
+          if (content.querySelector('#btnReportesMovil')) return;
+          crearModalReportes();
+          const btnContainer = document.createElement('div');
+          btnContainer.className = 'mt-2';
+          btnContainer.innerHTML = `<button class="btn btn-info btn-block" id="btnReportesMovil"><i class="bi bi-bar-chart"></i> 📊 Reportes</button>`;
+          const listaItems = content.querySelector('#listaItemsMovil');
+          if (listaItems) {
+            listaItems.parentNode.insertBefore(btnContainer, listaItems.nextSibling);
+          } else {
+            content.appendChild(btnContainer);
+          }
+
+          document.getElementById('btnReportesMovil').addEventListener('click', function() {
+            if (!modalReportesInstance) {
+              modalReportesInstance = new bootstrap.Modal(document.getElementById('modalReportesMovil'));
+            }
+            modalReportesInstance.show();
+            // Activar el botón "Día" por defecto
+            const btnDia = document.querySelector('#modalReportesMovil [data-periodo="dia"]');
+            if (btnDia) {
+              document.querySelectorAll('#modalReportesMovil [data-periodo]').forEach(b => b.classList.remove('btn-primary', 'active'));
+              btnDia.classList.add('btn-primary', 'active');
+            }
+            periodoActual = 'dia';
+            setTimeout(() => actualizarReportesMovil('dia'), 300);
+          });
+        }
+      });
+
+      const targetNode = document.getElementById('modoMovilContenido');
+      if (targetNode) {
+        observer.observe(targetNode, { childList: true, subtree: true });
+      }
+
+      // Al abrir el modal, actualizar
+      document.addEventListener('shown.bs.modal', function(e) {
+        if (e.target.id === 'modalReportesMovil') {
+          if (!periodoActual) periodoActual = 'dia';
+          actualizarReportesMovil(periodoActual);
+        }
+      });
+
+      // Crear el modal al cargar la página
+      crearModalReportes();
+    })();
+  </script>
+
 </body>
 </html>
