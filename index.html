@@ -1367,7 +1367,7 @@
   <script>
     // =================================================================
     // SCRIPT COMPLETO - TIEMPO REAL CON FIREBASE + MODO MÓVIL
-    // (Versión actualizada con fotos múltiples y gestión de categorías)
+    // (Versión actualizada con correcciones y mejoras)
     // =================================================================
     (function() {
       "use strict";
@@ -1422,6 +1422,7 @@
       let totalPasos = 0;
       let datosPaso = {};
       let entidadEditando = null;
+      let isSaving = false; // Flag para evitar guardados múltiples
 
       // ========== FUNCIONES DE AJUSTE DE ESPACIOS ==========
       function ajustarEspacios() {
@@ -1968,7 +1969,6 @@
         renderizarCategorias();
         renderCatalogo();
         renderAdminProductos();
-        // Si estamos en modo móvil y en paso 0, refrescar select
         if (modoMovilActivo && pasoActual === 0) {
           const sel = document.getElementById('movilProdCategoria');
           if (sel) {
@@ -2434,8 +2434,8 @@
               <td>${c.direccion || ''}</td>
               <td>
                 <button class="btn btn-sm btn-warning" onclick="editarCliente('${c.id}')"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-danger" onclick="eliminarCliente('${c.id}')"><i class="bi bi-trash"></i></button>
                 <button class="btn btn-sm btn-success" onclick="enviarWhatsappPresentacion('${c.id}')"><i class="bi bi-whatsapp"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="eliminarCliente('${c.id}')"><i class="bi bi-trash"></i></button>
               </td>
             </tr>
           `;
@@ -2516,8 +2516,8 @@
                 <td>${o.fechaIngreso || ''}</td>
                 <td>
                   <button class="btn btn-sm btn-warning" onclick="editarOrden('${o.id}')"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-danger" onclick="eliminarOrden('${o.id}')"><i class="bi bi-trash"></i></button>
                   <button class="btn btn-sm btn-success" onclick="enviarWhatsappOrden('${o.id}')"><i class="bi bi-whatsapp"></i></button>
+                  <button class="btn btn-sm btn-danger" onclick="eliminarOrden('${o.id}')"><i class="bi bi-trash"></i></button>
                 </td>
               </tr>
             `;
@@ -2542,8 +2542,8 @@
                 <td>${o.fechaIngreso || ''}</td>
                 <td>
                   <button class="btn btn-sm btn-warning" onclick="editarOrden('${o.id}')"><i class="bi bi-pencil"></i></button>
-                  <button class="btn btn-sm btn-danger" onclick="eliminarOrden('${o.id}')"><i class="bi bi-trash"></i></button>
                   <button class="btn btn-sm btn-success" onclick="enviarWhatsappOrden('${o.id}')"><i class="bi bi-whatsapp"></i></button>
+                  <button class="btn btn-sm btn-danger" onclick="eliminarOrden('${o.id}')"><i class="bi bi-trash"></i></button>
                 </td>
               </tr>
             `;
@@ -2584,7 +2584,10 @@
 
       window.enviarWhatsappOrden = function(id) {
         const orden = ordenes.find(o => o.id === id);
-        if (!orden) return;
+        if (!orden) {
+          alert('Orden no encontrada');
+          return;
+        }
         const cliente = clientes.find(c => c.id === orden.clienteId);
         const wpp = cliente ? cliente.whatsapp : orden.clienteWhatsapp;
         if (!wpp) {
@@ -3353,11 +3356,11 @@
         entidadEditando = prod ? prod.id : null;
         datosPaso = prod ? { ...prod } : {
           nombre: '', categoria: '', costo: 0, tipo: 'propio',
-          porcentaje: 20, precioFinal: 0, stock: 0, stockMinimo: 1,
-          fotos: [], // array de URLs
+          porcentaje: 20, precioFinal: 0, stock: 1, // <-- stock por defecto 1
+          stockMinimo: 1,
+          fotos: [],
           porcentajeReventa: 0
         };
-        // Si el producto tiene foto principal, la añadimos al array si no está
         if (datosPaso.foto && !datosPaso.fotos.includes(datosPaso.foto)) {
           datosPaso.fotos.push(datosPaso.foto);
         }
@@ -3447,12 +3450,11 @@
             html += `</div>`;
             break;
           case 3:
-            // Paso 4: Stock y Fotos (múltiples)
             html += `
               <h6>Paso 4: Stock y Fotos</h6>
               <div class="input-group-movil">
                 <label>Stock *</label>
-                <input type="number" id="movilProdStock" class="form-control" value="${p.stock || 0}">
+                <input type="number" id="movilProdStock" class="form-control" value="${p.stock || 1}">
               </div>
               <div class="input-group-movil">
                 <label>Stock Mínimo</label>
@@ -3485,7 +3487,7 @@
         html += `
           <div class="acciones-paso">
             <button class="btn btn-secondary" id="btnPasoAnterior" ${pasoActual === 0 ? 'disabled' : ''}>Atrás</button>
-            <button class="btn btn-primary" id="btnPaaSiguiente">${pasoActual === totalPasos-1 ? 'Guardar' : 'Siguiente'}</button>
+            <button class="btn btn-primary" id="btnPaaSiguiente" ${isSaving ? 'disabled' : ''}>${pasoActual === totalPasos-1 ? 'Guardar' : 'Siguiente'}</button>
           </div>
         </div>`;
         content.innerHTML = html;
@@ -3495,18 +3497,14 @@
           const btnGestionar = document.getElementById('btnGestionarCatsMovil');
           if (btnGestionar) {
             btnGestionar.addEventListener('click', function() {
-              // Guardar estado actual
               const nombre = document.getElementById('movilProdNombre')?.value || '';
               const categoria = document.getElementById('movilProdCategoria')?.value || '';
               datosPaso.nombre = nombre;
               datosPaso.categoria = categoria;
-              // Abrir modal
               abrirModalGestionCategorias();
-              // Al cerrar, refrescar el select y restaurar valores
               const modal = document.getElementById('modalGestionCategorias');
               modal.addEventListener('hidden.bs.modal', function handler() {
                 modal.removeEventListener('hidden.bs.modal', handler);
-                // Actualizar select con las categorías actuales
                 const sel = document.getElementById('movilProdCategoria');
                 if (sel) {
                   const currentVal = sel.value;
@@ -3515,7 +3513,6 @@
                     sel.innerHTML += `<option value="${c}" ${c === currentVal ? 'selected' : ''}>${c}</option>`;
                   });
                 }
-                // Restaurar nombre y categoría si no se perdió
                 const nombreInput = document.getElementById('movilProdNombre');
                 if (nombreInput) nombreInput.value = datosPaso.nombre || '';
               });
@@ -3544,16 +3541,24 @@
             btn.addEventListener('click', function() {
               const idx = parseInt(this.dataset.idx);
               datosPaso.fotos.splice(idx, 1);
-              // Actualizar vista
               mostrarPasoProducto();
             });
           });
+
+          // Función para guardar stock antes de agregar foto
+          function guardarStockAntesDeFoto() {
+            const stockInput = document.getElementById('movilProdStock');
+            const stockMinInput = document.getElementById('movilProdStockMinimo');
+            if (stockInput) datosPaso.stock = parseInt(stockInput.value) || 0;
+            if (stockMinInput) datosPaso.stockMinimo = parseInt(stockMinInput.value) || 1;
+          }
 
           // Botón Cámara
           const btnCamara = document.getElementById('btnCamaraMovil');
           const inputCamara = document.getElementById('inputCamaraMovil');
           if (btnCamara && inputCamara) {
             btnCamara.addEventListener('click', function() {
+              guardarStockAntesDeFoto();
               inputCamara.click();
             });
             inputCamara.addEventListener('change', function(e) {
@@ -3577,6 +3582,7 @@
           const inputArchivo = document.getElementById('inputArchivoMovil');
           if (btnArchivo && inputArchivo) {
             btnArchivo.addEventListener('click', function() {
+              guardarStockAntesDeFoto();
               inputArchivo.click();
             });
             inputArchivo.addEventListener('change', function(e) {
@@ -3599,6 +3605,7 @@
           const btnUrl = document.getElementById('btnUrlMovil');
           if (btnUrl) {
             btnUrl.addEventListener('click', function() {
+              guardarStockAntesDeFoto();
               const url = prompt('Ingresa la URL de la imagen:');
               if (url && url.trim() !== '') {
                 if (datosPaso.fotos.length < 4) {
@@ -3622,6 +3629,7 @@
         });
 
         document.getElementById('btnPaaSiguiente')?.addEventListener('click', function() {
+          if (isSaving) return;
           guardarDatosPasoProducto();
           if (pasoActual === totalPasos - 1) {
             guardarProductoMovil();
@@ -3642,26 +3650,38 @@
 
           function recalcularPreciosMovil() {
             const tipo = document.getElementById('movilProdTipo')?.value || 'propio';
-            const costo = parseFloat(document.getElementById('movilProdCosto')?.value) || 0;
+            // Usar el costo guardado en datosPaso (ya actualizado en paso 1)
+            const costo = datosPaso.costo || 0;
             if (tipo === 'propio') {
               const porcentaje = parseFloat(document.getElementById('movilProdPorcentaje')?.value) || 0;
               const pf = costo * (1 + porcentaje / 100);
               const pfInput = document.getElementById('movilProdPrecioFinal');
               if (pfInput) pfInput.value = pf.toFixed(2);
             } else {
-              // No hay campo para mostrar en este paso, solo guardamos
+              // Para consignación, el precio final es el acordado
+              const acordado = parseFloat(document.getElementById('movilProdPrecioAcordado')?.value) || 0;
+              const pfInput = document.getElementById('movilProdPrecioFinal');
+              if (pfInput) pfInput.value = acordado.toFixed(2);
             }
           }
 
-          if (costoInput) costoInput.addEventListener('input', recalcularPreciosMovil);
           if (porcentajeInput) porcentajeInput.addEventListener('input', recalcularPreciosMovil);
           if (acordadoInput) acordadoInput.addEventListener('input', recalcularPreciosMovil);
-          if (pReventaInput) pReventaInput.addEventListener('input', recalcularPreciosMovil);
+          if (pReventaInput) pReventaInput.addEventListener('input', function() {
+            // Solo para consignación, actualizar precio de reventa
+            const acordado = parseFloat(document.getElementById('movilProdPrecioAcordado')?.value) || 0;
+            const pRev = parseFloat(this.value) || 0;
+            const reventa = acordado * (1 + pRev / 100);
+            const pfInput = document.getElementById('movilProdPrecioFinal');
+            if (pfInput) pfInput.value = reventa.toFixed(2);
+          });
           const tipoSelect = document.getElementById('movilProdTipo');
           if (tipoSelect) tipoSelect.addEventListener('change', function() {
             guardarDatosPasoProducto();
             mostrarPasoProducto();
           });
+          // Llamar una vez para inicializar
+          setTimeout(recalcularPreciosMovil, 50);
         }
       }
 
@@ -3684,65 +3704,77 @@
         } else if (pasoActual === 3) {
           p.stock = parseInt(document.getElementById('movilProdStock')?.value) || 0;
           p.stockMinimo = parseInt(document.getElementById('movilProdStockMinimo')?.value) || 1;
-          // fotos se guardan en tiempo real al agregar/eliminar
         }
       }
 
       async function guardarProductoMovil() {
-        const p = datosPaso;
-        if (!p.nombre || !p.categoria) {
-          alert('Nombre y categoría son obligatorios');
-          return;
-        }
-        if (p.tipo === 'consignacion' && p.precioFinal <= 0) {
-          alert('Para consignación, el precio acordado debe ser mayor a 0');
-          return;
-        }
-        if (isNaN(p.stock)) {
-          alert('Stock debe ser un número');
-          return;
-        }
+        if (isSaving) return;
+        isSaving = true;
+        const btn = document.getElementById('btnPaaSiguiente');
+        if (btn) btn.disabled = true;
 
-        // Usar la primera foto como principal, el resto en array 'fotos'
-        const fotoPrincipal = p.fotos.length > 0 ? p.fotos[0] : '';
-        const fotosArray = p.fotos.length > 1 ? p.fotos.slice(1) : [];
-
-        const productoData = {
-          nombre: p.nombre,
-          categoria: p.categoria,
-          costo: p.costo,
-          tipo: p.tipo,
-          porcentaje: p.porcentaje || 0,
-          precioFinal: p.precioFinal,
-          stock: p.stock,
-          stockMinimo: p.stockMinimo || 1,
-          foto: fotoPrincipal,
-          fotos: fotosArray,
-          porcentajeReventa: p.porcentajeReventa || 0,
-          fechaCreacion: p.fechaCreacion || new Date().toISOString()
-        };
-
-        if (entidadEditando) {
-          const idx = productos.findIndex(prod => prod.id === entidadEditando);
-          if (idx !== -1) {
-            productos[idx] = { ...productos[idx], ...productoData };
+        try {
+          const p = datosPaso;
+          if (!p.nombre || !p.categoria) {
+            alert('Nombre y categoría son obligatorios');
+            return;
           }
-        } else {
-          const newProd = {
-            id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
-            ...productoData
+          if (p.tipo === 'consignacion' && p.precioFinal <= 0) {
+            alert('Para consignación, el precio acordado debe ser mayor a 0');
+            return;
+          }
+          if (isNaN(p.stock)) {
+            alert('Stock debe ser un número');
+            return;
+          }
+
+          const fotoPrincipal = p.fotos.length > 0 ? p.fotos[0] : '';
+          const fotosArray = p.fotos.length > 1 ? p.fotos.slice(1) : [];
+
+          const productoData = {
+            nombre: p.nombre,
+            categoria: p.categoria,
+            costo: p.costo,
+            tipo: p.tipo,
+            porcentaje: p.porcentaje || 0,
+            precioFinal: p.precioFinal,
+            stock: p.stock,
+            stockMinimo: p.stockMinimo || 1,
+            foto: fotoPrincipal,
+            fotos: fotosArray,
+            porcentajeReventa: p.porcentajeReventa || 0,
+            fechaCreacion: p.fechaCreacion || new Date().toISOString()
           };
-          productos.push(newProd);
+
+          if (entidadEditando) {
+            const idx = productos.findIndex(prod => prod.id === entidadEditando);
+            if (idx !== -1) {
+              productos[idx] = { ...productos[idx], ...productoData };
+            }
+          } else {
+            const newProd = {
+              id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+              ...productoData
+            };
+            productos.push(newProd);
+          }
+          await guardarTodo();
+          alert('Producto guardado');
+          renderListaItemsMovil('productos');
+          renderCatalogo();
+          renderAdminProductos();
+          cargarSelectVentas();
+          actualizarReportes();
+          const content = document.getElementById('modoMovilContenido');
+          if (content) renderModuloProductos(content);
+        } catch (error) {
+          console.error(error);
+          alert('Error al guardar el producto');
+        } finally {
+          isSaving = false;
+          const btn = document.getElementById('btnPaaSiguiente');
+          if (btn) btn.disabled = false;
         }
-        await guardarTodo();
-        alert('Producto guardado');
-        renderListaItemsMovil('productos');
-        renderCatalogo();
-        renderAdminProductos();
-        cargarSelectVentas();
-        actualizarReportes();
-        const content = document.getElementById('modoMovilContenido');
-        if (content) renderModuloProductos(content);
       }
 
       // --- ASISTENTE CLIENTE ---
@@ -3872,13 +3904,19 @@
         container.innerHTML = `
           <div class="d-flex justify-content-between mb-2">
             <h5>🔧 Taller (Órdenes)</h5>
-            <button class="btn btn-success btn-sm" id="btnNuevaOrdenMovil">+ Nueva</button>
+            <div>
+              <button class="btn btn-success btn-sm" id="btnNuevaOrdenMovil">+ Nueva</button>
+              <button class="btn btn-outline-secondary btn-sm" id="btnHistorialOrdenesMovil">📜 Historial</button>
+            </div>
           </div>
           <div id="listaItemsMovil" class="lista-items"></div>
         `;
         renderListaItemsMovil('ordenes');
         document.getElementById('btnNuevaOrdenMovil').addEventListener('click', function() {
           iniciarAsistenteOrden(null);
+        });
+        document.getElementById('btnHistorialOrdenesMovil').addEventListener('click', function() {
+          abrirModalHistorialOrdenes();
         });
       }
 
@@ -4225,6 +4263,138 @@
       }
 
       // ================================================================
+      //  MODAL HISTORIAL DE ÓRDENES (con filtros)
+      // ================================================================
+      function abrirModalHistorialOrdenes() {
+        let modalDiv = document.getElementById('modalHistorialOrdenesContainer');
+        if (!modalDiv) {
+          modalDiv = document.createElement('div');
+          modalDiv.id = 'modalHistorialOrdenesContainer';
+          modalDiv.innerHTML = `
+            <div class="modal fade" id="modalHistorialOrdenes" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">📜 Historial de Órdenes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row g-2 mb-2">
+                      <div class="col-md-4">
+                        <input type="text" id="historialFiltroTexto" class="form-control" placeholder="Buscar por ID o cliente">
+                      </div>
+                      <div class="col-md-3">
+                        <select id="historialFiltroEstado" class="form-select">
+                          <option value="todos">Todos los estados</option>
+                          <option value="retirada">Retirada</option>
+                          <option value="rechazado">Rechazado</option>
+                          <option value="no_visto">No visto</option>
+                          <option value="presupuestada">Presupuestada</option>
+                          <option value="confirmada">Confirmada</option>
+                          <option value="lista">Lista</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2">
+                        <button class="btn btn-primary w-100" id="btnAplicarFiltroHistorial">Filtrar</button>
+                      </div>
+                    </div>
+                    <div id="contenidoHistorialOrdenes" style="max-height: 400px; overflow-y: auto;">
+                      <p class="text-muted">Cargando...</p>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(modalDiv);
+          // Eventos del modal
+          modalDiv.querySelector('#btnAplicarFiltroHistorial').addEventListener('click', function() {
+            renderHistorialOrdenes();
+          });
+          modalDiv.querySelector('#historialFiltroTexto').addEventListener('input', function() {
+            renderHistorialOrdenes();
+          });
+          modalDiv.querySelector('#historialFiltroEstado').addEventListener('change', function() {
+            renderHistorialOrdenes();
+          });
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('modalHistorialOrdenes'));
+        modal.show();
+        renderHistorialOrdenes();
+      }
+
+      function renderHistorialOrdenes() {
+        const container = document.getElementById('contenidoHistorialOrdenes');
+        if (!container) return;
+        const texto = document.getElementById('historialFiltroTexto')?.value.toLowerCase() || '';
+        const estado = document.getElementById('historialFiltroEstado')?.value || 'todos';
+
+        let filtered = ordenes;
+        if (estado !== 'todos') {
+          filtered = filtered.filter(o => o.estado === estado);
+        }
+
+        if (texto) {
+          filtered = filtered.filter(o => 
+            o.id.includes(texto) || 
+            o.clienteNombre.toLowerCase().includes(texto)
+          );
+        }
+
+        filtered.sort((a, b) => new Date(b.fechaIngreso) - new Date(a.fechaIngreso));
+
+        if (filtered.length === 0) {
+          container.innerHTML = '<p class="text-muted">No hay órdenes que coincidan con los filtros.</p>';
+          return;
+        }
+
+        let html = `<div class="table-responsive"><table class="table table-sm table-striped"><thead><tr>
+          <th>ID</th><th>Cliente</th><th>Modelo</th><th>Estado</th><th>Ingreso</th><th>Salida</th><th>Total</th><th>Acciones</th>
+        </tr></thead><tbody>`;
+        filtered.forEach(o => {
+          const estadoLabel = o.estado.replace('_', ' ').toUpperCase();
+          const total = calcularTotalOrden(o);
+          html += `
+            <tr class="fila-${o.estado}">
+              <td>${o.id}</td>
+              <td>${o.clienteNombre}</td>
+              <td>${o.modelo || ''}</td>
+              <td><span class="badge estado-badge estado-${o.estado}">${estadoLabel}</span></td>
+              <td>${o.fechaIngreso || ''}</td>
+              <td>${o.fechaSalida || ''}</td>
+              <td>${formatearPrecio(total)}</td>
+              <td>
+                <button class="btn btn-sm btn-warning" onclick="editarOrden('${o.id}')"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-success" onclick="enviarWhatsappOrden('${o.id}')"><i class="bi bi-whatsapp"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+      }
+
+      // ================================================================
+      //  AGREGAR BOTÓN HISTORIAL EN LA PESTAÑA TALLER (ESCRITORIO)
+      // ================================================================
+      function agregarBotonHistorialEscritorio() {
+        const btnNuevaOrden = document.getElementById('btnNuevaOrden');
+        if (!btnNuevaOrden) return;
+        const parent = btnNuevaOrden.parentNode;
+        if (document.getElementById('btnHistorialEscritorio')) return;
+        const btnHistorial = document.createElement('button');
+        btnHistorial.id = 'btnHistorialEscritorio';
+        btnHistorial.className = 'btn btn-outline-secondary ms-2';
+        btnHistorial.innerHTML = '📜 Historial';
+        btnHistorial.addEventListener('click', abrirModalHistorialOrdenes);
+        parent.insertBefore(btnHistorial, btnNuevaOrden.nextSibling);
+      }
+
+      // ================================================================
       //  EVENTOS E INICIALIZACIÓN
       // ================================================================
       function initEventos() {
@@ -4300,7 +4470,6 @@
         document.getElementById('btnGestionarCategorias').addEventListener('click', abrirModalGestionCategorias);
         document.getElementById('btnAgregarCategoria').addEventListener('click', agregarCategoriaDesdeModal);
 
-        // Cambiar el ícono del botón de categorías a "+"
         const btnCat = document.getElementById('btnGestionarCategorias');
         if (btnCat) {
           btnCat.innerHTML = '<i class="bi bi-plus-circle"></i>';
@@ -4450,6 +4619,9 @@
           const navbar = document.getElementById('mainNavbar');
           if (navbar) resizeObserver.observe(navbar);
         }
+
+        // Agregar botón historial en escritorio
+        agregarBotonHistorialEscritorio();
       }
 
       function mostrarSeccion(seccion) {
@@ -4474,6 +4646,7 @@
           cargarSelectRepuestos();
           verificarBackupObligatorio();
           ajustarEspacios();
+          agregarBotonHistorialEscritorio();
         } else {
           document.getElementById('msjLogin').textContent = 'Clave incorrecta';
         }
@@ -4751,6 +4924,7 @@
                 renderClientes();
                 renderOrdenes();
                 cargarSelectRepuestos();
+                agregarBotonHistorialEscritorio();
               }
               if (modoMovilActivo) {
                 const content = document.getElementById('modoMovilContenido');
